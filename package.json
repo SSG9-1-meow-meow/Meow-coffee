@@ -1,0 +1,28 @@
+{
+  "name": "meow-coffee",
+  "version": "1.0.0",
+  "description": "> **2차 팀 프로젝트** | Team **야옹야옹(YaongYaong)**   > **Spring MVC 기반 웹 애플리케이션**   > Servlet + JSP + Spring Framework를 활용한 MVC 아키텍처 구현 프로젝트",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "postinstall": "git config commit.template .gitmessage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SSG9-1-meow-meow/Meow-coffee.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SSG9-1-meow-meow/Meow-coffee/issues"
+  },
+  "homepage": "https://github.com/SSG9-1-meow-meow/Meow-coffee#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "husky": "^9.1.7"
+  }
+}
