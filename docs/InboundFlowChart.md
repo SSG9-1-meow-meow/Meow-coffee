@@ -27,9 +27,9 @@ graph TD
         C -- "종료" --> M(종료);
     end
 
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style G fill:#f9f,stroke:#333,stroke-width:2px
-    style I fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#cce5ff,stroke:#333,stroke-width:2px
+    style G fill:#cce5ff,stroke:#333,stroke-width:2px
+    style I fill:#cce5ff,stroke:#333,stroke-width:2px
 ```
 
 API 요청 설명
@@ -85,14 +85,14 @@ graph TD
         K --> B;
     end
 
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style F1 fill:#f9f,stroke:#333,stroke-width:2px
-    style G fill:#f9f,stroke:#333,stroke-width:2px
-    style J fill:#f9f,stroke:#333,stroke-width:2px
-    style K fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#cce5ff,stroke:#333,stroke-width:2px
+    style F1 fill:#cce5ff,stroke:#333,stroke-width:2px
+    style G fill:#cce5ff,stroke:#333,stroke-width:2px
+    style J fill:#cce5ff,stroke:#333,stroke-width:2px
+    style K fill:#cce5ff,stroke:#333,stroke-width:2px
 ```
 
-1. 입고 현황 조회 (목록 및 필터링)
+1. 입고 현황 조회 (목록 및 필터링)ß
 
 - (GET /inbounds): 모든 입고 요청 목록(상태 무관)을 조회하여 관리자 대시보드에 표시합니다. 관리자가 전체 현황을 파악하는 기본 API입니다.
 - (GET /inbounds?status=...&start=...&end=...): 상태(pending, approved, received 등), 시작일, 종료일 등 다양한 쿼리 파라미터를 사용하여 입고 목록을 필터링하여 조회합니다. 예를 들어, 처리해야 할 승인대기 건만 보려면 ?status=pending을 사용합니다.

@@ -30,9 +30,9 @@ graph TD
         C -- "종료" --> M(종료);
     end
 
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style I fill:#f9f,stroke:#333,stroke-width:2px
-    style K fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#cce5ff,stroke:#333,stroke-width:2px
+    style I fill:#cce5ff,stroke:#333,stroke-width:2px
+    style K fill:#cce5ff,stroke:#333,stroke-width:2px
 ```
 
 ---
