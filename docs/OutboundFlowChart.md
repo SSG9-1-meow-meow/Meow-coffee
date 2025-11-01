@@ -29,7 +29,7 @@ graph TD
         C -- "종료" --> K(종료);
     end
 
-    style F fill:#f9f,stroke:#333,stroke-width:2px
+    style F fill:#cce5ff,stroke:#333,stroke-width:2px
 ```
 
 ### API 요청 설명
@@ -78,9 +78,9 @@ graph TD
         L --> B;
     end
 
-    style D fill:#f9f,stroke:#333,stroke-width:2px
-    style F fill:#f9f,stroke:#333,stroke-width:2px
-    style H fill:#f9f,stroke:#333,stroke-width:2px
+    style D fill:#cce5ff,stroke:#333,stroke-width:2px
+    style F fill:#cce5ff,stroke:#333,stroke-width:2px
+    style H fill:#cce5ff,stroke:#333,stroke-width:2px
 ```
 
 ### API 요청 설명
