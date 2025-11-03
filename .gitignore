@@ -1,3 +1,6 @@
+# Ignore Bootstrap layout container assets
+layouts/container/
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
