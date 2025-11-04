@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+    </Appenders>
+    <Loggers>
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
+
+        <Logger name="com.ssg" level="INFO" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
+
+        <!--  mapper loglevel = trace -->
+        <Logger name="com.ssg.meowcoffee.mapper" level="TRACE" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
+
+        <Root level="INFO">
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+
+    </Loggers>
+</Configuration>
