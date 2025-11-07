@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssg.meowcoffee.mapper.InboundMapper">
+
+  <select id="callCreateInReq" statementType="CALLABLE"
+    parameterType="com.ssg.meowcoffee.dto.InboundRequestInputDTO"
+    resultType="long">CALL CreateInReq(
+    -- IN 파라미터 (DTO 필드 이름 사용)
+    #{_comId, mode=IN, jdbcType=VARCHAR},
+    #{_inDttmReq, mode=IN, jdbcType=TIMESTAMP},
+    #{_inDateWish, mode=IN, jdbcType=DATE},
+    #{_inItemsJson, mode=IN, jdbcType=VARCHAR},
+    #{_isTempo, mode=IN, jdbcType=TINYINT},
+
+    -- OUT 파라미터 (DTO 필드 이름 사용)
+    #{generatedInReqId, mode=OUT, jdbcType=BIGINT}
+    )
+
+  </select>
+</mapper>
