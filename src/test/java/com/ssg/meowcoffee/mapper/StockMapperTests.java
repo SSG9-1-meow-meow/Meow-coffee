@@ -2,6 +2,7 @@ package com.ssg.meowcoffee.mapper;
 
 import com.ssg.meowcoffee.domain.CoffeeVO;
 import com.ssg.meowcoffee.dto.Criteria;
+import com.ssg.meowcoffee.dto.DueDiligenceReadDTO;
 import com.ssg.meowcoffee.dto.StockReadDTO;
 import com.ssg.meowcoffee.dto.StockSearchDTO;
 import lombok.extern.log4j.Log4j2;
@@ -21,20 +22,20 @@ public class StockMapperTests {
     private StockMapper stockMapper;
 
     @Test
-    public void selectStockListTest(){
+    public void selectStockListTest() {
         Criteria criteria = new Criteria();
         criteria.setAmount(10);
 
         StockSearchDTO stockSearchDTO = new StockSearchDTO();
 
         //전체 조회
-        List<StockReadDTO> totalList = stockMapper.selectStockList(criteria,stockSearchDTO);
+        List<StockReadDTO> totalList = stockMapper.selectStockList(criteria, stockSearchDTO);
 
         totalList.forEach(i -> log.info(i));
     }
 
     @Test
-    public void selectStockListTest2(){
+    public void selectStockListTest2() {
         Criteria criteria = new Criteria();
         criteria.setAmount(10);
 
@@ -42,13 +43,13 @@ public class StockMapperTests {
         stockSearchDTO.setCfCategory("B01");
 
         //대분류, 중분류, 소분류별 , 창고명별 조회
-        List<StockReadDTO> categoryList = stockMapper.selectStockList(criteria,stockSearchDTO);
+        List<StockReadDTO> categoryList = stockMapper.selectStockList(criteria, stockSearchDTO);
 
         categoryList.forEach(i -> log.info(i));
     }
 
     @Test
-    public void selectStockTest(){
+    public void selectStockTest() {
         //커피 상세 정보 조회 테스트
         String cfName = "에티오피아 예가체프";
 
@@ -57,7 +58,7 @@ public class StockMapperTests {
     }
 
     @Test
-    public void selectWarehousesTest(){
+    public void selectWarehousesTest() {
         //창고별 재고 조회
         Criteria criteria = new Criteria();
         criteria.setAmount(10);
@@ -67,4 +68,23 @@ public class StockMapperTests {
     }
 
     //거래처 현황 조회는 거래처 테이블 생성 후 test 가능. sql문은 작성해놨음.
+
+    //재고 실사 test
+    @Test
+    public void selectDueDiligenceListTest(){
+        //재고실사 현황 리스트 테스트
+        Criteria criteria = new Criteria();
+        criteria.setAmount(10);
+
+        List<DueDiligenceReadDTO> list = stockMapper.selectDueDiligenceList(criteria);
+        list.forEach(i -> log.info(i));
+    }
+
+    @Test
+    public void selectDueDiligenceTest(){
+        //재고 실사 개별 상세 조회 테스트
+        DueDiligenceReadDTO dto = stockMapper.selectDueDiligence(4L);
+
+        log.info(dto);
+    }
 }

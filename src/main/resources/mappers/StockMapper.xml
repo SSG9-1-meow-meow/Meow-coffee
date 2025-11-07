@@ -48,4 +48,25 @@
         from companies
     </select>
 
+    <select id="selectDueDiligenceList" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
+        select dd.ddId, wh.whCode, stk.stkId, dd.ddStatus, dd.ddApproval, dd.ddDate, dd.ddUpdateDate
+        from stock stk join due_diligence dd on dd.stkId = stk.stkId
+        join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where dd.isDelete = 0
+        order by dd.ddId desc
+        limit #{skip}, #{amount}
+    </select>
+
+    <select id="selectDueDiligence" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
+        select stk.stkId, wh.whCode, lp.zoneName, lp.rackName, lp.cellName, stk.stkQuantity, dd.realStkQuantity,
+        dd.ddDate, dd.maId, dd.ddLog
+        from stock stk join due_diligence dd on dd.stkId = stk.stkId
+        join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where dd.ddId = #{ddId} and dd.isDelete = 0
+    </select>
+
 </mapper>

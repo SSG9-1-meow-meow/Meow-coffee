@@ -1,10 +1,7 @@
 package com.ssg.meowcoffee.mapper;
 
 import com.ssg.meowcoffee.domain.CoffeeVO;
-import com.ssg.meowcoffee.dto.CompanyReadDTO;
-import com.ssg.meowcoffee.dto.Criteria;
-import com.ssg.meowcoffee.dto.StockReadDTO;
-import com.ssg.meowcoffee.dto.StockSearchDTO;
+import com.ssg.meowcoffee.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -14,4 +11,7 @@ public interface StockMapper {
     CoffeeVO selectCoffee(String cfName);
     List<StockReadDTO> selectWarehouses(Criteria criteria);
     List<CompanyReadDTO> selectCompany(Criteria criteria);
+
+    List<DueDiligenceReadDTO> selectDueDiligenceList(Criteria criteria);
+    DueDiligenceReadDTO selectDueDiligence(Long ddId);
 }
