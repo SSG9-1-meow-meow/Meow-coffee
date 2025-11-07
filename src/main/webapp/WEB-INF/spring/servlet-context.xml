@@ -21,6 +21,7 @@
             <set>
                 <bean class="com.ssg.meowcoffee.controller.formatter.LocalDateTimeFormatter"/>
                 <bean class="com.ssg.meowcoffee.controller.formatter.CheckboxFormatter"/>
+                <bean class="com.ssg.meowcoffee.controller.formatter.LocalDateFormatter"/>
             </set>
         </property>
     </bean>
