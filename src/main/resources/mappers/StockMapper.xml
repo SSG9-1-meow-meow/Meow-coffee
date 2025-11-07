@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssg.meowcoffee.mapper.StockMapper">
+    <sql id="search">
+        <choose>
+            <when test="searchDTO.cfCategory != null">
+                where cf.cfCategory = #{searchDTO.cfCategory}
+            </when>
+            <when test="searchDTO.cfType != null">
+                where cf.cfType = #{searchDTO.cfType}
+            </when>
+            <when test="searchDTO.cfGrade != null">
+                where cf.cfGrade = #{searchDTO.cfGrade}
+            </when>
+            <when test="searchDTO.cfName != null">
+                where cf.cfName = #{searchDTO.cfName}
+            </when>
+        </choose>
+    </sql>
+
+    <select id="selectStockList" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
+        select stk.stkId, stk.stkQuantity, cf.cfName, cf.cfCategory, cf.cfGrade, cf.cfType,
+        lp.zoneName, lp.rackName, lp.cellName, wh.whName
+        from stock stk join coffee cf on stk.cfId = cf.cfId
+        join location_places lp on stk.lpId = lp.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        <include refid="search"/>
+        limit #{criteria.skip}, #{criteria.amount}
+    </select>
+
+    <select id="selectCoffee" resultType="com.ssg.meowcoffee.domain.CoffeeVO">
+        select * from coffee where cfName = #{cfName}
+    </select>
+
+    <select id="selectWarehouses" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
+        select wh.whCode, wh.whName, wh.whGrade, wh.whAddress, sum(stk.stkQuantity) as stkQuantity
+        from warehouse wh join locations l on wh.whId = l.whId
+        join location_places lp on l.lpId = lp.lpId
+        join stock stk on stk.lpId = lp.lpId
+        group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress
+    </select>
+
+    <select id="selectCompanyList" resultType="com.ssg.meowcoffee.dto.CompanyReadDTO">
+        select comId, comName, comCode, comEmail, comPhone, comStartDate, comExpiredDate
+        from companies
+    </select>
+
+</mapper>
