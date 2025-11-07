@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e6ea3164-6cbd-49e1-afbf-09e82e1fba65" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssg/meowcoffee/mapper/StockMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssg/meowcoffee/mapper/StockMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mappers/StockMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mappers/StockMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/spring/servlet-context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/spring/servlet-context.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/ssg/meowcoffee/mapper/StockMapperTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/ssg/meowcoffee/mapper/StockMapperTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +22,16 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view />
+      </state>
+    </system>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -29,10 +44,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="352WXiJlK2gebW4I98rJmn3wfmV" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -40,6 +55,8 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Gradle.StockMapperTests.selectDueDiligenceListTest.executor": "Run",
+    "Gradle.StockMapperTests.selectDueDiligenceTest.executor": "Run",
     "Gradle.StockMapperTests.selectStockListTest.executor": "Run",
     "Gradle.StockMapperTests.selectStockListTest2.executor": "Run",
     "Gradle.StockMapperTests.selectStockTest.executor": "Run",
@@ -47,7 +64,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "feat/stock",
+    "git-widget-placeholder": "feat/dueDiligenceSearchTest",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -62,8 +79,8 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="Gradle.StockMapperTests.selectWarehousesTest">
-    <configuration name="StockMapperTests.selectStockListTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.StockMapperTests.selectDueDiligenceTest">
+    <configuration name="StockMapperTests.selectDueDiligenceListTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -76,7 +93,31 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.selectStockListTest&quot;" />
+            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.selectDueDiligenceListTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="StockMapperTests.selectDueDiligenceTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.selectDueDiligenceTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -161,10 +202,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.StockMapperTests.selectDueDiligenceTest" />
+        <item itemvalue="Gradle.StockMapperTests.selectDueDiligenceListTest" />
         <item itemvalue="Gradle.StockMapperTests.selectWarehousesTest" />
         <item itemvalue="Gradle.StockMapperTests.selectStockTest" />
         <item itemvalue="Gradle.StockMapperTests.selectStockListTest2" />
-        <item itemvalue="Gradle.StockMapperTests.selectStockListTest" />
       </list>
     </recent_temporary>
   </component>
