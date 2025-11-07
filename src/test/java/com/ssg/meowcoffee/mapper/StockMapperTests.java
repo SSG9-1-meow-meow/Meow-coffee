@@ -1,10 +1,7 @@
 package com.ssg.meowcoffee.mapper;
 
 import com.ssg.meowcoffee.domain.CoffeeVO;
-import com.ssg.meowcoffee.dto.Criteria;
-import com.ssg.meowcoffee.dto.DueDiligenceReadDTO;
-import com.ssg.meowcoffee.dto.StockReadDTO;
-import com.ssg.meowcoffee.dto.StockSearchDTO;
+import com.ssg.meowcoffee.dto.*;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,4 +84,57 @@ public class StockMapperTests {
 
         log.info(dto);
     }
+
+    @Test
+    public void insertDueDiligenceTest(){
+        DueDiligenceDTO dueDiligenceDTO = DueDiligenceDTO.builder()
+                .stkId("STK005")
+                .realStkQuantity(59)
+                .ddLog("1개가 불량품임")
+                .maId("manager05")
+                .build();
+
+        Integer result = stockMapper.insertDueDiligence(dueDiligenceDTO);
+        log.info("결과: "+ result);
+    }
+
+    @Test
+    public void updateDueDiligenceTest(){
+        DueDiligenceDTO dueDiligenceDTO = DueDiligenceDTO.builder()
+                .ddId(6L)
+                .stkQuantity(60)
+                .realStkQuantity(58)
+                .ddLog("불량품 1개 더 발견해서 총 2개임")
+                .build();
+
+        Integer result = stockMapper.updateDueDiligence(dueDiligenceDTO);
+        log.info("결과: "+ result);
+    }
+
+    @Test
+    public void deleteDueDiligenceTest(){
+        Integer result = stockMapper.deleteDueDiligence(5L);
+
+        log.info("결과: "+ result);
+    }
+
+    @Test
+    public void selectDueDiligenceInfoTest(){
+        //프론트로 정보 가져오기 위해 실행하는 메소드임
+        DueDiligenceDTO dueDiligenceDTO = stockMapper.selectDueDiligenceInfo("STK005", "WH003");
+        log.info("시스템 재고 가져오기: "+ dueDiligenceDTO.getStkQuantity());
+    }
+
+    @Test
+    public void updateApprovalStatusTest() {
+//        총관리자가 승인 또는 거절 버튼을 누를때 실행되는 프로시저 테스트
+        Integer result = stockMapper.updateApprovalStatus("APPROVED" , 6L);
+        log.info("결과: " + result);
+
+//        거절하는 경우
+        Integer result2 = stockMapper.updateApprovalStatus("REJECTED" , 2L);
+        log.info("결과: " + result2);
+    }
+
+    //일반관리자 id와 실사로그에 기록된 id를 비교하는 권한 확인 작업은 관리자 테이블에 데이터가 들어간 경우만 가능
 }

@@ -69,4 +69,40 @@
         where dd.ddId = #{ddId} and dd.isDelete = 0
     </select>
 
+    <insert id="insertDueDiligence" statementType="CALLABLE">
+        {call insertDueDiligence( #{insertDTO.stkId, mode=IN, jdbcType=VARCHAR},
+        #{insertDTO.realStkQuantity, mode=IN, jdbcType=INTEGER},
+        #{insertDTO.ddLog, mode=IN, jdbcType=VARCHAR},
+        #{insertDTO.maId, mode=IN, jdbcType=VARCHAR})}
+    </insert>
+
+    <update id="updateDueDiligence" statementType="CALLABLE">
+        {call updateDueDiligence(#{updateDTO.ddId, mode=IN, jdbcType=BIGINT},
+        #{updateDTO.stkQuantity, mode=IN, jdbcType=INTEGER},
+        #{updateDTO.realStkQuantity, mode=IN, jdbcType=INTEGER},
+        #{updateDTO.ddLog, mode=IN, jdbcType=VARCHAR})}
+    </update>
+
+    <delete id="deleteDueDiligence">
+        update due_diligence set isDelete = 1 where ddId = #{ddId}
+    </delete>
+
+    <select id="selectDueDiligenceInfo" resultType="com.ssg.meowcoffee.dto.DueDiligenceDTO">
+        select stk.stkQuantity
+        from stock stk join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where stk.stkId = #{stkId} and wh.whCode = #{whCode}
+    </select>
+
+    <update id="updateApprovalStatus" statementType="CALLABLE">
+        {call updateApprovalStatus(#{ddApproval, mode=IN, jdbcType=VARCHAR},
+        #{ddId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <select id="selectDueDiligenceAuthority" resultType="int">
+        select count(*)
+        from warehouse wh join warehouse_management wm on wh.whId = wm.whId
+        where wh.whCode = #{whCode} and wm.managerId = #{maId}
+    </select>
 </mapper>
