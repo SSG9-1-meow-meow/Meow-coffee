@@ -62,6 +62,9 @@ dependencies {
   // json convert library
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
+
+  // 유효성 검증 어노테이션
+  implementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'
 }
 
 test {
