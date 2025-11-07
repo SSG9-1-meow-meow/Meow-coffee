@@ -134,3 +134,79 @@ ALTER TABLE stock MODIFY lpId CHAR(40) NOT NULL;
 ALTER TABLE stock
     ADD CONSTRAINT fk_stock_location_places
         FOREIGN KEY (lpId) REFERENCES location_places(lpId);
+
+-- stock 프로시저 작성
+
+use meowcoffeedb;
+
+--  등록 프로시저
+delimiter ##
+create procedure insertDueDiligence(
+    in stk_Id varchar(12),
+    in real_StkQuantity int,
+    in dd_Log varchar(255),
+    in ma_Id varchar(30)
+)
+begin
+    declare status varchar(10);
+    declare quantity int;
+select stk.stkQuantity into quantity
+from stock stk
+where stk.stkId = stk_Id;
+if quantity = real_StkQuantity then set status = 'CORRECT';
+else set status = 'INCORRECT';
+end if;
+insert into due_diligence (stkId, ddStatus, maId, ddLog, realStkQuantity)
+values(stk_Id, status, ma_id, dd_Log, real_StkQuantity);
+
+end ##
+delimiter ;
+
+ -- 수정 프로시저
+delimiter ##
+create procedure updateDueDiligence(
+    in dd_Id BIGINT,
+    in stk_Quantity int,
+    in real_StkQuantity int,
+    in dd_Log VARCHAR(255)
+)
+begin
+    declare status varchar(10);
+
+    if stk_Quantity = real_StkQuantity then set status = 'CORRECT';
+else set status = 'INCORRECT';
+end if;
+
+update due_diligence set ddStatus=status, ddLog = dd_Log,
+                         ddUpdateDate = now(), realStkQuantity = real_StkQuantity
+where  ddId = dd_Id and isDelete = 0;
+
+end ##
+delimiter ;
+
+ -- 총관리자 승인 프로시저
+delimiter ##
+create procedure updateApprovalStatus(
+    in dd_Approval VARCHAR(10),
+    in dd_Id BIGINT
+)
+begin
+    declare real_quantity int;
+    declare stk_id varchar(12);
+    declare cur_status varchar(10);
+
+select realStkQuantity, stkId, ddApproval into real_quantity, stk_id, cur_status
+from due_diligence where ddId = dd_Id;
+
+if dd_Approval = 'APPROVED' and cur_status = 'PENDING' then
+update stock set stkQuantity = real_quantity
+where stkId = stk_id;
+update due_diligence set ddApproval = dd_Approval
+where ddId= dd_Id;
+elseif dd_Approval = 'REJECTED' and cur_status= 'PENDING' then
+update due_diligence set ddApproval = dd_Approval
+where ddId= dd_Id;
+end if;
+end ##
+delimiter ;
+
