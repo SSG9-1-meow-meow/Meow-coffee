@@ -1,10 +1,19 @@
 package com.ssg.meowcoffee.mapper;
 
-import com.ssg.meowcoffee.dto.InboundRequestInputDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.ssg.meowcoffee.dto.Criteria;
+import com.ssg.meowcoffee.dto.InboundReqItemDTO;
+import com.ssg.meowcoffee.dto.InboundReqInputDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +51,7 @@ public class InboundMapperTests {
     LocalDateTime currentDttm = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
     // DTO에 IN 파라미터 설정
-    InboundRequestInputDTO input = InboundRequestInputDTO.builder()
+    InboundReqInputDTO input = InboundReqInputDTO.builder()
         ._comId("TEST_COM01") // 유효한 comId
         ._inDttmReq(currentDttm)
         ._inDateWish(LocalDate.now().plusDays(60))
@@ -81,7 +90,7 @@ public class InboundMapperTests {
     String testItemsJson = "[{\"cfId\": \"CF0000000003\", \"inQtyReq\": 200}]";
 
     // DTO에 IN 파라미터 설정
-    InboundRequestInputDTO input = InboundRequestInputDTO.builder()
+    InboundReqInputDTO input = InboundReqInputDTO.builder()
         ._comId("TEST_COM02")
         ._inDttmReq(LocalDateTime.now())
         ._inDateWish(LocalDate.now().plusDays(10))
@@ -106,6 +115,32 @@ public class InboundMapperTests {
     } catch (Exception e) {
       log.error("임시 저장 프로시저 호출 중 예외 발생:", e);
       throw new RuntimeException("임시 저장 테스트 실패", e);
+    }
+  }
+
+
+  @Test
+  @DisplayName("입고 요청 + 상세 항목 리스트 조회 - 회원 권한")
+  void testSelectInboundReqItemListAsCompany() {
+    // given
+    Criteria criteria = new Criteria();
+    criteria.setPageNum(1);
+    criteria.setAmount(10);
+    criteria.setTypes(new String[]{"W"}); // 상품명 검색
+    criteria.setKeyword("예가체프");
+
+    String userId = "coffeebiz01";
+    String userRole = "COMPANY";
+
+    List<InboundReqItemDTO> result = inboundMapper.selectInReqItemList(criteria, userId, userRole);
+
+    assertNotNull(result);
+    assertFalse(result.isEmpty());
+
+    for (InboundReqItemDTO dto : result) {
+      log.info("조회 결과: {}", dto);
+      assertNotNull(dto.getInReqId());
+      assertTrue(dto.getCfName().contains("예가체프"));
     }
   }
 

@@ -1,9 +1,9 @@
 package com.ssg.meowcoffee.service;
 
-import com.ssg.meowcoffee.dto.InboundRequestInputDTO;
+import com.ssg.meowcoffee.dto.InboundReqInputDTO;
 
 public interface InboundService {
 
-  long registerInboundRequest(InboundRequestInputDTO input);
+  long registerInboundRequest(InboundReqInputDTO input);
 
 }
