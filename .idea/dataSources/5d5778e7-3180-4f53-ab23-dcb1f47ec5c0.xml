@@ -1032,349 +1032,628 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <table id="296" parent="282" name="warehouse">
+    <table id="296" parent="282" name="users">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <argument id="297" parent="288" name="stk_Id">
+    <table id="297" parent="282" name="vehicles">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="298" parent="282" name="warehouse">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="299" parent="282" name="warehouse_management">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <view id="300" parent="282" name="companies">
+      <Definer>root@localhost</Definer>
+      <SourceTextLength>932</SourceTextLength>
+    </view>
+    <view id="301" parent="282" name="managers">
+      <Definer>root@localhost</Definer>
+      <SourceTextLength>710</SourceTextLength>
+    </view>
+    <argument id="302" parent="288" name="stk_Id">
       <Position>1</Position>
       <StoredType>varchar(12)|0s</StoredType>
     </argument>
-    <argument id="298" parent="288" name="real_StkQuantity">
+    <argument id="303" parent="288" name="real_StkQuantity">
       <Position>2</Position>
       <StoredType>int(11)|0s</StoredType>
     </argument>
-    <argument id="299" parent="288" name="dd_Log">
+    <argument id="304" parent="288" name="dd_Log">
       <Position>3</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </argument>
-    <argument id="300" parent="288" name="ma_Id">
+    <argument id="305" parent="288" name="ma_Id">
       <Position>4</Position>
       <StoredType>varchar(30)|0s</StoredType>
     </argument>
-    <argument id="301" parent="289" name="dd_Approval">
+    <argument id="306" parent="289" name="dd_Approval">
       <Position>1</Position>
       <StoredType>varchar(10)|0s</StoredType>
     </argument>
-    <argument id="302" parent="289" name="dd_Id">
+    <argument id="307" parent="289" name="dd_Id">
       <Position>2</Position>
       <StoredType>bigint(20)|0s</StoredType>
     </argument>
-    <argument id="303" parent="290" name="dd_Id">
+    <argument id="308" parent="290" name="dd_Id">
       <Position>1</Position>
       <StoredType>bigint(20)|0s</StoredType>
     </argument>
-    <argument id="304" parent="290" name="stk_Quantity">
+    <argument id="309" parent="290" name="stk_Quantity">
       <Position>2</Position>
       <StoredType>int(11)|0s</StoredType>
     </argument>
-    <argument id="305" parent="290" name="real_StkQuantity">
+    <argument id="310" parent="290" name="real_StkQuantity">
       <Position>3</Position>
       <StoredType>int(11)|0s</StoredType>
     </argument>
-    <argument id="306" parent="290" name="dd_Log">
+    <argument id="311" parent="290" name="dd_Log">
       <Position>4</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </argument>
-    <column id="307" parent="291" name="cfId">
+    <column id="312" parent="291" name="cfId">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="308" parent="291" name="cfName">
+    <column id="313" parent="291" name="cfName">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>varchar(20)|0s</StoredType>
     </column>
-    <column id="309" parent="291" name="cfOrigin">
+    <column id="314" parent="291" name="cfOrigin">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>char(3)|0s</StoredType>
     </column>
-    <column id="310" parent="291" name="cfCategory">
+    <column id="315" parent="291" name="cfCategory">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>char(3)|0s</StoredType>
     </column>
-    <column id="311" parent="291" name="cfGrade">
+    <column id="316" parent="291" name="cfGrade">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StoredType>varchar(15)|0s</StoredType>
     </column>
-    <column id="312" parent="291" name="cfType">
+    <column id="317" parent="291" name="cfType">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StoredType>varchar(15)|0s</StoredType>
     </column>
-    <index id="313" parent="291" name="PRIMARY">
+    <index id="318" parent="291" name="PRIMARY">
       <ColNames>cfId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="314" parent="291" name="PRIMARY">
+    <key id="319" parent="291" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="315" parent="292" name="ddId">
+    <column id="320" parent="292" name="ddId">
       <AutoIncrement>1</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>bigint(20)|0s</StoredType>
     </column>
-    <column id="316" parent="292" name="stkId">
+    <column id="321" parent="292" name="stkId">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="317" parent="292" name="ddDate">
+    <column id="322" parent="292" name="ddDate">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>datetime|0s</StoredType>
     </column>
-    <column id="318" parent="292" name="ddApproval">
+    <column id="323" parent="292" name="ddApproval">
       <DefaultExpression>&apos;PENDING&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>char(10)|0s</StoredType>
     </column>
-    <column id="319" parent="292" name="ddStatus">
+    <column id="324" parent="292" name="ddStatus">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StoredType>char(10)|0s</StoredType>
     </column>
-    <column id="320" parent="292" name="isDelete">
+    <column id="325" parent="292" name="isDelete">
       <DefaultExpression>0</DefaultExpression>
       <Position>6</Position>
       <StoredType>tinyint(4)|0s</StoredType>
     </column>
-    <column id="321" parent="292" name="ddUpdateDate">
+    <column id="326" parent="292" name="ddUpdateDate">
       <Position>7</Position>
       <StoredType>datetime|0s</StoredType>
     </column>
-    <column id="322" parent="292" name="maid">
+    <column id="327" parent="292" name="maid">
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StoredType>varchar(30)|0s</StoredType>
     </column>
-    <column id="323" parent="292" name="ddLog">
+    <column id="328" parent="292" name="ddLog">
       <Position>9</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <column id="324" parent="292" name="realStkQuantity">
+    <column id="329" parent="292" name="realStkQuantity">
       <NotNull>1</NotNull>
       <Position>10</Position>
       <StoredType>int(11)|0s</StoredType>
     </column>
-    <foreign-key id="325" parent="292" name="fk_due_diligence_stock">
+    <foreign-key id="330" parent="292" name="fk_due_diligence_stock">
       <ColNames>stkId</ColNames>
       <RefColNames>stkId</RefColNames>
       <RefTableName>stock</RefTableName>
     </foreign-key>
-    <index id="326" parent="292" name="PRIMARY">
+    <index id="331" parent="292" name="PRIMARY">
       <ColNames>ddId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="327" parent="292" name="fk_due_diligence_stock">
+    <index id="332" parent="292" name="fk_due_diligence_stock">
       <ColNames>stkId</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="328" parent="292" name="PRIMARY">
+    <key id="333" parent="292" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="329" parent="293" name="lpId">
+    <column id="334" parent="293" name="lpId">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>char(40)|0s</StoredType>
     </column>
-    <column id="330" parent="293" name="zoneId">
+    <column id="335" parent="293" name="zoneId">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="331" parent="293" name="zoneName">
+    <column id="336" parent="293" name="zoneName">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="332" parent="293" name="rackId">
+    <column id="337" parent="293" name="rackId">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="333" parent="293" name="rackName">
+    <column id="338" parent="293" name="rackName">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="334" parent="293" name="cellId">
+    <column id="339" parent="293" name="cellId">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="335" parent="293" name="cellName">
+    <column id="340" parent="293" name="cellName">
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <index id="336" parent="293" name="PRIMARY">
+    <index id="341" parent="293" name="PRIMARY">
       <ColNames>lpId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="337" parent="293" name="PRIMARY">
+    <key id="342" parent="293" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="338" parent="294" name="locationId">
+    <column id="343" parent="294" name="locationId">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="339" parent="294" name="whId">
+    <column id="344" parent="294" name="whId">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>bigint(20)|0s</StoredType>
     </column>
-    <column id="340" parent="294" name="lpId">
+    <column id="345" parent="294" name="lpId">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>char(40)|0s</StoredType>
     </column>
-    <foreign-key id="341" parent="294" name="fk_locations_warehouse">
+    <foreign-key id="346" parent="294" name="fk_locations_warehouse">
       <ColNames>whId</ColNames>
       <RefColNames>whId</RefColNames>
       <RefTableName>warehouse</RefTableName>
     </foreign-key>
-    <foreign-key id="342" parent="294" name="fk_locations_location_places">
+    <foreign-key id="347" parent="294" name="fk_locations_location_places">
       <ColNames>lpId</ColNames>
       <RefColNames>lpId</RefColNames>
       <RefTableName>location_places</RefTableName>
     </foreign-key>
-    <index id="343" parent="294" name="PRIMARY">
+    <index id="348" parent="294" name="PRIMARY">
       <ColNames>locationId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="344" parent="294" name="fk_locations_warehouse">
+    <index id="349" parent="294" name="fk_locations_warehouse">
       <ColNames>whId</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="345" parent="294" name="fk_locations_location_places">
+    <index id="350" parent="294" name="fk_locations_location_places">
       <ColNames>lpId</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="346" parent="294" name="PRIMARY">
+    <key id="351" parent="294" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="347" parent="295" name="stkId">
+    <column id="352" parent="295" name="stkId">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="348" parent="295" name="lpId">
+    <column id="353" parent="295" name="lpId">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>char(40)|0s</StoredType>
     </column>
-    <column id="349" parent="295" name="cfId">
+    <column id="354" parent="295" name="cfId">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>char(12)|0s</StoredType>
     </column>
-    <column id="350" parent="295" name="stkQuantity">
+    <column id="355" parent="295" name="stkQuantity">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>int(11)|0s</StoredType>
     </column>
-    <foreign-key id="351" parent="295" name="fk_stock_location_places">
+    <foreign-key id="356" parent="295" name="fk_stock_location_places">
       <ColNames>lpId</ColNames>
       <RefColNames>lpId</RefColNames>
       <RefTableName>location_places</RefTableName>
     </foreign-key>
-    <foreign-key id="352" parent="295" name="fk_stock_coffee">
+    <foreign-key id="357" parent="295" name="fk_stock_coffee">
       <ColNames>cfId</ColNames>
       <RefColNames>cfId</RefColNames>
       <RefTableName>coffee</RefTableName>
     </foreign-key>
-    <index id="353" parent="295" name="PRIMARY">
+    <index id="358" parent="295" name="PRIMARY">
       <ColNames>stkId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="354" parent="295" name="fk_stock_location_places">
+    <index id="359" parent="295" name="fk_stock_location_places">
       <ColNames>lpId</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="355" parent="295" name="fk_stock_coffee">
+    <index id="360" parent="295" name="fk_stock_coffee">
       <ColNames>cfId</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="356" parent="295" name="PRIMARY">
+    <key id="361" parent="295" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="357" parent="296" name="whId">
+    <column id="362" parent="296" name="userId">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="363" parent="296" name="userPwd">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="364" parent="296" name="userCompanyName">
+      <Position>3</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="365" parent="296" name="userName">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="366" parent="296" name="userPhone">
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>varchar(13)|0s</StoredType>
+    </column>
+    <column id="367" parent="296" name="userEmail">
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="368" parent="296" name="userCode">
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>char(12)|0s</StoredType>
+    </column>
+    <column id="369" parent="296" name="userRoadAddr">
+      <Position>8</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="370" parent="296" name="userDetailAddr">
+      <Position>9</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="371" parent="296" name="userImgPath">
+      <Position>10</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="372" parent="296" name="userRole">
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>enum(&apos;COMPANY&apos;, &apos;MANAGER&apos;, &apos;ADMIN&apos;, &apos;DELIVERYMAN&apos;)|0e</StoredType>
+    </column>
+    <column id="373" parent="296" name="userStatus">
+      <DefaultExpression>&apos;WAITING_APPROVAL&apos;</DefaultExpression>
+      <Position>12</Position>
+      <StoredType>enum(&apos;APPROVAL&apos;, &apos;WAITING_APPROVAL&apos;, &apos;DEACTIVATED&apos;, &apos;WAITING_DEACTIVATED&apos;)|0e</StoredType>
+    </column>
+    <column id="374" parent="296" name="userJoinDate">
+      <Position>13</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="375" parent="296" name="userLastLogin">
+      <Position>14</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="376" parent="296" name="vehicleId">
+      <Position>15</Position>
+      <StoredType>char(10)|0s</StoredType>
+    </column>
+    <index id="377" parent="296" name="PRIMARY">
+      <ColNames>userId</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="378" parent="296" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="379" parent="297" name="vehicleId">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>char(10)|0s</StoredType>
+    </column>
+    <column id="380" parent="297" name="vehicleModel">
+      <DefaultExpression>&apos;5톤 윙바디&apos;</DefaultExpression>
+      <Position>2</Position>
+      <StoredType>enum(&apos;5톤 윙바디&apos;)|0e</StoredType>
+    </column>
+    <column id="381" parent="297" name="vehicleDesc">
+      <Position>3</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <index id="382" parent="297" name="PRIMARY">
+      <ColNames>vehicleId</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="383" parent="297" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="384" parent="298" name="whId">
       <AutoIncrement>1</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>bigint(20)|0s</StoredType>
     </column>
-    <column id="358" parent="296" name="whCode">
+    <column id="385" parent="298" name="whCode">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>varchar(12)|0s</StoredType>
     </column>
-    <column id="359" parent="296" name="whName">
+    <column id="386" parent="298" name="whName">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>varchar(30)|0s</StoredType>
     </column>
-    <column id="360" parent="296" name="whAddress">
+    <column id="387" parent="298" name="whAddress">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>varchar(100)|0s</StoredType>
     </column>
-    <column id="361" parent="296" name="whTelPhone">
+    <column id="388" parent="298" name="whTelPhone">
       <Position>5</Position>
       <StoredType>varchar(13)|0s</StoredType>
     </column>
-    <column id="362" parent="296" name="whGrade">
+    <column id="389" parent="298" name="whGrade">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StoredType>char(5)|0s</StoredType>
     </column>
-    <column id="363" parent="296" name="whField">
+    <column id="390" parent="298" name="whField">
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StoredType>int(11)|0s</StoredType>
     </column>
-    <column id="364" parent="296" name="whTotalCapa">
+    <column id="391" parent="298" name="whTotalCapa">
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StoredType>int(11)|0s</StoredType>
     </column>
-    <column id="365" parent="296" name="whUseCapa">
+    <column id="392" parent="298" name="whUseCapa">
       <Position>9</Position>
       <StoredType>int(11)|0s</StoredType>
     </column>
-    <index id="366" parent="296" name="PRIMARY">
+    <index id="393" parent="298" name="PRIMARY">
       <ColNames>whId</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="367" parent="296" name="PRIMARY">
+    <key id="394" parent="298" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
+    <column id="395" parent="299" name="whManagementId">
+      <AutoIncrement>1</AutoIncrement>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint(20)|0s</StoredType>
+    </column>
+    <column id="396" parent="299" name="whId">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint(20)|0s</StoredType>
+    </column>
+    <column id="397" parent="299" name="userId">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <foreign-key id="398" parent="299" name="fk_whId">
+      <ColNames>whId</ColNames>
+      <RefColNames>whId</RefColNames>
+      <RefTableName>warehouse</RefTableName>
+    </foreign-key>
+    <foreign-key id="399" parent="299" name="fk_userId">
+      <ColNames>userId</ColNames>
+      <RefColNames>userId</RefColNames>
+      <RefTableName>users</RefTableName>
+    </foreign-key>
+    <index id="400" parent="299" name="PRIMARY">
+      <ColNames>whManagementId</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="401" parent="299" name="fk_whId">
+      <ColNames>whId</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="402" parent="299" name="fk_userId">
+      <ColNames>userId</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="403" parent="299" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="404" parent="300" name="comId">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="405" parent="300" name="comName">
+      <Position>2</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="406" parent="300" name="comCeoName">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="407" parent="300" name="comPwd">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="408" parent="300" name="comPhone">
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>varchar(13)|0s</StoredType>
+    </column>
+    <column id="409" parent="300" name="comEmail">
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="410" parent="300" name="comCode">
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>char(12)|0s</StoredType>
+    </column>
+    <column id="411" parent="300" name="comRoadAddr">
+      <Position>8</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="412" parent="300" name="comDetailAddr">
+      <Position>9</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="413" parent="300" name="comImgPath">
+      <Position>10</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="414" parent="300" name="comStartDate">
+      <Position>11</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="415" parent="300" name="comExpiredDate">
+      <Position>12</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="416" parent="300" name="comLastLogin">
+      <Position>13</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="417" parent="300" name="comStatus">
+      <Position>14</Position>
+      <StoredType>enum(&apos;APPROVAL&apos;, &apos;WAITING_APPROVAL&apos;, &apos;DEACTIVATED&apos;, &apos;WAITING_DEACTIVATED&apos;)|0e</StoredType>
+    </column>
+    <column id="418" parent="301" name="managerId">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="419" parent="301" name="managerName">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(30)|0s</StoredType>
+    </column>
+    <column id="420" parent="301" name="managerPwd">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="421" parent="301" name="managerCode">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>char(12)|0s</StoredType>
+    </column>
+    <column id="422" parent="301" name="managerPhone">
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>varchar(13)|0s</StoredType>
+    </column>
+    <column id="423" parent="301" name="managerEmail">
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="424" parent="301" name="managerImgPath">
+      <Position>7</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="425" parent="301" name="managerHireDate">
+      <Position>8</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="426" parent="301" name="managerLastLogin">
+      <Position>9</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="427" parent="301" name="managerRole">
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>enum(&apos;COMPANY&apos;, &apos;MANAGER&apos;, &apos;ADMIN&apos;, &apos;DELIVERYMAN&apos;)|0e</StoredType>
+    </column>
+    <column id="428" parent="301" name="managerStatus">
+      <Position>11</Position>
+      <StoredType>enum(&apos;APPROVAL&apos;, &apos;WAITING_APPROVAL&apos;, &apos;DEACTIVATED&apos;, &apos;WAITING_DEACTIVATED&apos;)|0e</StoredType>
+    </column>
   </database-model>
 </dataSource>

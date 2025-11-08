@@ -103,6 +103,6 @@
     <select id="selectDueDiligenceAuthority" resultType="int">
         select count(*)
         from warehouse wh join warehouse_management wm on wh.whId = wm.whId
-        where wh.whCode = #{whCode} and wm.managerId = #{maId}
+        where wh.whCode = #{whCode} and wm.userId = #{maId}
     </select>
 </mapper>

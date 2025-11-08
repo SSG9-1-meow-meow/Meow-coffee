@@ -10,7 +10,7 @@ public interface StockMapper {
     List<StockReadDTO> selectStockList(@Param("criteria") Criteria criteria, @Param("searchDTO") StockSearchDTO stockSearchDTO);
     CoffeeVO selectCoffee(String cfName);
     List<StockReadDTO> selectWarehouses(Criteria criteria);
-    List<CompanyReadDTO> selectCompany(Criteria criteria);
+    List<CompanyReadDTO> selectCompanyList(Criteria criteria);
 
     List<DueDiligenceReadDTO> selectDueDiligenceList(Criteria criteria);
     DueDiligenceReadDTO selectDueDiligence(Long ddId);

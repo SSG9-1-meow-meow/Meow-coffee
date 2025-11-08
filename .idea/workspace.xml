@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e6ea3164-6cbd-49e1-afbf-09e82e1fba65" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/5d5778e7-3180-4f53-ab23-dcb1f47ec5c0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/5d5778e7-3180-4f53-ab23-dcb1f47ec5c0.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5d5778e7-3180-4f53-ab23-dcb1f47ec5c0/storage_v2/_src_/schema/meowcoffeedb.yr5IrA.zip" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/5d5778e7-3180-4f53-ab23-dcb1f47ec5c0/storage_v2/_src_/schema/meowcoffeedb.yr5IrA.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ssg/meowcoffee/mapper/StockMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssg/meowcoffee/mapper/StockMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/db_sql/StockTableCreation.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db_sql/StockTableCreation.sql" afterDir="false" />
@@ -35,8 +38,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -55,7 +58,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Gradle.StockMapperTests.deleteDueDiligenceTest.executor": "Run",
+    "Gradle.StockMapperTests.dueDiligenceAuthoriyTest.executor": "Run",
     "Gradle.StockMapperTests.insertDueDiligenceTest.executor": "Run",
+    "Gradle.StockMapperTests.selectCompanyListTest.executor": "Run",
     "Gradle.StockMapperTests.selectDueDiligenceInfoTest.executor": "Run",
     "Gradle.StockMapperTests.selectDueDiligenceListTest.executor": "Run",
     "Gradle.StockMapperTests.selectDueDiligenceTest.executor": "Run",
@@ -68,7 +73,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "feat/dueDiligenceCRUDTest",
+    "git-widget-placeholder": "feat/stockTest",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -83,7 +88,7 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="Gradle.StockMapperTests.updateApprovalStatusTest">
+  <component name="RunManager" selected="Gradle.StockMapperTests.dueDiligenceAuthoriyTest">
     <configuration name="StockMapperTests.deleteDueDiligenceTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -108,7 +113,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="StockMapperTests.insertDueDiligenceTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="StockMapperTests.dueDiligenceAuthoriyTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -121,7 +126,31 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.insertDueDiligenceTest&quot;" />
+            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.dueDiligenceAuthoriyTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="StockMapperTests.selectCompanyListTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.selectCompanyListTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -180,37 +209,13 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="StockMapperTests.updateDueDiligenceTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;com.ssg.meowcoffee.mapper.StockMapperTests.updateDueDiligenceTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.StockMapperTests.dueDiligenceAuthoriyTest" />
+        <item itemvalue="Gradle.StockMapperTests.selectCompanyListTest" />
         <item itemvalue="Gradle.StockMapperTests.updateApprovalStatusTest" />
         <item itemvalue="Gradle.StockMapperTests.selectDueDiligenceInfoTest" />
         <item itemvalue="Gradle.StockMapperTests.deleteDueDiligenceTest" />
-        <item itemvalue="Gradle.StockMapperTests.updateDueDiligenceTest" />
-        <item itemvalue="Gradle.StockMapperTests.insertDueDiligenceTest" />
       </list>
     </recent_temporary>
   </component>
