@@ -15,7 +15,11 @@ public interface MemberMapper {
     // 회원 리스트 출력(필터링 옵션 지정 - 관리자 전용)
     List<UserVO> selectUsers(@Param("cri") UserCriteria criteria);
 
-    // 현재 회원정보 조회
+    // 회원 리스트에서의 회원정보 조회 - 창고관리자, 총관리자 전용기능
+    // (승인대기, 휴면상태, 휴면대기 회원도 조회해야 하므로 users에서 조회)
+    UserVO selectUserById(String userId);
+
+    // 현재 로그인한 회원정보 조회
     ManagerVO selectManagerById(String userId);
     CompanyVO selectCompanyById(String userId);
     DeliverymanVO selectDeliverymenById(String userId);

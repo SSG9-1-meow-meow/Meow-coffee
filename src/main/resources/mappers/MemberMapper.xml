@@ -34,6 +34,10 @@
     limit #{cri.skip}, #{cri.amount}
   </select>
 
+  <select id="selectUserById" resultMap="userResultMap">
+    select * from users where userId = #{userId}
+  </select>
+
   <select id="selectManagerById" resultType="ManagerVO">
     select * from managers where managerId = #{userId}
   </select>

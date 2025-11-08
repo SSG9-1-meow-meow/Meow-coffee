@@ -27,7 +27,7 @@ public class MemberMapperTests {
     private MemberMapper memberMapper;
 
     @Test
-    @DisplayName("MemberMapper ResultMap 활용 조회 쿼리 테스트")
+    @DisplayName("페이지네이션 적용된 리스트 조회")
     public void testSelectAll() {
         UserCriteria criteria = UserCriteria.builder()
                 .pageNum(1)
@@ -46,7 +46,15 @@ public class MemberMapperTests {
     }
 
     @Test
-    @DisplayName("회원권한이 관리자인 회원정보를 조회")
+    @DisplayName("회원 리스트에서의 승인대기 중인 특정 회원정보 조회")
+    public void testSelectUserById() {
+        String userId = "delivery02";
+        UserVO userVO = memberMapper.selectUserById(userId);
+        Assertions.assertEquals(UserStatus.WAITING_APPROVAL, userVO.getUserStatus());
+    }
+
+    @Test
+    @DisplayName("현재 회원권한이 관리자인 회원정보를 조회")
     public void testSelectManagerById() {
         String userId = "manager_kim";
         ManagerVO managerVO = memberMapper.selectManagerById(userId);
