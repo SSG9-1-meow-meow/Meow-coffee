@@ -14,4 +14,12 @@ public interface StockMapper {
 
     List<DueDiligenceReadDTO> selectDueDiligenceList(Criteria criteria);
     DueDiligenceReadDTO selectDueDiligence(Long ddId);
+
+    Integer insertDueDiligence(@Param("insertDTO") DueDiligenceDTO dueDiligenceDTO);
+    Integer updateDueDiligence(@Param("updateDTO") DueDiligenceDTO dueDiligenceDTO);
+    Integer deleteDueDiligence(Long ddId);
+    DueDiligenceDTO selectDueDiligenceInfo(@Param("stkId") String stkId, @Param("whCode") String whCode);
+    Integer updateApprovalStatus(@Param("ddApproval") String ddApproval, @Param("ddId") Long ddId);
+    Integer selectDueDiligenceAuthority(@Param("whCode") String whCode, @Param("maId") String maId);
+
 }
