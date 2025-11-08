@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+// 회원 및 관리자 입고 관리 UI 에 필요한 데이터 모음
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,10 +16,11 @@ import lombok.Setter;
 @Builder
 public class InboundReqItemDTO {
   private Long inReqId;
+  private String comName; // 거래처명
   private String cfName;
   private String cfCategory;
   private Integer inQtyReq;
-  private Integer inQty;
+  private Integer inQty; // 입고 수량
   private InboundStatus status;
   private LocalDateTime inDttmReq;
   private LocalDateTime inDttmAppr;

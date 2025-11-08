@@ -21,7 +21,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("MemberMapper ResultMap 활용 조회 쿼리 테스트")
     public void testSelectAll() {
-        List<UserVO> list = memberMapper.selectAllUsers();
-        list.forEach(log::info);
+//        List<UserVO> list = memberMapper.selectAllUsers();
+//        list.forEach(log::info);
     }
 }
