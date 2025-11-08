@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssg.meowcoffee.mapper.MemberMapper">
+  <resultMap id="userResultMap" type="UserVO">
+    <id column="userId" property="userId"/>
+    <result column="userPwd" property="userPwd"/>
+    <result column="userCompanyName" property="userCompanyName"/>
+    <result column="userName" property="userName"/>
+    <result column="userPhone" property="userPhone"/>
+    <result column="userEmail" property="userEmail"/>
+    <result column="userCode" property="userCode"/>
+    <result column="userRoadAddr" property="userRoadAddr"/>
+    <result column="userDetailAddr" property="userDetailAddr"/>
+    <result column="userImgPath" property="userImgPath"/>
+    <result column="userJoinDate" property="userJoinDate"/>
+    <result column="userLastLogin" property="userLastLogin"/>
+
+    <!--  회원 관련 테이블/뷰의 enum 타입을 VO에서 저장할 경우에는 반드시 지정한 TypeHandler를 명시해주세요.  -->
+    <result column="userRole" property="userRole" typeHandler="com.ssg.meowcoffee.util.CustomEnumTypeHandler"/>
+    <result column="userStatus" property="userStatus" typeHandler="com.ssg.meowcoffee.util.CustomEnumTypeHandler"/>
+    <result column="vehicleId" property="vehicleId"/>
+  </resultMap>
+
+  <!-- resultMap Enum 매핑 테스트용 조회 쿼리 -->
+  <select id="selectAllUsers" resultMap="userResultMap">
+    select * from users;
+  </select>
+
+</mapper>
