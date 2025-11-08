@@ -8,7 +8,7 @@ import lombok.ToString;
 // 회원관리 기능용 페이지 DTO입니다.
 @Getter
 @ToString
-public class UserPageDTO<E> extends PageDTO {
+public class UserPageDTO<E> {
 
     private int page;
     private int amount;
@@ -21,7 +21,6 @@ public class UserPageDTO<E> extends PageDTO {
 
     @Builder
     public UserPageDTO(UserCriteria cri, List<E> dtoList, int total) {
-        super(cri, total);
         this.page = cri.getPageNum();
         this.amount = cri.getAmount();
         this.total = total;

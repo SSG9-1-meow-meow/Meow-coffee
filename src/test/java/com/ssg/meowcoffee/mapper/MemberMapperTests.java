@@ -4,10 +4,10 @@ import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
-import com.ssg.meowcoffee.dto.Criteria;
 import com.ssg.meowcoffee.dto.UserCriteria;
 import com.ssg.meowcoffee.dto.UserInfoDTO;
 import com.ssg.meowcoffee.dto.UserStatusDTO;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -27,11 +27,13 @@ public class MemberMapperTests {
     private MemberMapper memberMapper;
 
     @Test
-    @DisplayName("페이지네이션 적용된 리스트 조회")
-    public void testSelectAll() {
+    @DisplayName("페이지네이션 및 검색필터 적용된 회원 리스트 조회")
+    public void testSelectAllByFilter() {
         UserCriteria criteria = UserCriteria.builder()
                 .pageNum(1)
                 .amount(10)
+                .from(LocalDate.parse("2025-06-01"))
+                .to(LocalDate.parse("2025-11-01"))
                 .build();
         List<UserVO> list = memberMapper.selectUsers(criteria);
         list.forEach(log::info);
