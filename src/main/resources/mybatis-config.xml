@@ -7,5 +7,6 @@
     <!--  MyBatis ResultType 패키지 경로 설정  -->
     <typeAliases>
         <package name="com.ssg.meowcoffee.domain"/>
+        <package name="com.ssg.meowcoffee.util"/>
     </typeAliases>
 </configuration>

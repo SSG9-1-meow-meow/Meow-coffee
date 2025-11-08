@@ -19,18 +19,71 @@
     <result column="userLastLogin" property="userLastLogin"/>
 
     <!--  회원 관련 테이블/뷰의 enum 타입을 VO에서 저장할 경우에는 반드시 지정한 TypeHandler를 명시해주세요.  -->
-    <result column="userRole" property="userRole" typeHandler="com.ssg.meowcoffee.util.CustomEnumTypeHandler"/>
-    <result column="userStatus" property="userStatus" typeHandler="com.ssg.meowcoffee.util.CustomEnumTypeHandler"/>
+    <result column="userRole" property="userRole" typeHandler="CustomEnumTypeHandler"/>
+    <result column="userStatus" property="userStatus" typeHandler="CustomEnumTypeHandler"/>
     <result column="vehicleId" property="vehicleId"/>
   </resultMap>
 
+  <!-- 검색필터 조건 -->
+  <sql id="search">
+    <where>
+      <!--  회원권한 필터링  -->
+      <if test="cri.roleType != null and cri.roleType.name != 'ALL'">
+        and userRole = #{cri.roleType}
+      </if>
+      <!--  회원상태 필터링  -->
+      <if test="cri.statusType != null and cri.statusType.name != 'ALL'">
+        and userStatus = #{cri.statusType}
+      </if>
+
+      <!--  이름/아이디 키워드 검색  -->
+      <if test="cri.types != null and cri.keyword != null">
+        <foreach collection="cri.types" item="type" open="(" separator="OR" close=")">
+          <choose>
+            <when test="cri.type.equals('N')">
+              and userName like concat('%', #{keyword}, '%')
+            </when>
+            <when test="cri.type.equals('I')">
+              and userId like concat('%', #{keyword}, '%')
+            </when>
+          </choose>
+        </foreach>
+      </if>
+
+      <!--  기간별 필터링  -->
+      <if test="cri.from != null">
+        <choose>
+          <when test="cri.periodFilter == 'reg'">
+            and userJoinDate >= #{cri.from}
+          </when>
+          <otherwise>
+            and userLastLogin >= #{cri.from}
+          </otherwise>
+        </choose>
+      </if>
+      <if test="cri.to != null">
+        <choose>
+          <when test="cri.periodFilter == 'reg'">
+            and userJoinDate <![CDATA[ <= ]]> #{cri.to}
+          </when>
+          <otherwise>
+            and userLastLogin <![CDATA[ <= ]]> #{cri.to}
+          </otherwise>
+        </choose>
+      </if>
+    </where>
+  </sql>
+
+
   <select id="getCount" resultType="int">
     select count(userId) from users
+    <include refid="search"/>
   </select>
 
   <!-- resultMap Enum 매핑 테스트용 조회 쿼리 -->
   <select id="selectUsers" resultMap="userResultMap">
     select * from users
+    <include refid="search"/>
     limit #{cri.skip}, #{cri.amount}
   </select>
 
