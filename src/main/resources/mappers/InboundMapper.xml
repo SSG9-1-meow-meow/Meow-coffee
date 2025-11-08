@@ -4,10 +4,117 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssg.meowcoffee.mapper.InboundMapper">
 
+  <resultMap id="coffeeMap" type="CoffeeVO">
+    <id property="cfId" column="cfId"/>
+    <result property="cfName" column="cfName"/>
+    <result property="cfOrigin" column="cfOrigin"/>
+    <result property="cfCategory" column="cfCategory"/>
+    <result property="cfGrade" column="cfGrade"/>
+    <result property="cfType" column="cfType"/>
+  </resultMap>
+
+  <!-- DTO와 DB 컬럼명을 매핑하기 위한 ResultMap 정의 -->
+  <resultMap id="inboundReqItemMap" type="com.ssg.meowcoffee.dto.InboundReqItemDTO">
+    <id property="inReqItemsId" column="inReqItemsId"/>
+    <result property="status" column="status"
+            javaType="com.ssg.meowcoffee.domain.InboundStatus"
+            typeHandler="com.ssg.meowcoffee.util.InboundStatusTypeHandler"/>
+    <result property="inQtyReq" column="inQtyReq"/>
+    <result property="inDttmReq" column="inDttmReq"/>
+    <result property="inDttmAppr" column="inDttmAppr"/>
+    <result property="isTempo" column="isTempo"/>
+    <result property="comName" column="userCompanyName"/>
+    <result property="cfName" column="cfName"/>
+    <result property="cfCategory" column="cfCategory"/>
+  </resultMap>
+
+  <!-- 입고 관리 목록 조회를 위한 동적 SQL -->
+  <select id="selectInReqItemList" resultMap="inboundReqItemMap">
+    SELECT
+    IR.inReqId,
+    U.userCompanyName,
+    C.cfName,
+    C.cfCategory,
+    II.inQtyReq,
+    II.status,
+    IR.inDttmReq,
+    IR.inDttmAppr,
+    IR.IsTempo
+    FROM
+    inboundItems II
+    INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN users U ON IR.comId = U.userId
+    INNER JOIN coffee C ON II.cfId = C.cfId
+
+    <!-- WHERE 절 동적 생성 -->
+    <where>
+      <!-- 삭제되지 않은(IsDelete가 0이거나 NULL) 요청만 조회 대상으로 합니다. -->
+      (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+      <!-- 1. 사용자 권한에 따른 분기 -->
+      <choose>
+        <!-- 거래처(COMPANY) 회원이면 자신의 comId와 일치하는 데이터만 조회 -->
+        <when test="userRole.name() == 'COMPANY'">
+          AND IR.comId = #{userId}
+        </when>
+        <!-- 관리자나 총관리자는 모든 데이터를 볼 수 있으므로 별도 조건 없음 -->
+      </choose>
+
+      <!-- 2. 검색 조건에 따른 분기 -->
+      <!-- 거래처명으로 검색 -->
+      <if test="criteria.companyName != null and criteria.companyName != ''">
+        AND U.userCompanyName LIKE CONCAT('%', #{criteria.companyName}, '%')
+      </if>
+      <!-- 커피 카테고리 필터링 -->
+      <if test="criteria.coffeeCategory != null and criteria.coffeeCategory != ''">
+        AND C.cfCategory = #{criteria.coffeeCategory}
+      </if>
+      <!-- 입고 상태 필터링 -->
+      <if test="criteria.inboundStatus != null and criteria.inboundStatus != ''">
+        AND II.status = #{criteria.inboundStatus}
+      </if>
+      <!-- 임시저장 여부 필터링 -->
+      <if test="criteria.isTempo != null">
+        AND IR.IsTempo = #{criteria.isTempo}
+      </if>
+    </where>
+
+    <!-- ORDER BY 절 동적 생성 -->
+    <trim prefix="ORDER BY">
+      <choose>
+        <when test="criteria.sortBy == 'companyName'">
+          U.userCompanyName ${criteria.sortOrder}
+        </when>
+        <when test="criteria.sortBy == 'category'">
+          C.cfCategory ${criteria.sortOrder}, IR.inDttmReq DESC
+        </when>
+        <when test="criteria.sortBy == 'quantity'">
+          II.inQtyReq ${criteria.sortOrder}
+        </when>
+        <when test="criteria.sortBy == 'status'">
+          II.status ${criteria.sortOrder}, IR.inDttmReq DESC
+        </when>
+        <when test="criteria.sortBy == 'apprDate'">
+          IR.inDttmAppr ${criteria.sortOrder}
+        </when>
+        <!-- 기본 정렬: 입고 요청일(reqDate) 최신순 -->
+        <otherwise>
+          IR.inDttmReq ${criteria.sortOrder}
+        </otherwise>
+      </choose>
+    </trim>
+
+    <!-- 페이징 처리 -->
+    LIMIT #{criteria.size} OFFSET #{criteria.skip}
+  </select>
+
+  <select id="selectCoffeeList" resultMap="coffeeMap">
+    select * from coffee;
+  </select>
+
   <!-- 회원 입고 요청 프로시저 호출문 (회원은 임시 저장 혹은 그냥 등록 신청 가능)  -->
   <select id="callCreateInReq" statementType="CALLABLE"
-    parameterType="com.ssg.meowcoffee.dto.InboundReqInputDTO"
-    resultType="long">CALL CreateInReq(
+          parameterType="com.ssg.meowcoffee.dto.InboundReqInputDTO"
+          resultType="long">CALL CreateInReq(
     -- IN 파라미터 (DTO 필드 이름 사용)
     #{_comId, mode=IN, jdbcType=VARCHAR},
     #{_inDttmReq, mode=IN, jdbcType=TIMESTAMP},
@@ -20,58 +127,45 @@
     )
   </select>
 
-  <!-- 공통 SELECT 필드 -->
-  <sql id="InReqItemSelectFields">
-    ir.inReqId,
-    c.cfName,
-    c.cfCategory,
-    ii.inQtyReq,
-    ii.inQty,
-    ii.status,
-    ir.inDttmReq,
-    ir.inDttmAppr,
-    ir.IsTempo AS isTempo
-  </sql>
 
+  <!-- 입고 요청 수정 프로시저 호출 -->
+  <update id="callUpdateInReq" statementType="CALLABLE"
+          parameterType="com.ssg.meowcoffee.dto.InboundReqInputDTO">
+    CALL ModifyInReq(
+    #{_inReqId, mode=IN, jdbcType=BIGINT},
+    #{_comId, mode=IN, jdbcType=VARCHAR},
+    #{_inDateWish, mode=IN, jdbcType=DATE},
+    #{_inItemsJson, mode=IN, jdbcType=VARCHAR},
+    #{_isTempo, mode=IN, jdbcType=TINYINT}
+    )
+  </update>
 
-  <!-- 입고 요청 + 상세 항목 조회 -->
-  <select id="selectInReqItemList" resultType="com.ssg.meowcoffee.dto.InboundReqItemDTO">
-    SELECT
-    <include refid="InReqItemSelectFields"/>
-    FROM inboundRequests ir
-    JOIN inboundItems ii ON ir.inReqId = ii.inReqId
-    JOIN coffee c ON ii.cfId = c.cfId
-    <where>
-      <!-- 권한별 조건 분기 -->
-      <choose>
-        <when test="userRole == 'MANAGER' or userRole == 'ADMIN'">
-          ir.managerId = #{userId}
-        </when>
-        <when test="userRole == 'COMPANY'">
-          ir.comId = #{userId}
-        </when>
-      </choose>
+  <!-- 입고 요청 논리적 삭제 (Soft Delete) -->
+  <update id="deleteInReq">
+    UPDATE
+    inboundRequests
+    SET IsDelete = 1
+    WHERE inReqId = #{inReqId}
+    <!--
+        사용자 역할이 'COMPANY'일 경우에만, 요청의 소유주(comId)와 현재 사용자(userId)가 일치하는지 추가로 확인합니다.
+        관리자는 이 조건 없이 inReqId만으로 삭제가 가능합니다.
+    -->
+    <if test="userRole.name() == 'COMPANY'">
+      AND comId = #{userId}
+    </if>
+  </update>
 
-      <!-- 검색 조건 -->
-      <if test="criteria.keyword != null and criteria.keyword != ''">
-        <choose>
-          <when test='criteria.typeStr.contains("T")'>
-            AND ii.status LIKE CONCAT('%', #{criteria.keyword}, '%')
-          </when>
-          <when test='criteria.typeStr.contains("C")'>
-            AND c.cfCategory LIKE CONCAT('%', #{criteria.keyword}, '%')
-          </when>
-          <when test='criteria.typeStr.contains("W")'>
-            AND c.cfName LIKE CONCAT('%', #{criteria.keyword}, '%')
-          </when>
-        </choose>
-      </if>
-    </where>
-    ORDER BY ir.inDttmReq DESC
-    LIMIT #{criteria.amount} OFFSET #{criteria.skip}
+  <!-- ID로 단일 입고 요청 조회 (검증용) -->
+  <select id="selectInReqById" resultType="com.ssg.meowcoffee.domain.InboundRequestVO">
+    SELECT * FROM inboundRequests WHERE inReqId = #{inReqId}
+  </select>
+
+  <!-- 입고 요청 ID로 상세 항목 리스트 조회 (검증용) -->
+  <select id="selectInItemsByReqId" resultType="com.ssg.meowcoffee.domain.InboundItemVO">
+    SELECT * FROM inboundItems WHERE inReqId = #{inReqId}
   </select>
 
 
 
-
 </mapper>
+

@@ -1,51 +1,23 @@
-
-
-drop database meowcoffeedb;
-create database meowcoffeedb;
 use meowcoffeedb;
-
--- 1. 차량 테이블 생성
-DROP TABLE IF EXISTS vehicles;
-CREATE TABLE vehicles (
-                          vehicleId	char(10)	PRIMARY KEY ,
-                          vehicleModel	ENUM('5톤 윙바디', '1톤 탑차', '1.2톤 카고')	NOT NULL,
-                          vehicleDesc	varchar(255)	NULL
-);
-
--- 1. 차량데이터 생성
-INSERT INTO vehicles
-(vehicleId, vehicleModel, vehicleDesc)
-VALUES
-    ('55가1001', '5톤 윙바디', '주력 운송 차량, 정비 완료'),
-    ('55나2002', '5톤 윙바디', '차량 점검 필요, 다음 주 정비 예정'),
-    ('55다3003', '5톤 윙바디', '서울-경기 지역 운행 중'),
-    ('55라4004', '5톤 윙바디', '긴급 물류 요청 대비 예비 차량'),
-    ('55마5005', '5톤 윙바디', '주로 부산/영남권 장거리 운행 담당'),
-    ('55바6006', '5톤 윙바디', '운전자 변경 대기 중'),
-    ('55사7007', '5톤 윙바디', '오전 운행 후 복귀'),
-    ('55아8008', '5톤 윙바디', '새로 구매한 차량, 시범 운행 중'),
-    ('55자9009', '5톤 윙바디', '창고 간 재고 이동 전용'),
-    ('55차0010', '5톤 윙바디', '가장 최근에 정비 받은 차량');
-
 -- 2. 회원 정보 생성
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-userId	varchar(30)	PRIMARY KEY ,
-userPwd	varchar(255)	NOT NULL,
-userCompanyName	varchar(30)	NULL,
-userName	varchar(30)	NOT NULL,
-userPhone	varchar(13)	NOT NULL,
-userEmail	varchar(50)	NOT NULL,
-userCode	char(12)	NOT NULL,
-userRoadAddr	varchar(100)	NULL,
-userDetailAddr	varchar(100)	NULL,
-userJoinDate	date	NULL,
-userRole	enum('COMPANY', 'MANAGER', 'ADMIN', 'DELIVERYMAN')	NOT NULL,
-userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATE')	NOT NULL,
-userLastLogin	date	NULL,
-userImgPath	varchar(255)	NULL,
-vehicleId	char(10)	NULL,
-CONSTRAINT fk_users_vehicles FOREIGN KEY (vehicleId) REFERENCES vehicles(vehicleId)
+                       userId	varchar(30)	PRIMARY KEY ,
+                       userPwd	varchar(255)	NOT NULL,
+                       userCompanyName	varchar(30)	NULL,
+                       userName	varchar(30)	NOT NULL,
+                       userPhone	varchar(13)	NOT NULL,
+                       userEmail	varchar(50)	NOT NULL,
+                       userCode	char(12)	NOT NULL,
+                       userRoadAddr	varchar(100)	NULL,
+                       userDetailAddr	varchar(100)	NULL,
+                       userJoinDate	date	NULL,
+                       userRole	enum('COMPANY', 'MANAGER', 'ADMIN', 'DELIVERYMAN')	NOT NULL,
+                       userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATE')	NOT NULL,
+                       userLastLogin	date	NULL,
+                       userImgPath	varchar(255)	NULL,
+                       vehicleId	char(10)	NULL,
+                       CONSTRAINT fk_users_vehicles FOREIGN KEY (vehicleId) REFERENCES vehicles(vehicleId)
 
 );
 
@@ -107,12 +79,12 @@ INSERT INTO users (
 -- 3. 커피 (Coffee) 테이블 생성
 DROP TABLE IF EXISTS Coffee;
 CREATE TABLE coffee (
-cfId CHAR(12) PRIMARY KEY,
-cfName VARCHAR(20) NOT NULL,
-cfOrigin CHAR(3) NOT NULL,
-cfCategory CHAR(3) NOT NULL,
-cfGrade VARCHAR(15) NOT NULL,
-cfType VARCHAR(15) NOT NULL
+                        cfId CHAR(12) PRIMARY KEY,
+                        cfName VARCHAR(20) NOT NULL,
+                        cfOrigin CHAR(3) NOT NULL,
+                        cfCategory CHAR(3) NOT NULL,
+                        cfGrade VARCHAR(15) NOT NULL,
+                        cfType VARCHAR(15) NOT NULL
 );
 
 -- 3. 커피 (coffee) 데이터 생성
@@ -127,15 +99,15 @@ VALUES
 -- 4. 창고 (warehouse) 테이블 생성
 DROP TABLE IF EXISTS warehouse;
 CREATE TABLE warehouse (
-whId BIGINT AUTO_INCREMENT PRIMARY KEY,
-whCode VARCHAR(12) NOT NULL,
-whName VARCHAR(30) NOT NULL,
-whAddress VARCHAR(100) NOT NULL,
-whTelPhone VARCHAR(13),
-whGrade CHAR(5) NOT NULL,
-whField INT NOT NULL,
-whTotalCapa INT NOT NULL,
-whUseCapa INT NULL
+                           whId BIGINT AUTO_INCREMENT PRIMARY KEY,
+                           whCode VARCHAR(12) NOT NULL,
+                           whName VARCHAR(30) NOT NULL,
+                           whAddress VARCHAR(100) NOT NULL,
+                           whTelPhone VARCHAR(13),
+                           whGrade CHAR(5) NOT NULL,
+                           whField INT NOT NULL,
+                           whTotalCapa INT NOT NULL,
+                           whUseCapa INT NULL
 );
 
 -- 4. 창고 (warehouse) 데이터 생성
@@ -170,12 +142,12 @@ VALUES
 -- 6. 재고 (stock) 테이블 생성
 DROP TABLE IF EXISTS stock;
 CREATE TABLE stock (
-stkId CHAR(12) PRIMARY KEY,
-lpId CHAR(40) NOT NULL,
-cfId CHAR(12) NOT NULL,
-stkQuantity INT NOT NULL,
-CONSTRAINT fk_stock_location_places FOREIGN KEY (lpId) REFERENCES location_places(lpId),
-CONSTRAINT fk_stock_coffee FOREIGN KEY (cfId) REFERENCES coffee(cfId)
+                       stkId CHAR(12) PRIMARY KEY,
+                       lpId CHAR(40) NOT NULL,
+                       cfId CHAR(12) NOT NULL,
+                       stkQuantity INT NOT NULL,
+                       CONSTRAINT fk_stock_location_places FOREIGN KEY (lpId) REFERENCES location_places(lpId),
+                       CONSTRAINT fk_stock_coffee FOREIGN KEY (cfId) REFERENCES coffee(cfId)
 );
 
 
@@ -193,11 +165,11 @@ VALUES
 -- 7. 보관위치지정 (locations) 테이블 생성
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
-locationId CHAR(12) PRIMARY KEY,
-whId BIGINT NOT NULL,
-lpId CHAR(40) NOT NULL,
-CONSTRAINT fk_locations_warehouse FOREIGN KEY (whId) REFERENCES warehouse(whId),
-CONSTRAINT fk_locations_location_places FOREIGN KEY (lpId) REFERENCES location_places(lpId)
+                           locationId CHAR(12) PRIMARY KEY,
+                           whId BIGINT NOT NULL,
+                           lpId CHAR(40) NOT NULL,
+                           CONSTRAINT fk_locations_warehouse FOREIGN KEY (whId) REFERENCES warehouse(whId),
+                           CONSTRAINT fk_locations_location_places FOREIGN KEY (lpId) REFERENCES location_places(lpId)
 );
 
 -- 7. 보관위치지정 (locations) 데이터 생성
@@ -214,14 +186,14 @@ VALUES
 DROP TABLE if exists inboundRequests;
 
 CREATE TABLE inboundRequests (
-inReqId	bigint AUTO_INCREMENT PRIMARY KEY ,
-comId	varchar(30)	NOT NULL,
-managerId	varchar(30)	NULL,
-inDttmReq	datetime	NOT NULL,
-inDateWish	date	NULL,
-inDttmAppr	datetime	NULL,
-IsDelete	tinyint	NULL,
-IsTempo	tinyint	NULL
+                                 inReqId	bigint AUTO_INCREMENT PRIMARY KEY ,
+                                 comId	varchar(30)	NOT NULL,
+                                 managerId	varchar(30)	NULL,
+                                 inDttmReq	datetime	NOT NULL,
+                                 inDateWish	date	NULL,
+                                 inDttmAppr	datetime	NULL,
+                                 IsDelete	tinyint	NULL,
+                                 IsTempo	tinyint	NULL
 );
 
 ALTER TABLE inboundRequests ADD CONSTRAINT FK_users_TO_inboundRequests_1 FOREIGN KEY (comId)
@@ -245,19 +217,19 @@ VALUES
 
 DROP TABLE if exists inboundItems;
 CREATE TABLE inboundItems (
-inReqItemsId	bigint AUTO_INCREMENT PRIMARY KEY ,
-inReqId	bigint	NOT NULL,
-cfId	char(12)	NOT NULL,
-locationId	char(12)	NULL,
-status	ENUM('승인대기', '승인완료', '입고완료', '반려')	NOT NULL,
-inQtyReq	integer	NULL,
-inOrderAddr	varchar(255)	NULL,
-inQty	integer	NULL,
-inDttmSchd	datetime	NULL,
-inDttmInsp	datetime	NULL,
-inDttmRecv	datetime	NULL
+                              inReqItemsId	bigint AUTO_INCREMENT PRIMARY KEY ,
+                              inReqId	bigint	NOT NULL,
+                              cfId	char(12)	NOT NULL,
+                              locationId	char(12)	NULL,
+                              status	ENUM('승인대기', '승인완료', '입고완료', '반려')	NOT NULL,
+                              inQtyReq	integer	NULL,
+                              inOrderAddr	varchar(255)	NULL,
+                              inQty	integer	NULL,
+                              inDttmSchd	datetime	NULL,
+                              inDttmInsp	datetime	NULL,
+                              inDttmRecv	datetime	NULL
 );
-
+ALTER TABLE inboundItems MODIFY status ENUM('승인대기', '승인완료', '입고완료', '반려');
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (inReqId) REFERENCES inboundRequests (inReqId);
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (cfId) REFERENCES Coffee(CFID);
 
@@ -276,124 +248,15 @@ VALUES
     (5, 'CF005', 'LOC005', '승인완료', 110, '대구 수성 물류센터', 110, '2025-11-09 14:00:00', '2025-11-08 16:00:00', '2025-11-09 15:00:00');
 
 
-
--- 9. 출고 요청 테이블 생성
-DROP TABLE IF EXISTS outboundrequest;
-CREATE TABLE `outboundrequest` (
-outReqId	bigint	AUTO_INCREMENT PRIMARY KEY ,
-comId	varchar(30)	NOT NULL,
-managerID	varchar(30)	NULL,
-outDttmReq	datetime	NOT NULL,
-outDateWish	date	NULL,
-outDttmAppr	datetime	NULL,
-IsDelete	tinyint	NULL,
-IsTempo	date	NULL
-);
-
-ALTER TABLE outboundRequest ADD CONSTRAINT FK_users_TO_outboundRequest_1 FOREIGN KEY (comId) REFERENCES users (userId);
-
-ALTER TABLE `outboundRequest` ADD CONSTRAINT `FK_users_TO_outboundRequest_2` FOREIGN KEY (managerId) REFERENCES users (userId);
-
--- 9. 출고 요청 샘플 데이터
-INSERT INTO outboundRequest (comId, managerID, outDttmReq, outDateWish, outDttmAppr, IsDelete, IsTempo)
-VALUES
-    ('coffeebiz01', 'manager01', '2025-11-06 09:00:00', '2025-11-08', '2025-11-06 14:00:00', 0, NULL),
-    ('coffeebiz02', 'manager01', '2025-11-06 10:30:00', '2025-11-09', NULL, 0, NULL),
-    ('coffeebiz01', 'manager02', '2025-11-07 11:15:00', '2025-11-10', '2025-11-07 16:00:00', 0, NULL),
-    ('coffeebiz03', 'manager03', '2025-11-07 13:45:00', '2025-11-11', NULL, 0, NULL),
-    ('coffeebiz01', 'manager01', '2025-11-08 08:20:00', '2025-11-12', '2025-11-08 12:00:00', 0, NULL);
-
-
-
--- 10. 출고 상세 테이블 생성
-DROP TABLE IF EXISTS outboundItems;
-CREATE TABLE `outboundItems` (
-outReqItemsId	bigint	AUTO_INCREMENT PRIMARY KEY,
-outReqId	bigint	NOT NULL,
-stkId	char(12)	NOT NULL,
-vehicleId	char(10)	NULL,
-status	ENUM('승인대기', '승인완료', '출고완료')	NOT NULL,
-outQtyReq	int	NOT NULL,
-outOrderAddr	varchar(255)	NULL,
-outDttmSchd	datetime	NULL,
-outDttmInsp	datetime	NULL,
-outDttmShip	datetime	NULL
-);
-
-ALTER TABLE outboundItems ADD CONSTRAINT FOREIGN KEY (outReqId) REFERENCES outboundrequest(outReqId);
-ALTER TABLE outboundItems ADD CONSTRAINT FOREIGN KEY (stkId) REFERENCES stock(stkId);
-
--- 10. 출고 상세 샘플 데이터 10건
-INSERT INTO outboundItems (outReqId, stkId, vehicleId, status, outQtyReq, outOrderAddr, outDttmSchd, outDttmInsp, outDttmShip)
-VALUES
-    (1, 'STK001', '55가1001', '승인완료', 50, '서울 강남구 테헤란로 123', '2025-11-08 09:00:00', '2025-11-07 15:00:00', '2025-11-08 10:00:00'),
-    (1, 'STK002', '55가1001', '승인완료', 30, '서울 강남구 테헤란로 123', '2025-11-08 09:00:00', '2025-11-07 15:00:00', '2025-11-08 10:00:00'),
-    (2, 'STK003', '55나2002', '승인대기', 40, '서울 마포구 월드컵북로 45', '2025-11-09 10:00:00', NULL, NULL),
-    (2, 'STK004', '55나2002', '승인대기', 20, '서울 마포구 월드컵북로 45', '2025-11-09 10:00:00', NULL, NULL),
-    (3, 'STK005', '55다3003', '승인완료', 25, '경기 성남시 판교로 242', '2025-11-10 11:00:00', '2025-11-09 14:00:00', '2025-11-10 12:00:00'),
-    (3, 'STK001', '55다3003', '승인완료', 15, '경기 성남시 판교로 242', '2025-11-10 11:00:00', '2025-11-09 14:00:00', '2025-11-10 12:00:00'),
-    (4, 'STK002', '55라4004', '승인대기', 35, '부산 해운대구 해운대로 321', '2025-11-11 13:00:00', NULL, NULL),
-    (4, 'STK003', '55라4004', '승인대기', 45, '부산 해운대구 해운대로 321', '2025-11-11 13:00:00', NULL, NULL),
-    (5, 'STK004', '55마5005', '승인완료', 20, '대구 수성구 동대구로 88', '2025-11-12 14:00:00', '2025-11-11 16:00:00', '2025-11-12 15:00:00'),
-    (5, 'STK005', '55마5005', '승인완료', 40, '대구 수성구 동대구로 88', '2025-11-12 14:00:00', '2025-11-11 16:00:00', '2025-11-12 15:00:00');
-
-
--- 11. 실사 (due_diligence) 테이블 생성
-CREATE TABLE due_diligence (
-ddId BIGINT AUTO_INCREMENT PRIMARY KEY,
-stkId CHAR(12) NOT NULL,
-ddDate DATETIME NOT NULL default now(),
-ddApproval CHAR(10) NOT NULL DEFAULT 'PENDING',
-ddStatus CHAR(10) NOT NULL,
-isDelete TINYINT DEFAULT 0,
-ddUpdateDate DATETIME NULL,
-maid VARCHAR(30) NOT NULL,
-ddLog VARCHAR(255) NULL,
-realStkQuantity INT NOT NULL,
-CONSTRAINT fk_due_diligence_stock FOREIGN KEY (stkId) REFERENCES stock(stkId)
-);
-
--- 11. 실사 (due_diligence) 데이터 생성
-INSERT INTO due_diligence (stkId, ddDate, ddApproval, ddStatus, maid, ddLog, realStkQuantity)
-VALUES
-    ('STK001', NOW(), 'APPROVED', 'CORRECT', 'admin', '정상 수량 확인', 120),
-    ('STK002', NOW(), 'PENDING', 'INCORRECT', 'manager01', '수량 확인 중', 195),
-    ('STK003', NOW(), 'REJECTED', 'INCORRECT', 'manager02', '수량 차이 발생', 140),
-    ('STK004', NOW(), 'APPROVED', 'CORRECT', 'admin', '검수 완료', 80),
-    ('STK005', NOW(), 'PENDING', 'INCORRECT', 'manager03', '실사 대기 중', 0);
-
-
--- 12. 창고관리 테이블 생성
-drop table if exists warehouse_management;
-CREATE TABLE `warehouse_management` (
-`whManagementId`	bigint	NOT NULL,
-`whId`	bigint	NOT NULL,
-`userId`	varchar(30)	NOT NULL
-);
-
-ALTER TABLE `warehouse_management` ADD CONSTRAINT `PK_WAREHOUSE_MANAGEMENT` PRIMARY KEY (`whManagementId`);
-ALTER TABLE `warehouse_management` ADD CONSTRAINT `FK_warehouse_TO_warehouse_management_1` FOREIGN KEY (`whId`) REFERENCES `warehouse` (`whId`);
-ALTER TABLE `warehouse_management` ADD CONSTRAINT `FK_users_TO_warehouse_management_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`);
-
--- 12. 창고관리 테이블 샘플 데이터 생성
-INSERT INTO warehouse_management (whManagementId, whId, userId)
-VALUES
-    (1, 1, 'manager01'),  -- 서울창고 → 박관리자
-    (2, 2, 'manager02'),  -- 부산창고 → 최관리자
-    (3, 3, 'manager03'),  -- 대구창고 → 한관리자
-    (4, 1, 'admin01'),    -- 서울창고 → 정총관리자 (총관리자도 관리 가능)
-    (5, 2, 'admin01');    -- 부산창고 → 정총관리자 (복수 창고 관리 가능)
-
-
 -- 13. 일별 처리용량
 CREATE TABLE dailyCapacity (
-dateId	date	PRIMARY KEY ,
-maxCapa	INT	NULL,
-usedCapa	INT	NULL,
-staffAvailable	INT	NULL,
-staffAssign	INT	NULL,
-equipAvailable	INT	NULL,
-equipAssign	INT	NULL
+                               dateId	date	PRIMARY KEY ,
+                               maxCapa	INT	NULL,
+                               usedCapa	INT	NULL,
+                               staffAvailable	INT	NULL,
+                               staffAssign	INT	NULL,
+                               equipAvailable	INT	NULL,
+                               equipAssign	INT	NULL
 );
 
 INSERT INTO dailyCapacity (dateId, maxCapa, usedCapa, staffAvailable, staffAssign, equipAvailable, equipAssign)
@@ -407,10 +270,10 @@ VALUES
 
 -- 14. 창고별 예정 수용량
 CREATE TABLE `warehouseCapaSchedule` (
-dateId	DATE	NOT NULL,
-whId	bigint	NOT NULL,
-used_capacity	INT	NULL,
-available_capacity	INT	NULL
+                                         dateId	DATE	NOT NULL,
+                                         whId	bigint	NOT NULL,
+                                         used_capacity	INT	NULL,
+                                         available_capacity	INT	NULL
 );
 
 INSERT INTO warehouseCapaSchedule (dateId, whId, used_capacity, available_capacity)
@@ -426,6 +289,3 @@ ALTER TABLE `warehouseCapaSchedule` ADD CONSTRAINT `FK_warehouse_TO_warehouseCap
 
 
 
-
--- 회원 입고관리 메인에 표시되는 리스트 데이터 select 문
--- 입고 요청 ID, 커피상품명, 카테고리, 요청 수량, 입고 수량, 상태, 요청날짜, 승인날짜, 임시저장여부
