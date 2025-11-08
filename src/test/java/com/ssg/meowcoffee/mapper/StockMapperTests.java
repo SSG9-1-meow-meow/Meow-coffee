@@ -64,7 +64,17 @@ public class StockMapperTests {
         list.forEach(i -> log.info(i));
     }
 
-    //거래처 현황 조회는 거래처 테이블 생성 후 test 가능. sql문은 작성해놨음.
+    //거래처 현황 조회는 거래처 테이블 생성 후 test 가능.
+    //거래처 현황 조회 test 가능
+    @Test
+    public void selectCompanyListTest() {
+        Criteria criteria = new Criteria();
+        criteria.setAmount(10);
+
+        List<CompanyReadDTO> list = stockMapper.selectCompanyList(criteria);
+
+        list.forEach( i -> log.info(i.getComEmail()));
+    }
 
     //재고 실사 test
     @Test
@@ -137,4 +147,16 @@ public class StockMapperTests {
     }
 
     //일반관리자 id와 실사로그에 기록된 id를 비교하는 권한 확인 작업은 관리자 테이블에 데이터가 들어간 경우만 가능
+    //테스트 실행
+    @Test
+    public void dueDiligenceAuthoriyTest() {
+        Integer result = stockMapper.selectDueDiligenceAuthority("WH001", "manager_choi");
+        //일치하는 경우 -> 1
+
+        result = stockMapper.selectDueDiligenceAuthority("WH001", "manager_lee");
+        //일치하지 않는 경우 -> 0
+
+        log.info("결과 행의 수: "+ result);
+    }
+
 }
