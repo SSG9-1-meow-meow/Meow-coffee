@@ -15,7 +15,7 @@ import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBl
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InboundRequestInputDTO {
+public class InboundReqInputDTO {
 
   @NotBlank(message = "거래처 ID(comId)는 필수 입력 항목입니다.")
   private String _comId;           // comId

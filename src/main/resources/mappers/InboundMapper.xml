@@ -4,8 +4,9 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssg.meowcoffee.mapper.InboundMapper">
 
+  <!-- 회원 입고 요청 프로시저 호출문 (회원은 임시 저장 혹은 그냥 등록 신청 가능)  -->
   <select id="callCreateInReq" statementType="CALLABLE"
-    parameterType="com.ssg.meowcoffee.dto.InboundRequestInputDTO"
+    parameterType="com.ssg.meowcoffee.dto.InboundReqInputDTO"
     resultType="long">CALL CreateInReq(
     -- IN 파라미터 (DTO 필드 이름 사용)
     #{_comId, mode=IN, jdbcType=VARCHAR},
@@ -17,6 +18,60 @@
     -- OUT 파라미터 (DTO 필드 이름 사용)
     #{generatedInReqId, mode=OUT, jdbcType=BIGINT}
     )
-
   </select>
+
+  <!-- 공통 SELECT 필드 -->
+  <sql id="InReqItemSelectFields">
+    ir.inReqId,
+    c.cfName,
+    c.cfCategory,
+    ii.inQtyReq,
+    ii.inQty,
+    ii.status,
+    ir.inDttmReq,
+    ir.inDttmAppr,
+    ir.IsTempo AS isTempo
+  </sql>
+
+
+  <!-- 입고 요청 + 상세 항목 조회 -->
+  <select id="selectInReqItemList" resultType="com.ssg.meowcoffee.dto.InboundReqItemDTO">
+    SELECT
+    <include refid="InReqItemSelectFields"/>
+    FROM inboundRequests ir
+    JOIN inboundItems ii ON ir.inReqId = ii.inReqId
+    JOIN coffee c ON ii.cfId = c.cfId
+    <where>
+      <!-- 권한별 조건 분기 -->
+      <choose>
+        <when test="userRole == 'MANAGER' or userRole == 'ADMIN'">
+          ir.managerId = #{userId}
+        </when>
+        <when test="userRole == 'COMPANY'">
+          ir.comId = #{userId}
+        </when>
+      </choose>
+
+      <!-- 검색 조건 -->
+      <if test="criteria.keyword != null and criteria.keyword != ''">
+        <choose>
+          <when test='criteria.typeStr.contains("T")'>
+            AND ii.status LIKE CONCAT('%', #{criteria.keyword}, '%')
+          </when>
+          <when test='criteria.typeStr.contains("C")'>
+            AND c.cfCategory LIKE CONCAT('%', #{criteria.keyword}, '%')
+          </when>
+          <when test='criteria.typeStr.contains("W")'>
+            AND c.cfName LIKE CONCAT('%', #{criteria.keyword}, '%')
+          </when>
+        </choose>
+      </if>
+    </where>
+    ORDER BY ir.inDttmReq DESC
+    LIMIT #{criteria.amount} OFFSET #{criteria.skip}
+  </select>
+
+
+
+
 </mapper>

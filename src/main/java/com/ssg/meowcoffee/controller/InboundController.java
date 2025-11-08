@@ -1,6 +1,6 @@
 package com.ssg.meowcoffee.controller;
 
-import com.ssg.meowcoffee.dto.InboundRequestInputDTO;
+import com.ssg.meowcoffee.dto.InboundReqInputDTO;
 import com.ssg.meowcoffee.service.InboundService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class InboundController {
   private final InboundService inboundService;
 
   @PostMapping("/inbounds/req")
-  public ResponseEntity<Long> createRequest(@Valid @RequestBody InboundRequestInputDTO requestDto) {
+  public ResponseEntity<Long> createRequest(@Valid @RequestBody InboundReqInputDTO requestDto) {
 
 // 1. 유효성 검사 실패 시, 이 코드는 실행되지 않고 GlobalExceptionHandler로 바로 넘어갑니다.
     long inReqId = inboundService.registerInboundRequest(requestDto);
