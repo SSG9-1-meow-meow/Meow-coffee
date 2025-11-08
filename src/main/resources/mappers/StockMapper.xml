@@ -105,4 +105,8 @@
         from warehouse wh join warehouse_management wm on wh.whId = wm.whId
         where wh.whCode = #{whCode} and wm.userId = #{maId}
     </select>
+
+    <select id="selectWarehouseCodeList" resultType="string">
+        select distinct whCode from warehouse
+    </select>
 </mapper>
