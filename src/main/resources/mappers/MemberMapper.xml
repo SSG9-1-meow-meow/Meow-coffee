@@ -25,7 +25,7 @@
   </resultMap>
 
   <!-- resultMap Enum 매핑 테스트용 조회 쿼리 -->
-  <select id="selectAllUsers" resultMap="userResultMap">
+  <select id="selectUsers" resultMap="userResultMap">
     select * from users;
   </select>
 

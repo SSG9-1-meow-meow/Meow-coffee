@@ -14,7 +14,7 @@ CREATE TABLE users (
      userImgPath	varchar(255)	NULL,
 
      userRole	enum('COMPANY', 'MANAGER', 'ADMIN', 'DELIVERYMAN')	NOT NULL,
-     userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATED') DEFAULT 'WAITING_APPROVAL',
+     userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATE') DEFAULT 'WAITING_APPROVAL',
      userJoinDate	date	NULL,
      userLastLogin	date	NULL,
 
@@ -138,7 +138,7 @@ VALUES
 ALTER TABLE users ADD CONSTRAINT FK_vehicles_TO_users FOREIGN KEY (vehicleId)
 REFERENCES vehicles (vehicleId);
 
-update users set userStatus = 'WAITING_DEACTIVATED' where userId = 'company_good';
+update users set userStatus = 'WAITING_DEACTIVATE' where userId = 'company_good';
 
 select * from users;
 select * from managers;

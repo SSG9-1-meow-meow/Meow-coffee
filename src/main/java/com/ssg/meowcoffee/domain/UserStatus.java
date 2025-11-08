@@ -11,7 +11,7 @@ public enum UserStatus implements UserEnum {
     APPROVAL("APPROVAL", "승인완료"),
     WAITING_APPROVAL("WAITING_APPROVAL", "승인대기"),
     DEACTIVATED("DEACTIVATED", "휴면상태"),
-    WAITING_DEACTIVATED("WAITING_DEACTIVATED", "휴면대기");
+    WAITING_DEACTIVATED("WAITING_DEACTIVATE", "휴면대기");
 
     private final String statusName;
     private final String statusValue;
