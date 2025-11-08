@@ -5,9 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+// 회원관리 기능용 페이지 DTO입니다.
 @Getter
 @ToString
-public class UserPageDTO<E> {
+public class UserPageDTO<E> extends PageDTO {
 
     private int page;
     private int amount;
@@ -20,6 +21,7 @@ public class UserPageDTO<E> {
 
     @Builder
     public UserPageDTO(UserCriteria cri, List<E> dtoList, int total) {
+        super(cri, total);
         this.page = cri.getPageNum();
         this.amount = cri.getAmount();
         this.total = total;
