@@ -1,10 +1,10 @@
 package com.ssg.meowcoffee.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public enum VehicleModel {
 
     WING_BODY("5톤 윙바디", 5000);

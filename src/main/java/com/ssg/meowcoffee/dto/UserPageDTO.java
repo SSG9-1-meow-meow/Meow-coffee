@@ -1,7 +1,6 @@
 package com.ssg.meowcoffee.dto;
 
 import java.util.List;
-import javax.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

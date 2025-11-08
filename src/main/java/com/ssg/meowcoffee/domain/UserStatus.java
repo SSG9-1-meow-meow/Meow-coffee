@@ -1,11 +1,11 @@
 package com.ssg.meowcoffee.domain;
 
 import com.ssg.meowcoffee.util.UserEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public enum UserStatus implements UserEnum {
 
     APPROVAL("APPROVAL", "승인완료"),
@@ -15,7 +15,6 @@ public enum UserStatus implements UserEnum {
 
     private final String statusName;
     private final String statusValue;
-
 
     @Override
     public String getName() {
