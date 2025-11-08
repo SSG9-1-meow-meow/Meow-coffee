@@ -21,7 +21,6 @@ public class DeliverymanVO {
     private String delivImgPath;
     private String delivVhcId;
 
-    // 추후 수정 예정
-    private String delivVhcModel;
+    private VehicleModel delivVhcModel; // ENUM 사용
     private LocalDate delivLastLogin;
 }

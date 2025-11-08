@@ -14,12 +14,14 @@ CREATE TABLE users (
      userImgPath	varchar(255)	NULL,
 
      userRole	enum('COMPANY', 'MANAGER', 'ADMIN', 'DELIVERYMAN')	NOT NULL,
-     userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATE')	NOT NULL,
+     userStatus	enum('APPROVAL', 'WAITING_APPROVAL', 'DEACTIVATED', 'WAITING_DEACTIVATED') DEFAULT 'WAITING_APPROVAL',
      userJoinDate	date	NULL,
      userLastLogin	date	NULL,
 
      vehicleId	char(10)	NULL
 );
+
+ALTER TABLE users ADD CONSTRAINT PK_USERS PRIMARY KEY (userId);
 
 
 # 원본 테이블인 users를 먼저 생성해야 관리자 뷰를 생성할 수 있습니다.
@@ -131,12 +133,14 @@ VALUES
 ('company_kitchen', 'hashed_password_placeholder', '(주)키친아트', '한주방', '010-6666-2222', 'kitchen@art.com', '420-82-77777', '경기도 파주시', '공단 1로', 'C:\\study\\meowcoffeeFile\\profiles\\profile_company_kitchen_420-82-77777.jpg', 'COMPANY', 'APPROVAL', '2023-12-10', '2025-11-02', NULL);
 
 
-select * from managers;
-select * from companies;
-select * from deliverymen;
-
-
 
 # vehicles 테이블의 기본키를 참조하는 외래키를 users에 추가
 ALTER TABLE users ADD CONSTRAINT FK_vehicles_TO_users FOREIGN KEY (vehicleId)
 REFERENCES vehicles (vehicleId);
+
+update users set userStatus = 'WAITING_DEACTIVATED' where userId = 'company_good';
+
+select * from users;
+select * from managers;
+select * from companies;
+select * from deliverymen;
