@@ -68,6 +68,16 @@ CREATE TABLE due_diligence (
                                CONSTRAINT fk_due_diligence_stock FOREIGN KEY (stkId) REFERENCES stock(stkId)
 );
 
+-- 창고 관리 테이블
+create table warehouse_management(
+    whManagementId bigint primary key auto_increment,
+    whId bigint not null,
+    userId varchar(30) not null,
+    constraint fk_whId foreign key (whId) references warehouse(whId),
+    constraint fk_userId foreign key (userId) references users(userId)
+);
+
+
 -- 더미데이터 넣음
 -- 🚀 0. 데이터베이스 선택
 USE meowcoffeedb;
@@ -123,6 +133,10 @@ VALUES
     ('STK003', NOW(), 'REJECTED', 'INCORRECT', 'manager02', '수량 차이 발생', 140),
     ('STK004', NOW(), 'APPROVED', 'CORRECT', 'admin', '검수 완료', 80),
     ('STK005', NOW(), 'PENDING', 'INCORRECT', 'manager03', '실사 대기 중', 0);
+
+INSERT INTO warehouse_management(whId, userId)
+values (1, 'manager_choi'),(1,'manager_kim'), (2, 'manager_lee'), (3, 'manager_park');
+
 
 ALTER TABLE stock MODIFY lpId CHAR(40) NOT NULL;
 
