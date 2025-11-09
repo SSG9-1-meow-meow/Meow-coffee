@@ -208,19 +208,20 @@ begin
     declare real_quantity int;
     declare stk_id varchar(12);
     declare cur_status varchar(10);
+    declare is_deleted tinyint;
 
-select realStkQuantity, stkId, ddApproval into real_quantity, stk_id, cur_status
+select realStkQuantity, stkId, ddApproval, isDelete into real_quantity, stk_id, cur_status, is_deleted
 from due_diligence where ddId = dd_Id;
 
-if dd_Approval = 'APPROVED' and cur_status = 'PENDING' then
+if dd_Approval = 'APPROVED' and cur_status = 'PENDING' and is_deleted = 0 then
 update stock set stkQuantity = real_quantity
 where stkId = stk_id;
 update due_diligence set ddApproval = dd_Approval
 where ddId= dd_Id;
-elseif dd_Approval = 'REJECTED' and cur_status= 'PENDING' then
+elseif dd_Approval = 'REJECTED' and cur_status= 'PENDING' and is_deleted = 0 then
 update due_diligence set ddApproval = dd_Approval
 where ddId= dd_Id;
 end if;
 end ##
 delimiter ;
-
+drop procedure if exists updateApprovalStatus;

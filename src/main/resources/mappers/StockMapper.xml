@@ -41,13 +41,13 @@
         join location_places lp on l.lpId = lp.lpId
         join stock stk on stk.lpId = lp.lpId
         group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress
-        limit #{criteria.skip}, #{criteria.amount}
+        limit #{skip}, #{amount}
     </select>
 
     <select id="selectCompanyList" resultType="com.ssg.meowcoffee.dto.CompanyReadDTO">
         select comId, comName, comCode, comEmail, comPhone, comStartDate, comExpiredDate
         from companies
-        limit #{criteria.skip}, #{criteria.amount}
+        limit #{skip}, #{amount}
     </select>
 
     <select id="selectDueDiligenceList" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
@@ -121,7 +121,7 @@
         <include refid="search"/>
     </select>
 
-    <select id="countDueDligenceTotal" resultType="int">
+    <select id="countDueDiligenceTotal" resultType="int">
         select count(*)
         from stock stk join due_diligence dd on dd.stkId = stk.stkId
         join location_places lp on lp.lpId = stk.lpId
