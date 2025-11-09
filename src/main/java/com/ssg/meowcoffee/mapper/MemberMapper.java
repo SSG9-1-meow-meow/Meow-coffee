@@ -17,18 +17,18 @@ public interface MemberMapper {
 
     // 회원 리스트에서의 회원정보 조회 - 창고관리자, 총관리자 전용기능
     // (승인대기, 휴면상태, 휴면대기 회원도 조회해야 하므로 users에서 조회)
-    UserVO selectUserById(String userId);
+    UserVO selectUserById(@Param("userId") String userId);
 
     // 현재 로그인한 회원정보 조회
-    ManagerVO selectManagerById(String userId);
-    CompanyVO selectCompanyById(String userId);
-    DeliverymanVO selectDeliverymenById(String userId);
+    ManagerVO selectManagerById(@Param("userId") String userId);
+    CompanyVO selectCompanyById(@Param("userId") String userId);
+    DeliverymanVO selectDeliverymenById(@Param("userId") String userId);
 
     int getCount(@Param("cri") UserCriteria criteria);
 
-    int updateUser(UserInfoDTO userInfoDTO);                // 회원정보 변경
-    int updateUserStatus(UserStatusDTO userStatusDTO);      // 회원상태 변경(총관리자 전용)
+    int updateUser(@Param("userInfo") UserInfoDTO userInfoDTO);                // 회원정보 변경
+    int updateUserStatus(@Param("userStat") UserStatusDTO userStatusDTO);      // 회원상태 변경(총관리자 전용)
 
-    int deleteUser(String currentId);         // 휴면회원 전환 신청
-    int deleteUserByAdmin(String targetId);   // 휴면회원 전환(총관리자 전용)
+    int deleteUser(@Param("currentId") String currentId);         // 휴면회원 전환 신청
+    int deleteUserByAdmin(@Param("targetId") String targetId);   // 휴면회원 전환(총관리자 전용)
 }

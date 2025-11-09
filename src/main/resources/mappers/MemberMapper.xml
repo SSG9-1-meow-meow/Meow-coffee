@@ -105,27 +105,27 @@
 
   <update id="updateUser">
     update users
-    set userPwd = #{userPwd}
-    <if test="#{userEmail} != null">
-      , userEmail = #{userEmail}
+    set userPwd = #{userInfo.userPwd}
+    <if test="#{userInfo.userEmail} != null">
+      , userEmail = #{userInfo.userEmail}
     </if>
-    <if test="#{userPhone} != null">
-      , userPhone = #{userPhone}
+    <if test="#{userInfo.userPhone} != null">
+      , userPhone = #{userInfo.userPhone}
     </if>
-    <if test="#{userImgPath} != null">
-      , userImgPath = #{userImgPath}
+    <if test="#{userInfo.userImgPath} != null">
+      , userImgPath = #{userInfo.userImgPath}
     </if>
-    where userId = #{userId}
+    where userId = #{userInfo.userId}
   </update>
 
   <update id="updateUserStatus">
     update users
-    set userStatus = #{newStatus}
-    where userId = #{userId} and userStatus = #{oldStatus}
+    set userStatus = #{userStat.newStatus}
+    where userId = #{userStat.userId} and userStatus = #{userStat.oldStatus}
   </update>
 
   <update id="deleteUser">
-    <!-- 현재 로그인한 회원의 아이디를 휴면상태로 전환 -->
+    <!-- 현재 로그인한 회원의 아이디를 휴면대기상태로 전환 -->
     update users
     set userStatus = 'WAITING_DEACTIVATE' where userId = #{currentId}
   </update>
