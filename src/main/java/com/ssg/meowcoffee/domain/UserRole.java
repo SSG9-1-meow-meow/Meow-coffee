@@ -1,5 +1,6 @@
 package com.ssg.meowcoffee.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.ssg.meowcoffee.util.UserEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public enum UserRole implements UserEnum {
 
 
     @Override
+    @JsonValue
     public String getName() {
         return roleName;
     }
