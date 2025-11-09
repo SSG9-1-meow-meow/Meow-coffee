@@ -86,6 +86,8 @@ public class GlobalExceptionHandler {
    * 404 NOT FOUND 처리
    * 예: 요청한 URL에 매핑되는 핸들러가 없을 때
    */
+  // 정적 리소스 매핑 제거해야 돌아가서 일단 주석 처리함(박기웅)
+  // <mvc:resources mapping="/resources/**" location="classpath:/static/"/>
 //  @ExceptionHandler(NoHandlerFoundException.class)
 //  public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
 //    HttpStatus status = HttpStatus.NOT_FOUND;

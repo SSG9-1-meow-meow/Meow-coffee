@@ -159,8 +159,8 @@ CREATE TRIGGER trg_upsert_daily_capacity
     AFTER UPDATE ON inboundItems
     FOR EACH ROW
 BEGIN
-    -- inDttmSchd가 NULL에서 특정 시간으로 업데이트되었는지 확인
-    IF OLD.inDttmSchd IS NULL AND NEW.inDttmSchd IS NOT NULL THEN
+    -- [최종 조건] 상태가 '승인완료'가 아니었다가 '승인완료'로 변경되는 시점에만 발동
+    IF OLD.status != '승인완료' AND NEW.status = '승인완료' THEN
         -- dailyCapacity 테이블에 해당 날짜 데이터가 있으면 UPDATE, 없으면 INSERT
         INSERT INTO dailyCapacity (
             dateId,
@@ -207,9 +207,8 @@ BEGIN
     DECLARE v_whId BIGINT; -- 조회된 창고 ID를 저장할 변수
     DECLARE v_total_capa INT; -- 조회된 창고의 총 수용량을 저장할 변수
 
-    -- inDttmSchd가 NULL에서 특정 시간으로 업데이트되었고, locationId가 지정되었는지 확인
-    IF OLD.inDttmSchd IS NULL AND NEW.inDttmSchd IS NOT NULL AND NEW.locationId IS NOT NULL THEN
-
+-- [최종 조건] 상태가 '승인완료'가 아니었다가 '승인완료'로 변경되는 시점에만 발동 (locationId도 있어야 함)
+    IF OLD.status != '승인완료' AND NEW.status = '승인완료' AND NEW.locationId IS NOT NULL THEN
         -- 1. locationId를 사용해 whId (창고 ID)를 조회
         SELECT whId INTO v_whId
         FROM locations
@@ -319,26 +318,89 @@ UPDATE inboundItems SET status = '입고완료', inQty = 50, inDttmRecv = NOW() 
 SELECT * FROM stock WHERE lpId = 'LP001' AND cfId = 'CF002'; -- 원래 재고가 없던 경우
 
 
+-- 관리자 입고요청 처리 프로시저
 
+DROP PROCEDURE IF EXISTS ProcessInboundItem;
 
+DELIMITER //
 
+CREATE PROCEDURE ProcessInboundItem(
+    IN _inReqItemsId BIGINT,
+    IN _managerId VARCHAR(30),
+    IN _newStatus VARCHAR(20),
+    IN _locationId CHAR(12),
+    IN _inDttmSchd DATETIME,
+    IN _isTempo TINYINT
+)
+BEGIN
+    DECLARE _parentInReqId BIGINT;
+    DECLARE _totalItems INT;
+    DECLARE _processedItems INT;
 
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error processing inbound item. Transaction rolled back.';
+        END;
 
+    START TRANSACTION;
 
+    -- 1. 부모 입고 요청 ID 조회
+    SELECT inReqId INTO _parentInReqId
+    FROM inboundItems
+    WHERE inReqItemsId = _inReqItemsId;
 
--- 회원 입고관리 메인 조회용
--- 입고 요청ID, 커피상품명, 카테고리, 요청 수량, 입고 수량, 상태, 요청날짜, 승인 날짜, 임시저장여부
+    IF _parentInReqId IS NOT NULL THEN
+        -- 2. 현재 처리 중인 inboundItems 항목 업데이트
+        UPDATE inboundItems
+        SET
+            status = IF(_isTempo = 1, '승인대기', _newStatus),
+            locationId = _locationId,
+            inDttmSchd = _inDttmSchd
+        WHERE
+            inReqItemsId = _inReqItemsId;
 
-SELECT
-    ir.inReqId,
-    c.cfName AS coffeeName,
-    c.cfCategory AS category,
-    ii.inQtyReq AS requestedQty,
-    ii.inQty AS receivedQty,
-    ii.status,
-    ir.inDttmReq AS requestDate,
-    ir.inDttmAppr AS approvalDate,
-    ir.IsTempo AS isTemporary
-FROM inboundRequests ir
-         JOIN inboundItems ii ON ir.inReqId = ii.inReqId
-         JOIN coffee c ON ii.cfId = c.cfId;
+        -- 3. 최종 처리(_isTempo=0)인 경우에만 부모 요청 상태 변경 로직 실행
+        IF _isTempo = 0 THEN
+            -- ★★★ [새로운 핵심 로직] ★★★
+            -- 3-1. 부모 요청에 속한 전체 상세 항목 수 조회
+            SELECT COUNT(*) INTO _totalItems
+            FROM inboundItems
+            WHERE inReqId = _parentInReqId;
+
+            -- 3-2. '승인대기'가 아닌 (즉, 처리가 완료된) 상세 항목 수 조회
+            SELECT COUNT(*) INTO _processedItems
+            FROM inboundItems
+            WHERE inReqId = _parentInReqId AND status != '승인대기';
+
+            -- 3-3. 두 수가 같으면, 모든 항목이 처리된 것이므로 부모 요청의 최종 승인 정보 업데이트
+            IF _totalItems = _processedItems THEN
+                UPDATE inboundRequests
+                SET
+                    managerId = _managerId,
+                    inDttmAppr = NOW(),
+                    IsTempo = 0
+                WHERE
+                    inReqId = _parentInReqId;
+            ELSE
+                -- 아직 '승인대기' 항목이 남아있으면, 승인 정보는 업데이트하지 않고 임시저장 상태만 해제
+                UPDATE inboundRequests
+                SET IsTempo = 0
+                WHERE inReqId = _parentInReqId;
+            END IF;
+
+        ELSE -- 임시 저장(_isTempo=1)인 경우
+            UPDATE inboundRequests
+            SET IsTempo = 1
+            WHERE inReqId = _parentInReqId;
+        END IF;
+
+    ELSE
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Inbound item not found.';
+    END IF;
+
+    COMMIT;
+END //
+
+DELIMITER ;

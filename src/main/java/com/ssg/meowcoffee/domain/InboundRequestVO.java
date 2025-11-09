@@ -1,13 +1,11 @@
 package com.ssg.meowcoffee.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Setter // 테스트용 동적 데이터 생성을 위해 임시로 삽입
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

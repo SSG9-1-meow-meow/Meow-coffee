@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,47 +21,77 @@ public class StockController {
 
     //재고 관리 controller
     @GetMapping("/stocks")
-    public ResponseEntity<List<StockReadDTO>> readStockList(@ModelAttribute Criteria criteria) {
+    public ResponseEntity<Map<String, Object>> readStockList(@ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = new StockSearchDTO(); //재고 전체 조회이니 searchDTO에 아무것도 설정 안해줘도 됨
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(searchDTO, "stock");
+        PageDTO pageDTO = new PageDTO(criteria,total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/stocks/category/{cfCategory}") //카테고리(대분류)별 재고 조회
-    public ResponseEntity<List<StockReadDTO>> readStockListByCategory(@PathVariable("cfCategory") String cfCategory,
+    public ResponseEntity<Map<String, Object>> readStockListByCategory(@PathVariable("cfCategory") String cfCategory,
                                                                       @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfCategory(cfCategory).build();
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(searchDTO, "stock");
+        PageDTO pageDTO = new PageDTO(criteria,total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/stocks/type/{cfType}") //품종(중분류)별 재고 조회
-    public ResponseEntity<List<StockReadDTO>> readStockListByType(@PathVariable("cfType") String cfType,
+    public ResponseEntity<Map<String, Object>> readStockListByType(@PathVariable("cfType") String cfType,
                                                                   @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfType(cfType).build();
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(searchDTO, "stock");
+        PageDTO pageDTO = new PageDTO(criteria,total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/stocks/grade/{cfGrade}") //등급(소분류)별 재고 조회
-    public ResponseEntity<List<StockReadDTO>> readStockListByGrade(@PathVariable("cfGrade") String cfGrade,
+    public ResponseEntity<Map<String, Object>> readStockListByGrade(@PathVariable("cfGrade") String cfGrade,
                                                                    @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfGrade(cfGrade).build();
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(searchDTO, "stock");
+        PageDTO pageDTO = new PageDTO(criteria,total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/stocks/{cfName}") //품목별 재고 조회
-    public ResponseEntity<List<StockReadDTO>> readStockListByName(@PathVariable("cfName") String cfName,
+    public ResponseEntity<Map<String, Object>> readStockListByName(@PathVariable("cfName") String cfName,
                                                                   @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfName(cfName).build();
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(searchDTO, "stock");
+        PageDTO pageDTO = new PageDTO(criteria,total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/stocks/coffee/{cfName}") //커피 정보 상세 조회
@@ -71,27 +103,46 @@ public class StockController {
 
     //유효성 검사 필수 (총관리자 + 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/stocks/warehouse")
-    public ResponseEntity<List<StockReadDTO>> readStocksByWarehouse(@ModelAttribute Criteria criteria) {
+    public ResponseEntity<Map<String, Object>> readStocksByWarehouse(@ModelAttribute Criteria criteria) {
         List<StockReadDTO> list = stockService.getWarehouses(criteria);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(null, "warehouse");
+        PageDTO pageDTO = new PageDTO(criteria, total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
     //유효성 검사 필수 (총관리자+ 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/stocks/company")
-    public ResponseEntity<List<CompanyReadDTO>> readCompanyList(@ModelAttribute Criteria criteria) {
+    public ResponseEntity<Map<String, Object>> readCompanyList(@ModelAttribute Criteria criteria) {
         List<CompanyReadDTO> list = stockService.getCompanyList(criteria);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(null, "company");
+        PageDTO pageDTO = new PageDTO(criteria, total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+        return ResponseEntity.ok(response);
     }
 
 
     //재고 실사 controller -> 기본 페이지에서만 유효성 검사해도 됨
     @GetMapping("/dueDiligences")
-    public ResponseEntity<List<DueDiligenceReadDTO>> readDueDiligenceList(@ModelAttribute Criteria criteria) {
+    public ResponseEntity<Map<String, Object>> readDueDiligenceList(@ModelAttribute Criteria criteria) {
         List<DueDiligenceReadDTO> list = stockService.getDueDiligenceList(criteria);
 
-        return ResponseEntity.ok(list);
+        Integer total = stockService.getListCount(null, "dueDiligence");
+        PageDTO pageDTO = new PageDTO(criteria, total);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", list);
+        response.put("pageDTO", pageDTO);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/dueDiligences/{ddId}") //재고 실사 상세 페이지

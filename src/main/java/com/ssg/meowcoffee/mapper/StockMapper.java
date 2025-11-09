@@ -22,5 +22,8 @@ public interface StockMapper {
     Integer updateApprovalStatus(@Param("ddApproval") String ddApproval, @Param("ddId") Long ddId);
     Integer selectDueDiligenceAuthority(@Param("whCode") String whCode, @Param("maId") String maId);
     List<String> selectWarehouseCodeList();
-
+    Integer countStockTotal(@Param("searchDTO") StockSearchDTO stockSearchDTO);
+    Integer countDueDiligenceTotal();
+    Integer countWarehouseTotal();
+    Integer countCompanyTotal();
 }

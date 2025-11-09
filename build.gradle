@@ -65,6 +65,10 @@ dependencies {
 
   // 유효성 검증 어노테이션
   implementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'
+
+  // QR 코드 출력 의존성 추가(박기웅)
+  implementation("com.google.zxing:core:3.5.3")
+  implementation("com.google.zxing:javase:3.5.3")
 }
 
 test {
