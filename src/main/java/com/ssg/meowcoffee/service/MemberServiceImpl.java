@@ -9,7 +9,9 @@ import com.ssg.meowcoffee.dto.DeliverymanDTO;
 import com.ssg.meowcoffee.dto.ManagerDetailDTO;
 import com.ssg.meowcoffee.dto.UserCriteria;
 import com.ssg.meowcoffee.dto.UserDetailDTO;
+import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
 import com.ssg.meowcoffee.dto.UserPageDTO;
+import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
 import com.ssg.meowcoffee.mapper.MemberMapper;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,5 +70,25 @@ public class MemberServiceImpl implements MemberService {
         DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
         DeliverymanDTO deliverymanDTO = modelMapper.map(deliverymanVO, DeliverymanDTO.class);
         return deliverymanDTO;
+    }
+
+    @Override
+    public void modifyUser(UserInfoUpdateDTO userInfoUpdateDTO) {
+        memberMapper.updateUser(userInfoUpdateDTO);
+    }
+
+    @Override
+    public void modifyUserStatus(UserStatUpdateDTO userStatUpdateDTO) {
+        memberMapper.updateUserStatus(userStatUpdateDTO);
+    }
+
+    @Override
+    public void deactivateUser(String currentId) {
+        memberMapper.deleteUser(currentId);
+    }
+
+    @Override
+    public void deactivateUserByAdmin(String targetId) {
+        memberMapper.deleteUserByAdmin(targetId);
     }
 }
