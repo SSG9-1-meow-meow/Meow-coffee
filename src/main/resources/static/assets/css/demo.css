@@ -181,6 +181,25 @@ body[data-background-color="dark"] .demo-icon .icon-class {
     .row-demo-grid [class^="col"] .card-body {
       background: #ddd; }
 
+/*    kwp add*/
+.btnSwitch button[data-font] {
+  background-color: #000;
+}
+.btnSwitch button[data-font="xlarge"] {
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.btnSwitch button[data-font="large"] {
+  height: 2rem;
+  width: 2rem;
+}
+
+.btnSwitch button[data-font="normal"] {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
 .btnSwitch button[data-color="white"] {
   background-color: #fff; }
 .btnSwitch button[data-color="grey"] {
