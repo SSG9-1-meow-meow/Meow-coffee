@@ -6,7 +6,7 @@ import lombok.Data;
 public class Criteria {
 
     private int pageNum = 1;
-    private int amount;
+    private int amount = 10;
 
     //null, T, C, W, TC, TW, TCW
     private String[] types;

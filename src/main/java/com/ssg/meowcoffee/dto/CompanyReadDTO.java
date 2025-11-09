@@ -16,5 +16,5 @@ public class CompanyReadDTO {
     private String comEmail;
     private String comPhone;
     private LocalDate comStartDate;
-    private LocalDate comEndDate;
+    private LocalDate comExpiredDate;
 }

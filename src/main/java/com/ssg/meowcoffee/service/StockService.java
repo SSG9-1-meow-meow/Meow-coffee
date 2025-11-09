@@ -19,4 +19,5 @@ public interface StockService {
     Integer modifyApprovalStatus(String ddApproval, Long ddId);
 
     List<String> getWarehouseCodeList();
+    Integer getListCount(StockSearchDTO stockSearchDTO, String menu);
 }

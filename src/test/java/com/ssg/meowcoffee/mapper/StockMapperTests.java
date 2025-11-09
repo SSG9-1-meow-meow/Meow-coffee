@@ -24,6 +24,9 @@ public class StockMapperTests {
         criteria.setAmount(10);
 
         StockSearchDTO stockSearchDTO = new StockSearchDTO();
+        //재고 리스트 개수 가져오기 test 추가
+        Integer result = stockMapper.countStockTotal(stockSearchDTO);
+        log.info("개수: "+ result);
 
         //전체 조회
         List<StockReadDTO> totalList = stockMapper.selectStockList(criteria, stockSearchDTO);
