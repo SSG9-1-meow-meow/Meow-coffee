@@ -27,21 +27,21 @@ public class CustomEnumTypeHandler<E extends Enum<E>> implements TypeHandler<Use
     public UserEnum getResult(ResultSet rs, String columnName) throws SQLException {
         // executeQuery 수행 결과(칼럼명으로 반환)
         String roleName = rs.getString(columnName);
-        return getEnum(roleName);
+        return (roleName != null) ? getEnum(roleName) : null;
     }
 
     @Override
     public UserEnum getResult(ResultSet rs, int i) throws SQLException {
         // executeQuery 수행 결과(칼럼 인덱스를 통해 반환)
         String roleName = rs.getString(i);
-        return getEnum(roleName);
+        return (roleName != null) ? getEnum(roleName) : null;
     }
 
     @Override
     public UserEnum getResult(CallableStatement call, int i) throws SQLException {
         // 프로시저 조회 쿼리 실행 시 반환 방법
         String roleName = call.getString(i);
-        return getEnum(roleName);
+        return (roleName != null) ? getEnum(roleName) : null;
     }
 
     private UserEnum getEnum(String enumName) {

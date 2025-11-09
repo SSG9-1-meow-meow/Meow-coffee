@@ -34,6 +34,9 @@ public class MemberMapperTests {
         UserCriteria criteria = UserCriteria.builder()
                 .pageNum(1)
                 .amount(10)
+                .roleType(UserRole.COMPANY)
+                .type("I")          // 키워드 검색 옵션: 아이디
+                .keyword("good")
                 .from(LocalDate.parse("2025-06-01"))
                 .to(LocalDate.parse("2025-11-01"))
                 .build();
@@ -102,12 +105,10 @@ public class MemberMapperTests {
     @Test
     @DisplayName("현재 로그인한 총관리자가 회원의 계정상태를 변경 - 회원가입 승인")
     public void testUpdateUserStatus() {
-        String userId = "manager02";
+        String userId = "company_good";
         UserStatUpdateDTO newStatus = UserStatUpdateDTO.builder()
                 .userId(userId)
-                .userRole(UserRole.COMPANY)
-                .oldStatus(UserStatus.WAITING_APPROVAL)
-                .newStatus(UserStatus.APPROVAL)
+                .userStatus(UserStatus.APPROVAL)
                 .build();
         int affected = memberMapper.updateUserStatus(newStatus);
         Assertions.assertEquals(1, affected);

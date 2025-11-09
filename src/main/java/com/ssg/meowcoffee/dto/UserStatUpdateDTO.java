@@ -23,9 +23,7 @@ public class UserStatUpdateDTO {
 
     private UserRole userRole;
 
-    private UserStatus oldStatus;
-
-    private UserStatus newStatus;
+    private UserStatus userStatus;
 
     private LocalDate userJoinDate;
 }
