@@ -86,17 +86,17 @@ public class GlobalExceptionHandler {
    * 404 NOT FOUND 처리
    * 예: 요청한 URL에 매핑되는 핸들러가 없을 때
    */
-  @ExceptionHandler(NoHandlerFoundException.class)
-  public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
-    HttpStatus status = HttpStatus.NOT_FOUND;
-
-    ErrorResponse response = ErrorResponse.builder()
-            .status(status.value())
-            .error(status.getReasonPhrase())
-            .message("요청하신 리소스를 찾을 수 없습니다.")
-            .path(request.getDescription(false).replace("uri=", ""))
-            .build();
-
-    return new ResponseEntity<>(response, status);
-  }
+//  @ExceptionHandler(NoHandlerFoundException.class)
+//  public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
+//    HttpStatus status = HttpStatus.NOT_FOUND;
+//
+//    ErrorResponse response = ErrorResponse.builder()
+//            .status(status.value())
+//            .error(status.getReasonPhrase())
+//            .message("요청하신 리소스를 찾을 수 없습니다.")
+//            .path(request.getDescription(false).replace("uri=", ""))
+//            .build();
+//
+//    return new ResponseEntity<>(response, status);
+//  }
 }
