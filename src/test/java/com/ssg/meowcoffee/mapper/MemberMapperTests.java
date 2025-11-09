@@ -1,5 +1,7 @@
 package com.ssg.meowcoffee.mapper;
 
+import com.ssg.meowcoffee.domain.CompanyVO;
+import com.ssg.meowcoffee.domain.DeliverymanVO;
 import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
@@ -56,12 +58,31 @@ public class MemberMapperTests {
     }
 
     @Test
-    @DisplayName("현재 회원권한이 관리자인 회원정보를 조회")
+    @DisplayName("현재 회원권한이 창고관리자인 회원정보를 조회")
     public void testSelectManagerById() {
         String userId = "manager_kim";
         ManagerVO managerVO = memberMapper.selectManagerById(userId);
         log.info(managerVO);
-        Assertions.assertNotNull(managerVO);
+        Assertions.assertEquals(userId, managerVO.getManagerId());
+        Assertions.assertEquals("창고관리자", managerVO.getManagerRole().getValue());
+    }
+
+    @Test
+    @DisplayName("거래처의 담당자가 현재 회원정보를 조회")
+    public void testSelectCompanyById() {
+        String userId = "company_basic";
+        CompanyVO companyVO = memberMapper.selectCompanyById(userId);
+        log.info(companyVO);
+        Assertions.assertEquals(userId, companyVO.getComId());
+    }
+
+    @Test
+    @DisplayName("현재 회원권한이 배송기사인 회원정보를 조회")
+    public void testSelectDeliverymanById() {
+        String userId = "delivery01";
+        DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
+        log.info(deliverymanVO);
+        Assertions.assertEquals(userId, deliverymanVO.getDelivId());
     }
 
     @Test
@@ -97,6 +118,14 @@ public class MemberMapperTests {
     public void testDelete() {
         String currentId = "manager01";
         int affected = memberMapper.deleteUser(currentId);
+        Assertions.assertEquals(1, affected);
+    }
+
+    @Test
+    @DisplayName("현재 로그인한 총관리자가 지정한 회원의 상태를 변경 - 휴면회원 전환")
+    public void testDeleteUserByAdmin() {
+        String targetId = "manager01";
+        int affected = memberMapper.deleteUserByAdmin(targetId);
         Assertions.assertEquals(1, affected);
     }
 }
