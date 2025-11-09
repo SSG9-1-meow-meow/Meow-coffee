@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 
-// 프로시저 호출용 DTO (VO의 필드를 확장)
+// 회원 입고 요청시 활용 DTO (VO의 필드를 확장)
 @Getter
-@Setter // OUT 파라미터를 MyBatis가 설정해야 하므로 Setter는 필수입니다.
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InboundRequestInputDTO {
+public class InboundReqInputDTO {
+
+  private Long _inReqId;
 
   @NotBlank(message = "거래처 ID(comId)는 필수 입력 항목입니다.")
   private String _comId;           // comId

@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice // 이 클래스가 모든 컨트롤러에 대한 예외 처리를 담당함을 선언
 public class GlobalExceptionHandler {
@@ -79,4 +80,25 @@ public class GlobalExceptionHandler {
 
     return new ResponseEntity<>(response, status);
   }
+
+
+  /**
+   * 404 NOT FOUND 처리
+   * 예: 요청한 URL에 매핑되는 핸들러가 없을 때
+   */
+  // 정적 리소스 매핑 제거해야 돌아가서 일단 주석 처리함(박기웅)
+  // <mvc:resources mapping="/resources/**" location="classpath:/static/"/>
+//  @ExceptionHandler(NoHandlerFoundException.class)
+//  public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
+//    HttpStatus status = HttpStatus.NOT_FOUND;
+//
+//    ErrorResponse response = ErrorResponse.builder()
+//            .status(status.value())
+//            .error(status.getReasonPhrase())
+//            .message("요청하신 리소스를 찾을 수 없습니다.")
+//            .path(request.getDescription(false).replace("uri=", ""))
+//            .build();
+//
+//    return new ResponseEntity<>(response, status);
+//  }
 }

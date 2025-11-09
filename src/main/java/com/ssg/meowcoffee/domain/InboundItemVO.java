@@ -17,7 +17,7 @@ public class InboundItemVO {
     private Long inReqId;
     private String cfId;
     private String locationId;
-    private String status;
+    private InboundStatus status;
     private Integer inQtyReq;
     private String inOrderAddr;
     private Integer inQty;

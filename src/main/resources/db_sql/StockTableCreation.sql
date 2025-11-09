@@ -68,6 +68,16 @@ CREATE TABLE due_diligence (
                                CONSTRAINT fk_due_diligence_stock FOREIGN KEY (stkId) REFERENCES stock(stkId)
 );
 
+-- 창고 관리 테이블
+create table warehouse_management(
+    whManagementId bigint primary key auto_increment,
+    whId bigint not null,
+    userId varchar(30) not null,
+    constraint fk_whId foreign key (whId) references warehouse(whId),
+    constraint fk_userId foreign key (userId) references users(userId)
+);
+
+
 -- 더미데이터 넣음
 -- 🚀 0. 데이터베이스 선택
 USE meowcoffeedb;
@@ -124,6 +134,10 @@ VALUES
     ('STK004', NOW(), 'APPROVED', 'CORRECT', 'admin', '검수 완료', 80),
     ('STK005', NOW(), 'PENDING', 'INCORRECT', 'manager03', '실사 대기 중', 0);
 
+INSERT INTO warehouse_management(whId, userId)
+values (1, 'manager_choi'),(1,'manager_kim'), (2, 'manager_lee'), (3, 'manager_park');
+
+
 ALTER TABLE stock MODIFY lpId CHAR(40) NOT NULL;
 
 desc stock;
@@ -134,3 +148,80 @@ ALTER TABLE stock MODIFY lpId CHAR(40) NOT NULL;
 ALTER TABLE stock
     ADD CONSTRAINT fk_stock_location_places
         FOREIGN KEY (lpId) REFERENCES location_places(lpId);
+
+-- stock 프로시저 작성
+
+use meowcoffeedb;
+
+--  등록 프로시저
+delimiter ##
+create procedure insertDueDiligence(
+    in stk_Id varchar(12),
+    in real_StkQuantity int,
+    in dd_Log varchar(255),
+    in ma_Id varchar(30)
+)
+begin
+    declare status varchar(10);
+    declare quantity int;
+select stk.stkQuantity into quantity
+from stock stk
+where stk.stkId = stk_Id;
+if quantity = real_StkQuantity then set status = 'CORRECT';
+else set status = 'INCORRECT';
+end if;
+insert into due_diligence (stkId, ddStatus, maId, ddLog, realStkQuantity)
+values(stk_Id, status, ma_id, dd_Log, real_StkQuantity);
+
+end ##
+delimiter ;
+
+ -- 수정 프로시저
+delimiter ##
+create procedure updateDueDiligence(
+    in dd_Id BIGINT,
+    in stk_Quantity int,
+    in real_StkQuantity int,
+    in dd_Log VARCHAR(255)
+)
+begin
+    declare status varchar(10);
+
+    if stk_Quantity = real_StkQuantity then set status = 'CORRECT';
+else set status = 'INCORRECT';
+end if;
+
+update due_diligence set ddStatus=status, ddLog = dd_Log,
+                         ddUpdateDate = now(), realStkQuantity = real_StkQuantity
+where  ddId = dd_Id and isDelete = 0;
+
+end ##
+delimiter ;
+
+ -- 총관리자 승인 프로시저
+delimiter ##
+create procedure updateApprovalStatus(
+    in dd_Approval VARCHAR(10),
+    in dd_Id BIGINT
+)
+begin
+    declare real_quantity int;
+    declare stk_id varchar(12);
+    declare cur_status varchar(10);
+    declare is_deleted tinyint;
+
+select realStkQuantity, stkId, ddApproval, isDelete into real_quantity, stk_id, cur_status, is_deleted
+from due_diligence where ddId = dd_Id;
+
+if dd_Approval = 'APPROVED' and cur_status = 'PENDING' and is_deleted = 0 then
+update stock set stkQuantity = real_quantity
+where stkId = stk_id;
+update due_diligence set ddApproval = dd_Approval
+where ddId= dd_Id;
+elseif dd_Approval = 'REJECTED' and cur_status= 'PENDING' and is_deleted = 0 then
+update due_diligence set ddApproval = dd_Approval
+where ddId= dd_Id;
+end if;
+end ##
+delimiter ;
+drop procedure if exists updateApprovalStatus;
