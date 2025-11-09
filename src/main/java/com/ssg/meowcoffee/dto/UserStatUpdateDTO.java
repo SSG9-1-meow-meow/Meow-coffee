@@ -10,12 +10,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * 회원정보에서 회원상태 변경 시 사용되는 DTO입니다.
+ */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStatusDTO {
+public class UserStatUpdateDTO {
 
     @NotNull
     private String userId;

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfoDTO {
+public class UserInfoUpdateDTO {
 
     private String userId;
     private String userPwd;
