@@ -24,6 +24,19 @@
     <result column="vehicleId" property="vehicleId"/>
   </resultMap>
 
+  <resultMap id="deliverymanMap" type="DeliverymanVO">
+    <id property="delivId" column="delivId" />
+    <result property="delivName"    column="delivName" />
+    <result property="delivPwd"     column="delivPwd" />
+    <result property="delivPhone"   column="delivPhone" />
+    <result property="delivCode"    column="delivCode" />
+    <result property="delivImgPath" column="delivImgPath" />
+    <result property="delivVhcId"   column="delivVhcId" />
+    <result property="delivVhcModel" column="delivVhcModel" typeHandler="CustomEnumTypeHandler" />
+    <result property="delivStatus"   column="delivStatus"   typeHandler="CustomEnumTypeHandler" />
+    <result property="delivLastLogin" column="delivLastLogin"/>
+  </resultMap>
+
   <!-- 검색필터 조건 -->
   <sql id="search">
     <where>
@@ -99,7 +112,7 @@
     select * from companies where comId = #{userId}
   </select>
 
-  <select id="selectDeliverymanById" resultType="DeliverymanVO">
+  <select id="selectDeliverymenById" resultMap="deliverymanMap">
     select * from deliverymen where delivId = #{userId}
   </select>
 
@@ -134,6 +147,6 @@
     <!-- 회원리스트에서 지정한 회원을 휴면상태로 전환(총관리자 전용 기능) -->
     update users
     set userStatus = 'DEACTIVATED'
-    where userId = #{targetId} and userStatus = ('APPROVAL', 'WAITING_DEACTIVATE')
+    where userId = #{targetId} and userStatus in ('APPROVAL', 'WAITING_DEACTIVATE')
   </update>
 </mapper>
