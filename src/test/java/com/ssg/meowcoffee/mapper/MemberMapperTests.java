@@ -5,8 +5,8 @@ import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
 import com.ssg.meowcoffee.dto.UserCriteria;
-import com.ssg.meowcoffee.dto.UserInfoDTO;
-import com.ssg.meowcoffee.dto.UserStatusDTO;
+import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
+import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
@@ -68,7 +68,7 @@ public class MemberMapperTests {
     @DisplayName("현재 로그인한 회원이 회원 정보를 변경")
     public void testUpdateUser() {
         String userId = "manager01";
-        UserInfoDTO newUserInfo = UserInfoDTO.builder()
+        UserInfoUpdateDTO newUserInfo = UserInfoUpdateDTO.builder()
                 .userId(userId)
                 .userPwd("2222")
                 .userPhone("010-1234-5678")
@@ -82,7 +82,7 @@ public class MemberMapperTests {
     @DisplayName("현재 로그인한 총관리자가 회원의 계정상태를 변경 - 회원가입 승인")
     public void testUpdateUserStatus() {
         String userId = "manager02";
-        UserStatusDTO newStatus = UserStatusDTO.builder()
+        UserStatUpdateDTO newStatus = UserStatUpdateDTO.builder()
                 .userId(userId)
                 .userRole(UserRole.COMPANY)
                 .oldStatus(UserStatus.WAITING_APPROVAL)

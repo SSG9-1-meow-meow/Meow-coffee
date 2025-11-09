@@ -20,15 +20,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserStatUpdateDTO {
 
-    @NotNull
     private String userId;
 
-    @NotNull
     private UserRole userRole;
 
     private UserStatus oldStatus;
 
-    @NotNull
     private UserStatus newStatus;
 
     private LocalDate userJoinDate;

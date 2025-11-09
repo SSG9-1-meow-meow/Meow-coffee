@@ -5,8 +5,8 @@ import com.ssg.meowcoffee.domain.DeliverymanVO;
 import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserVO;
 import com.ssg.meowcoffee.dto.UserCriteria;
-import com.ssg.meowcoffee.dto.UserInfoDTO;
-import com.ssg.meowcoffee.dto.UserStatusDTO;
+import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
+import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,8 +26,8 @@ public interface MemberMapper {
 
     int getCount(@Param("cri") UserCriteria criteria);
 
-    int updateUser(@Param("userInfo") UserInfoDTO userInfoDTO);                // 회원정보 변경
-    int updateUserStatus(@Param("userStat") UserStatusDTO userStatusDTO);      // 회원상태 변경(총관리자 전용)
+    int updateUser(@Param("userInfo") UserInfoUpdateDTO userInfoUpdateDTO);                // 회원정보 변경
+    int updateUserStatus(@Param("userStat") UserStatUpdateDTO userStatUpdateDTO);      // 회원상태 변경(총관리자 전용)
 
     int deleteUser(@Param("currentId") String currentId);         // 휴면회원 전환 신청
     int deleteUserByAdmin(@Param("targetId") String targetId);   // 휴면회원 전환(총관리자 전용)
