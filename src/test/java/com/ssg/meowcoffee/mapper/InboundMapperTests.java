@@ -734,6 +734,47 @@ public class InboundMapperTests {
     log.info("모든 항목 처리 후 부모 요청 승인일시({})가 기록됨을 확인.", parentRequestAfterAll.getInDttmAppr());
   }
 
+  @Test
+  @DisplayName("관리자 실제 입고 수량 조회 및 업데이트")
+  @Transactional
+  void testSelectAndUpdateActualQuantity() {
+    log.info("--- 실제 입고 수량 조회 및 업데이트 테스트 시작 ---");
+    // given: 샘플 데이터에서 inReqItemsId=1인 항목은 inQtyReq=80, inQty=NULL 상태
+    long targetItemId = 3L;
+
+    // --- 1. 초기 수량 정보 조회 ---
+    log.info("1. 초기 수량 정보 조회 (ID: {})", targetItemId);
+    InboundQtyDTO initialQuantities = inboundMapper.selectInboundQtyById(targetItemId);
+
+    // then 1: 초기 상태 검증
+    assertNotNull(initialQuantities);
+    assertEquals(80, initialQuantities.getInQtyReq(), "초기 요청 수량은 80이어야 합니다.");
+    assertNull(initialQuantities.getInQty(), "초기 실제 입고 수량은 NULL이어야 합니다.");
+    log.info("초기 상태 확인: 요청량={}, 실제량={}", initialQuantities.getInQtyReq(), initialQuantities.getInQty());
+
+
+    // --- 2. 실제 입고 수량 업데이트 ---
+    int newActualQty = 98;
+    log.info("2. 실제 입고 수량을 {}로 업데이트", newActualQty);
+    int affectedRows = inboundMapper.updateActualInboundQuantity(targetItemId, newActualQty);
+
+    // then 2: 업데이트 성공 여부 검증
+    assertEquals(1, affectedRows, "업데이트는 정확히 1개 행에 영향을 주어야 합니다.");
+
+
+    // --- 3. 업데이트 후 수량 정보 재조회 ---
+    log.info("3. 업데이트 후 수량 정보 재조회");
+    InboundQtyDTO updatedQuantities = inboundMapper.selectInboundQtyById(targetItemId);
+
+    // then 3: 최종 상태 검증
+    assertNotNull(updatedQuantities);
+    assertEquals(80, updatedQuantities.getInQtyReq(), "업데이트 후에도 요청 수량은 100으로 유지되어야 합니다.");
+    assertEquals(newActualQty, updatedQuantities.getInQty(), "업데이트 후 실제 입고 수량은 98이어야 합니다.");
+    log.info("최종 상태 확인: 요청량={}, 실제량={}", updatedQuantities.getInQtyReq(), updatedQuantities.getInQty());
+
+    log.info("실제 입고 수량 조회 및 업데이트 테스트 성공.");
+  }
+
 
 
 

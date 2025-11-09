@@ -21,6 +21,7 @@ public interface InboundMapper {
                   @Param("userId") String userId,
                   @Param("userRole") UserRole userRole);
 
+  // 입고 관리 목록 전체 필터링, 권한별 조회를 위함.
   List<InboundReqItemDTO> selectInReqItemList(
       @Param("criteria") CriteriaInbound criteria,
       @Param("userId") String userId,
@@ -28,7 +29,6 @@ public interface InboundMapper {
   );
 
   List<CoffeeVO> selectCoffeeList();
-
   InboundRequestVO selectInReqById(@Param("inReqId") long inReqId);
   List<InboundItemVO> selectInItemsByReqId(@Param("inReqId") long inReqId);
   InboundItemVO selectInItemById(@Param("inReqItemsId") long inReqItemsId);
@@ -94,7 +94,6 @@ public interface InboundMapper {
   /**
    * [관리자] 특정 날짜에 특정 수용량을 감당할 수 있는 모든 창고와,
    * 각 창고에 속한 모든 Zone 목록을 조회합니다.
-   *
    * @param targetDate   조회할 미래 날짜
    * @param requiredCapa 필요한 잔여 수용량
    * @return 할당 가능한 창고 및 Zone 정보 리스트
@@ -109,6 +108,32 @@ public interface InboundMapper {
    * @param approvalDTO 처리 정보를 담은 DTO
    */
   void processInboundItem(InboundApprovalDTO approvalDTO);
+
+  // [관리자] 특정 입고 상세 항목의 요청 수량과 실제 수량 조회
+  InboundQtyDTO selectInboundQtyById(@Param("inReqItemsId") long inReqItemsId);
+
+  /**
+   * [관리자] 특정 입고 상세 항목의 실제 입고 수량(inQty)을 업데이트합니다.
+   * @param inReqItemsId 업데이트할 입고 상세 항목 ID
+   * @param actualQty    새로 입력된 실제 입고 수량
+   * @return 영향을 받은 행의 수 (성공 시 1)
+   */
+  int updateActualInboundQuantity(
+          @Param("inReqItemsId") long inReqItemsId,
+          @Param("actualQty") int actualQty
+  );
+
+  // 상세 페이지 조회를 위한 메서드
+  InboundDetailDTO selectInboundDetailById(@Param("inReqItemsId") long inReqItemsId);
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,7 @@
 package com.ssg.meowcoffee.service;
 
 import com.ssg.meowcoffee.domain.UserRole;
+import com.ssg.meowcoffee.dto.InboundDetailDTO;
 import com.ssg.meowcoffee.dto.InboundReqInputDTO;
 import com.ssg.meowcoffee.exception.DatabaseTransactionException;
 import com.ssg.meowcoffee.mapper.InboundMapper;
@@ -47,6 +48,11 @@ public class InboundServiceImpl implements InboundService {
       }
       throw new RuntimeException("입고 요청 수정 중 오류가 발생했습니다.", e);
     }
+  }
+
+  @Override
+  public InboundDetailDTO getInboundDetail(long inReqItemsId) {
+    return inboundMapper.selectInboundDetailById(inReqItemsId);
   }
 
 
