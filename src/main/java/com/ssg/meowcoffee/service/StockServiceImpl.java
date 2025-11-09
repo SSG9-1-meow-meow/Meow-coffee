@@ -185,11 +185,22 @@ public class StockServiceImpl implements StockService{
     public Integer getListCount(StockSearchDTO stockSearchDTO, String menu) {
         Integer result = 0;
         try {
-            switch(menu.trim()){
-                case "stock" -> result = stockMapper.countStockTotal(stockSearchDTO);
-                case "dueDiligence" -> result = stockMapper.countDueDiligenceTotal();
-                case "warehouse" -> result = stockMapper.countWarehouseTotal();
-                case "company" -> result = stockMapper.countCompanyTotal();
+            switch (menu.trim()) {
+                case "stock":
+                    result = stockMapper.countStockTotal(stockSearchDTO);
+                    break;
+
+                case "dueDiligence":
+                    result = stockMapper.countDueDiligenceTotal();
+                    break;
+
+                case "warehouse":
+                    result = stockMapper.countWarehouseTotal();
+                    break;
+
+                case "company":
+                    result = stockMapper.countCompanyTotal();
+                    break;
             }
 
             return result;
