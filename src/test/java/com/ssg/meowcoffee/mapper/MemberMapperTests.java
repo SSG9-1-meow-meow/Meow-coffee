@@ -1,12 +1,14 @@
 package com.ssg.meowcoffee.mapper;
 
+import com.ssg.meowcoffee.domain.CompanyVO;
+import com.ssg.meowcoffee.domain.DeliverymanVO;
 import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
 import com.ssg.meowcoffee.dto.UserCriteria;
-import com.ssg.meowcoffee.dto.UserInfoDTO;
-import com.ssg.meowcoffee.dto.UserStatusDTO;
+import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
+import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Log4j2
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/test-mapper-context.xml")
 public class MemberMapperTests {
 
     @Autowired(required = false)
@@ -56,19 +58,38 @@ public class MemberMapperTests {
     }
 
     @Test
-    @DisplayName("현재 회원권한이 관리자인 회원정보를 조회")
+    @DisplayName("현재 회원권한이 창고관리자인 회원정보를 조회")
     public void testSelectManagerById() {
         String userId = "manager_kim";
         ManagerVO managerVO = memberMapper.selectManagerById(userId);
         log.info(managerVO);
-        Assertions.assertNotNull(managerVO);
+        Assertions.assertEquals(userId, managerVO.getManagerId());
+        Assertions.assertEquals("창고관리자", managerVO.getManagerRole().getValue());
+    }
+
+    @Test
+    @DisplayName("거래처의 담당자가 현재 회원정보를 조회")
+    public void testSelectCompanyById() {
+        String userId = "company_basic";
+        CompanyVO companyVO = memberMapper.selectCompanyById(userId);
+        log.info(companyVO);
+        Assertions.assertEquals(userId, companyVO.getComId());
+    }
+
+    @Test
+    @DisplayName("현재 회원권한이 배송기사인 회원정보를 조회")
+    public void testSelectDeliverymanById() {
+        String userId = "delivery01";
+        DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
+        log.info(deliverymanVO);
+        Assertions.assertEquals(userId, deliverymanVO.getDelivId());
     }
 
     @Test
     @DisplayName("현재 로그인한 회원이 회원 정보를 변경")
     public void testUpdateUser() {
         String userId = "manager01";
-        UserInfoDTO newUserInfo = UserInfoDTO.builder()
+        UserInfoUpdateDTO newUserInfo = UserInfoUpdateDTO.builder()
                 .userId(userId)
                 .userPwd("2222")
                 .userPhone("010-1234-5678")
@@ -82,7 +103,7 @@ public class MemberMapperTests {
     @DisplayName("현재 로그인한 총관리자가 회원의 계정상태를 변경 - 회원가입 승인")
     public void testUpdateUserStatus() {
         String userId = "manager02";
-        UserStatusDTO newStatus = UserStatusDTO.builder()
+        UserStatUpdateDTO newStatus = UserStatUpdateDTO.builder()
                 .userId(userId)
                 .userRole(UserRole.COMPANY)
                 .oldStatus(UserStatus.WAITING_APPROVAL)
@@ -97,6 +118,14 @@ public class MemberMapperTests {
     public void testDelete() {
         String currentId = "manager01";
         int affected = memberMapper.deleteUser(currentId);
+        Assertions.assertEquals(1, affected);
+    }
+
+    @Test
+    @DisplayName("현재 로그인한 총관리자가 지정한 회원의 상태를 변경 - 휴면회원 전환")
+    public void testDeleteUserByAdmin() {
+        String targetId = "manager01";
+        int affected = memberMapper.deleteUserByAdmin(targetId);
         Assertions.assertEquals(1, affected);
     }
 }

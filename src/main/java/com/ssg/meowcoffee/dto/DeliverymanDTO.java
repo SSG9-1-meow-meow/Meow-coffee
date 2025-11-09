@@ -1,17 +1,10 @@
-package com.ssg.meowcoffee.domain;
+package com.ssg.meowcoffee.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import com.ssg.meowcoffee.domain.UserStatus;
+import com.ssg.meowcoffee.domain.VehicleModel;
 import java.time.LocalDate;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class DeliverymanVO {
+public class DeliverymanDTO {
 
     private String delivId;
     private String delivName;

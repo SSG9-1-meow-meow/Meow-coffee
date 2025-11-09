@@ -91,10 +91,12 @@ VALUES
 drop view if exists deliverymen;
 create view deliverymen (
     delivId, delivName, delivPwd, delivPhone,
-    delivCode, delivImgPath, delivVhcId, delivVhcModel, delivLastLogin
+    delivCode, delivImgPath, delivVhcId, delivVhcModel,
+    delivStatus, delivLastLogin
 ) as select
  u.userId, u.userName, u.userPwd, u.userPhone,
- u.userCode, u.userImgPath, v.vehicleId, v.vehicleModel, u.userLastLogin
+ u.userCode, u.userImgPath, v.vehicleId, v.vehicleModel,
+ u.userStatus, u.userLastLogin
 from users u join vehicles v on u.vehicleId = v.vehicleId
 where userStatus = 'APPROVAL' and userRole = 'DELIVERYMAN';
 
