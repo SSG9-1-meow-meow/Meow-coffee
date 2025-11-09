@@ -180,4 +180,21 @@ public class StockServiceImpl implements StockService{
             throw new DatabaseTransactionException("창고 코드 리스트 조회 중 DB에서 오류 발생");
         }
     }
+
+    @Override
+    public Integer getListCount(StockSearchDTO stockSearchDTO, String menu) {
+        Integer result = 0;
+        try {
+            switch(menu.trim()){
+                case "stock" -> result = stockMapper.countStockTotal(stockSearchDTO);
+                case "dueDiligence" -> result = stockMapper.countDueDiligenceTotal();
+                case "warehouse" -> result = stockMapper.countWarehouseTotal();
+                case "company" -> result = stockMapper.countCompanyTotal();
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new DatabaseTransactionException("리스트 total 개수 구하는 중 DB에서 오류 발생");
+        }
+    }
 }
