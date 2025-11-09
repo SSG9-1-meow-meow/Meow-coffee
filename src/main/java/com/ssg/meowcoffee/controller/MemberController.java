@@ -68,11 +68,12 @@ public class MemberController {
     }
 
     @PutMapping("/list/{id}:deactivate")
-    public ResponseEntity<Void> deactivateUser(@PathVariable("id") String id) {
+    public ResponseEntity<UserDetailDTO> deactivateUser(@PathVariable("id") String id) {
         boolean result = memberService.deactivateUserByAdmin(id);
         if (!result) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+        UserDetailDTO deactivated = memberService.getUserById(id);
+        return ResponseEntity.ok(deactivated);
     }
 }
