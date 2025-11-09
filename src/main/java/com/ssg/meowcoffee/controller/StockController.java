@@ -163,6 +163,8 @@ public class StockController {
     public ResponseEntity<DueDiligenceDTO> readDueDiligenceInfo(@PathVariable String stkId, @PathVariable String whCode) {
         DueDiligenceDTO dto = stockService.getDueDiligenceInfo(stkId, whCode);
 
+        if(dto == null) return ResponseEntity.notFound().build(); //입력한 stkId가 존재하지 않을 때
+
         return ResponseEntity.ok(dto);
     }
 
@@ -194,14 +196,12 @@ public class StockController {
 
     @PutMapping("/dueDiligences/{ddId}") //String id는 현재 로그인한 id를 말함
     public ResponseEntity<Integer> deleteDueDiligence(@PathVariable("ddId") Long ddId,
-                                                      @RequestBody String id) {
+                                                      @RequestBody DueDiligenceDTO dueDiligenceDTO) {
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //현재 정보를 불러와야 권한 확인 가능
-        DueDiligenceDTO dto = DueDiligenceDTO.builder()
-                .ddId(ddId)
-                .whCode(readDTO.getWhCode())
-                .maId(id)
-                .build();
-        Integer result = stockService.removeDueDiligence(dto);
+        dueDiligenceDTO.setDdId(ddId);
+        dueDiligenceDTO.setWhCode(readDTO.getWhCode());
+
+        Integer result = stockService.removeDueDiligence(dueDiligenceDTO);
         return ResponseEntity.ok(result);
         //프론트에서 받은 값이 -1이라면 권한 없음 띄우기
     }
@@ -210,7 +210,7 @@ public class StockController {
     public ResponseEntity<Integer> updateApprovalStatus(@PathVariable("ddApproval") String ddApproval,
                                                         @PathVariable("ddId") Long ddId) {
         Integer result = stockService.modifyApprovalStatus(ddApproval, ddId);
-
+        //result값이 0이면 승인/거부 할 수 있는 상태가 아님
         return ResponseEntity.ok(result);
     }
 }
