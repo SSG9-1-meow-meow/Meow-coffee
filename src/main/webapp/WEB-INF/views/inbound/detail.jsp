@@ -3,23 +3,41 @@
 
 <html>
 <head>
-    <title>Title</title>
+    <title>입고 상세 처리</title>
   <!-- Bootstrap CSS
          - 테이블, 버튼, 모달 등을 예쁘게 꾸미기 위한 CSS 프레임워크
          - CDN 방식으로 불러온다. -->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
 
+  <!-- 1. jQuery 라이브러리 (Bootstrap JS보다 먼저 와야 함) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- 2. Bootstrap JavaScript 번들 (모달 등의 기능을 위해 필요) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
+<h1>입고 상세 정보 (ID: ${inboundDetail.inReqItemsId})</h1>
+
+<ul>
+  <li><strong>거래처:</strong> ${inboundDetail.companyName}</li>
+  <li><strong>품목:</strong> ${inboundDetail.coffeeName} (${inboundDetail.coffeeCategory})</li>
+  <li><strong>요청 수량:</strong> ${inboundDetail.inQtyReq}</li>
+  <li><strong>상태:</strong> ${inboundDetail.status.value}</li>
+</ul>
+
+<hr>
+
+<h2>QR 코드 테스트</h2>
 
 <!-- '입고완료' 상태일 때만 버튼을 보여줌 -->
-<c:if test="${item.status == 'RECEIVED'}">
+<%--<c:if test="${inboundDetail.status.name() == 'RECEIVED'}">--%>
   <!-- 재고 ID(inReqItemsId)를 data-stock-id 속성에 담아 둠 -->
-  <button class="btn btn-secondary qr-print-btn" data-inReqItems-id="${item.inReqItemsId}">
+  <button class="btn btn-secondary qr-print-btn" data-inreqitems-id="${inboundDetail.inReqItemsId}">
     QR 출력
   </button>
-</c:if>
+<%--  <img src="/inbounds/qr/${inboundDetail.inReqItemsId}" alt="입고 QR 코드">--%>
+<%--</c:if>--%>
 
 
 <!-- QR 코드 표시를 위한 모달 (Bootstrap Modal 예시) -->
@@ -46,7 +64,7 @@
   $(document).ready(function() {
     // 'QR 출력' 버튼 클릭 이벤트
     $('.qr-print-btn').on('click', function() {
-      const inReqItemsId = $(this).data('inReqItems-id'); // 버튼에서 입고 ID 가져오기
+      const inReqItemsId = $(this).data('inreqitems-id'); // 버튼에서 입고 ID 가져오기; js에서는 소문자만
 
       if (inReqItemsId) {
         // <img> 태그의 src 속성에 QR 코드 API 엔드포인트 주소를 설정

@@ -476,6 +476,39 @@
 
 
 
+  <!-- [관리자] 입고 상세 항목의 요청/실제 수량 조회 -->
+  <select id="selectInboundQtyById" resultType="com.ssg.meowcoffee.dto.InboundQtyDTO">
+    SELECT inQtyReq, inQty FROM inboundItems WHERE inReqItemsId = #{inReqItemsId}
+  </select>
+
+  <!-- [관리자] 실제 입고 수량 업데이트 -->
+  <update id="updateActualInboundQuantity">
+    UPDATE inboundItems SET inQty = #{actualQty}
+    WHERE inReqItemsId = #{inReqItemsId}
+  </update>
+
+  <select id="selectInboundDetailById" resultType="com.ssg.meowcoffee.dto.InboundDetailDTO">
+    SELECT
+    II.inReqItemsId, II.status, II.inQtyReq, II.inQty, II.inDttmSchd,
+    C.cfName AS coffeeName, C.cfCategory AS coffeeCategory,
+    IR.inReqId, U.userCompanyName AS companyName, IR.inDttmReq,
+    S.stkId
+    FROM
+    inboundItems II
+    INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN users U ON IR.comId = U.userId
+    INNER JOIN coffee C ON II.cfId = C.cfId
+    -- Stock 정보는 있을 수도 없을 수도 있으므로 LEFT JOIN
+    LEFT JOIN locations L ON II.locationId = L.locationId
+    LEFT JOIN stock S ON L.lpId = S.lpId AND II.cfId = S.cfId
+    WHERE
+    II.inReqItemsId = #{inReqItemsId}
+  </select>
+
+
+
+
+
 
 </mapper>
 
