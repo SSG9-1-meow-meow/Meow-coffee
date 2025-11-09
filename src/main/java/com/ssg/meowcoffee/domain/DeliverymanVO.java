@@ -22,5 +22,6 @@ public class DeliverymanVO {
     private String delivVhcId;
 
     private VehicleModel delivVhcModel; // ENUM 사용
+    private UserStatus delivStatus;     // 배송기사 회원상태 확인 가능
     private LocalDate delivLastLogin;
 }
