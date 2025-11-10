@@ -144,7 +144,7 @@ public class InboundMapperTests {
 
     // --- 시나리오 1: 거래처(COMPANY) 권한으로 조회 ---
     log.info("--- 시나리오 1: 거래처(COMPANY) 권한 테스트 ---");
-    CriteriaInbound companyCriteria = new CriteriaInbound();
+    InboundCriteria companyCriteria = new InboundCriteria();
     String companyUserId = "coffeebiz01"; // '메오커피'
     UserRole companyUserRole = UserRole.COMPANY;
 
@@ -161,7 +161,7 @@ public class InboundMapperTests {
 
     // --- 시나리오 2: 관리자(MANAGER) 권한으로 전체 조회 ---
     log.info("--- 시나리오 2: 관리자(MANAGER) 권한 테스트 ---");
-    CriteriaInbound managerCriteria = new CriteriaInbound();
+    InboundCriteria managerCriteria = new InboundCriteria();
     String managerUserId = "manager01"; // 관리자 ID
     UserRole managerUserRole = UserRole.MANAGER;
 
@@ -175,7 +175,7 @@ public class InboundMapperTests {
 
     // --- 시나리오 3: 관리자 권한 + 필터링(검색) 테스트 ---
     log.info("--- 시나리오 3: 관리자 권한 + 필터링 테스트 (상태: 승인완료) ---");
-    CriteriaInbound filterCriteria = new CriteriaInbound();
+    InboundCriteria filterCriteria = new InboundCriteria();
     filterCriteria.setInboundStatus("승인완료"); // '승인완료' 상태만 필터링
 
     List<InboundReqItemDTO> filteredList = inboundMapper.selectInReqItemList(filterCriteria, managerUserId, managerUserRole);
@@ -190,7 +190,7 @@ public class InboundMapperTests {
 
     // --- 시나리오 4: 관리자 권한 + 정렬 테스트 ---
     log.info("--- 시나리오 4: 관리자 권한 + 정렬 테스트 (수량 오름차순) ---");
-    CriteriaInbound sortCriteria = new CriteriaInbound();
+    InboundCriteria sortCriteria = new InboundCriteria();
     sortCriteria.setSortBy("quantity"); // 정렬 기준: 수량
     sortCriteria.setSortOrder("ASC");   // 정렬 순서: 오름차순
 
@@ -206,7 +206,7 @@ public class InboundMapperTests {
 
     // --- 시나리오 5: 관리자 권한 + 페이징 테스트 ---
     log.info("--- 시나리오 5: 관리자 권한 + 페이징 테스트 (2페이지, 3개씩) ---");
-    CriteriaInbound pagingCriteria = new CriteriaInbound();
+    InboundCriteria pagingCriteria = new InboundCriteria();
     pagingCriteria.setPage(2);  // 2페이지
     pagingCriteria.setSize(3);  // 페이지당 3개
 
@@ -774,6 +774,44 @@ public class InboundMapperTests {
 
     log.info("실제 입고 수량 조회 및 업데이트 테스트 성공.");
   }
+
+
+  @Test
+  @DisplayName("입고 상세 목록 기본 조회 테스트 (페이징, 권한)")
+  @Transactional
+  void testSelectInboundDetailsByCriteria_Basic() {
+    log.info("--- 입고 상세 목록 기본 조회 테스트 시작 ---");
+
+    // given: 아무런 필터링/정렬 조건이 없는 기본 Criteria 객체
+    // InboundCriteria 생성자는 page=1, size=10으로 기본 설정됩니다.
+    InboundCriteria criteria = new InboundCriteria();
+    String adminUserId = "admin01"; // 관리자 ID
+    UserRole adminUserRole = UserRole.ADMIN; // 관리자 권한
+
+    // when: 매퍼 메서드 호출
+    List<InboundDetailDTO> resultList = inboundMapper.selectInboundDetailsByCriteria(criteria, adminUserId, adminUserRole);
+    log.info("조회된 입고 상세 목록: {} 건", resultList.size());
+
+    // then: 결과 검증
+    assertNotNull(resultList, "결과 리스트는 null이 아니어야 합니다.");
+
+    // 샘플 데이터의 inboundItems 총 개수는 10개입니다.
+    // size가 10이므로, 첫 페이지 조회 시 10개의 결과가 모두 나와야 합니다.
+    assertEquals(10, resultList.size(), "기본 조회 시 전체 10개의 항목이 조회되어야 합니다.");
+
+    // 첫 번째 결과 항목의 일부 데이터만 간단히 확인하여 조인이 잘 되었는지 검증
+    // 기본 정렬은 요청일(inDttmReq) 내림차순이므로, 가장 최신 요청이 첫 번째로 와야 합니다.
+    // 샘플 데이터에서 가장 최신 요청은 inReqId=1 입니다.
+    InboundDetailDTO firstItem = resultList.get(0);
+    assertNotNull(firstItem);
+    assertEquals(1, firstItem.getInReqId(), "기본 정렬(최신순)에 따라 첫 항목의 inReqId는 5여야 합니다.");
+    assertEquals("메오커피", firstItem.getCompanyName(), "거래처 이름이 올바르게 조인되어야 합니다.");
+    assertEquals("과테말라 안티구아", firstItem.getCoffeeName(), "커피 이름이 올바르게 조인되어야 합니다.");
+
+    log.info("기본 조회 테스트 성공. 첫 항목의 거래처명: {}", firstItem.getCompanyName());
+  }
+
+
 
 
 

@@ -84,7 +84,7 @@
         <div class="btnSwitch">
           <button
               type="button"
-              class="changeNavBarColor"
+              class="selected changeNavBarColor"
               data-color="dark"
           ></button>
           <button
@@ -119,7 +119,7 @@
           ></button>
           <button
               type="button"
-              class="selected changeNavBarColor"
+              class="changeNavBarColor"
               data-color="white"
           ></button>
           <br/>
@@ -212,7 +212,7 @@
 
 <!-- Kaiadmin DEMO methods, don't include it in your project! -->
 <script src="/resources/assets/js/setting-demo.js"></script>
-<script src="/resources/assets/js/demo.js"></script>
+<%--<script src="/resources/assets/js/demo.js"></script>--%>
 <!-- ... 인라인 스크립트 그대로 유지 ... -->
 <script>
     $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {

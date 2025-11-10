@@ -505,9 +505,129 @@
     II.inReqItemsId = #{inReqItemsId}
   </select>
 
+  <!-- InboundDetailDTO를 위한 ResultMap 정의 -->
+  <resultMap id="inboundDetailMap" type="com.ssg.meowcoffee.dto.InboundDetailDTO">
+    <id property="inReqItemsId" column="inReqItemsId"/>
+    <result property="status" column="status"
+            javaType="com.ssg.meowcoffee.domain.InboundStatus"
+            typeHandler="com.ssg.meowcoffee.util.InboundStatusTypeHandler"/>
+    <result property="inQtyReq" column="inQtyReq"/>
+    <result property="inQty" column="inQty"/>
+    <result property="inDttmSchd" column="inDttmSchd"/>
+    <result property="inDttmAppr" column="inDttmAppr"/>
+    <result property="coffeeName" column="cfName"/>
+    <result property="coffeeCategory" column="cfCategory"/>
+    <result property="inReqId" column="inReqId"/>
+    <result property="companyName" column="userCompanyName"/>
+    <result property="inDttmReq" column="inDttmReq"/>
+    <result property="stkId" column="stkId"/>
+  </resultMap>
 
+  <!-- 페이징, 필터링, 정렬이 적용된 입고 상세 목록 조회 -->
+  <select id="selectInboundDetailsByCriteria" resultMap="inboundDetailMap">
+    SELECT
+    II.inReqItemsId, II.status, II.inQtyReq, II.inQty, II.inDttmSchd,
+    C.cfName, C.cfCategory,
+    IR.inReqId, U.userCompanyName, IR.inDttmReq, IR.inDttmAppr,
+    S.stkId
+    FROM
+    inboundItems II
+    INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN users U ON IR.comId = U.userId
+    INNER JOIN coffee C ON II.cfId = C.cfId
+    -- '입고완료' 된 항목의 재고 ID를 가져오기 위해 LEFT JOIN
+    LEFT JOIN locations L ON II.locationId = L.locationId
+    LEFT JOIN stock S ON L.lpId = S.lpId AND II.cfId = S.cfId
 
+    <!-- WHERE 절 동적 생성 -->
+    <where>
+      (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+      <!-- 1. 사용자 권한 분기 -->
+      <choose>
+        <when test="userRole.name() == 'COMPANY'">
+          AND IR.comId = #{userId}
+        </when>
+      </choose>
 
+      <!-- 2. 검색 조건 분기 (InboundCriteria DTO 필드명 사용) -->
+      <if test="criteria.companyName != null and criteria.companyName != ''">
+        AND U.userCompanyName LIKE CONCAT('%', #{criteria.companyName}, '%')
+      </if>
+      <if test="criteria.coffeeCategory != null and criteria.coffeeCategory != ''">
+        AND C.cfCategory = #{criteria.coffeeCategory}
+      </if>
+      <if test="criteria.inboundStatus != null and criteria.inboundStatus != ''">
+        AND II.status = #{criteria.inboundStatus}
+      </if>
+      <if test="criteria.isTempo != null">
+        AND IR.IsTempo = #{criteria.isTempo}
+      </if>
+    </where>
+
+    <!-- ORDER BY 절 동적 생성 (InboundCriteria DTO 필드명 사용) -->
+    <trim prefix="ORDER BY">
+      <choose>
+        <when test="criteria.sortBy == 'companyName'">
+          U.userCompanyName ${criteria.sortOrder}
+        </when>
+        <when test="criteria.sortBy == 'category'">
+          C.cfCategory ${criteria.sortOrder}, IR.inDttmReq DESC
+        </when>
+        <when test="criteria.sortBy == 'quantity'">
+          II.inQtyReq ${criteria.sortOrder}
+        </when>
+        <when test="criteria.sortBy == 'status'">
+          II.status ${criteria.sortOrder}, IR.inDttmReq DESC
+        </when>
+        <when test="criteria.sortBy == 'apprDate'">
+          IR.inDttmAppr ${criteria.sortOrder}
+        </when>
+        <!-- 기본 정렬: 입고 요청일(reqDate) 최신순 -->
+        <otherwise>
+          IR.inDttmReq ${criteria.sortOrder}
+        </otherwise>
+      </choose>
+    </trim>
+
+    <!-- 페이징 처리 (InboundCriteria의 getSkip() 메서드 사용) -->
+    LIMIT #{criteria.size} OFFSET #{criteria.skip}
+  </select>
+
+  <!-- 조건에 맞는 전체 입고 상세 항목 건수 조회 (페이지네이션용) -->
+  <select id="getTotalCountByCriteria" resultType="int">
+    SELECT
+    COUNT(II.inReqItemsId)
+    FROM
+    inboundItems II
+    INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN users U ON IR.comId = U.userId
+    INNER JOIN coffee C ON II.cfId = C.cfId
+
+    <!-- WHERE 절은 목록 조회 쿼리와 완전히 동일해야 합니다. -->
+    <where>
+      (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+      <!-- 1. 사용자 권한 분기 -->
+      <choose>
+        <when test="userRole.name() == 'COMPANY'">
+          AND IR.comId = #{userId}
+        </when>
+      </choose>
+
+      <!-- 2. 검색 조건 분기 -->
+      <if test="criteria.companyName != null and criteria.companyName != ''">
+        AND U.userCompanyName LIKE CONCAT('%', #{criteria.companyName}, '%')
+      </if>
+      <if test="criteria.coffeeCategory != null and criteria.coffeeCategory != ''">
+        AND C.cfCategory = #{criteria.coffeeCategory}
+      </if>
+      <if test="criteria.inboundStatus != null and criteria.inboundStatus != ''">
+        AND II.status = #{criteria.inboundStatus}
+      </if>
+      <if test="criteria.isTempo != null">
+        AND IR.IsTempo = #{criteria.isTempo}
+      </if>
+    </where>
+  </select>
 
 
 </mapper>

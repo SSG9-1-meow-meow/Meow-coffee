@@ -1,6 +1,7 @@
 package com.ssg.meowcoffee.service;
 
 import com.ssg.meowcoffee.domain.UserRole;
+import com.ssg.meowcoffee.dto.InboundCriteria;
 import com.ssg.meowcoffee.dto.InboundDetailDTO;
 import com.ssg.meowcoffee.dto.InboundReqInputDTO;
 import com.ssg.meowcoffee.exception.DatabaseTransactionException;
@@ -11,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -66,6 +68,26 @@ public class InboundServiceImpl implements InboundService {
     }
     return true;
   }
+
+  @Override
+  public List<InboundDetailDTO> getInboundListByCriteria(InboundCriteria criteria, String userId, UserRole userRole) {
+    log.info("입고 목록 조회 서비스 실행. Criteria: {}, UserID: {}", criteria, userId);
+
+    try {
+      return inboundMapper.selectInboundDetailsByCriteria(criteria, userId, userRole);
+    } catch (DataAccessException e) {
+      log.error("입고 목록 조회 중 데이터베이스 오류 발생", e);
+      throw new RuntimeException("입고 목록을 조회하는 중 문제가 발생했습니다.", e);
+    }
+  }
+
+  @Override
+  public int getTotalCount(InboundCriteria criteria, String userId, UserRole userRole) {
+    log.info("입고 목록 전체 건수 조회 서비스 실행. Criteria: {}, UserID: {}", criteria, userId);
+    return inboundMapper.getTotalCountByCriteria(criteria, userId, userRole);
+  }
+
+
 
 
 
