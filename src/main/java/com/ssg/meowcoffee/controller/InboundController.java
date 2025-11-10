@@ -1,9 +1,8 @@
 package com.ssg.meowcoffee.controller;
 
 import com.ssg.meowcoffee.domain.InboundMemoCode;
-import com.ssg.meowcoffee.dto.InboundDetailDTO;
-import com.ssg.meowcoffee.dto.InboundMemoCodeDTO;
-import com.ssg.meowcoffee.dto.InboundReqInputDTO;
+import com.ssg.meowcoffee.domain.UserRole;
+import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.service.InboundService;
 import javax.validation.Valid;
 
@@ -18,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -30,6 +31,51 @@ public class InboundController {
 
   private final InboundService inboundService;
   private final QrCodeService qrCodeService;
+
+  // --- 1. 페이지 렌더링 메서드 ---
+  /**
+   * 입고 관리 목록 '페이지'를 반환합니다. (데이터 없음)
+   * 이 메서드는 빈 껍데기 JSP 페이지만 렌더링합니다.
+   */
+  @GetMapping
+  public String inboundListPage() {
+    log.info("GET /inbounds - 입고 목록 페이지 렌더링 요청");
+    return "inbounds/list"; // /WEB-INF/views/inbounds/list.jsp 렌더링
+  }
+
+  @GetMapping("/api")
+  @ResponseBody // 이 어노테이션이 메서드의 반환값을 JSON으로 변환해줍니다.
+  public ResponseEntity<Map<String, Object>> getInboundListData(InboundCriteria criteria) {
+    log.info("GET /inbounds/api - 입고 목록 데이터 API 요청. Criteria: {}", criteria);
+
+    // --- 임시 사용자 정보 ---
+    String currentUserId = "manager01";
+    UserRole currentUserRole = UserRole.MANAGER;
+
+    // 관리자로 테스트
+    // String currentUserId = "manager01";
+    // UserRole currentUserRole = UserRole.MANAGER;
+
+    try {
+      List<InboundDetailDTO> inboundList = inboundService.getInboundListByCriteria(criteria, currentUserId, currentUserRole);
+      int totalCount = inboundService.getTotalCount(criteria, currentUserId, currentUserRole);
+      InboundPageDTO pageDTO = new InboundPageDTO(criteria, totalCount);
+
+      Map<String, Object> response = new HashMap<>();
+      response.put("list", inboundList);
+      response.put("pageMaker", pageDTO);
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      log.error("입고 목록 데이터 API 조회 중 오류 발생", e);
+      // 오류 발생 시 500 Internal Server Error 응답 반환
+      return ResponseEntity.internalServerError().build();
+    }
+  }
+
+
+
 
   @PostMapping("/req")
   public ResponseEntity<Long> createRequest(@Valid @RequestBody InboundReqInputDTO requestDto) {

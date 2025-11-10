@@ -554,7 +554,7 @@
       <!-- Header 하단 가로 네비게이션 -->
       <nav
           class="navbar navbar-expand-lg navbar-bottom border-bottom"
-          data-background-color="white"
+          data-background-color="dark"
       >
         <div class="container-fluid">
           <button
