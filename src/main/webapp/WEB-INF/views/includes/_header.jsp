@@ -92,7 +92,7 @@
               <a class="nav-link" href="#">입/출고 현황</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">입고 관리<span class="badge bg-success ms-1">4</span></a>
+              <a class="nav-link" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a>
@@ -158,7 +158,7 @@
         <div class="collapse" id="oc-forms">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">회원 입고 요청</a>
+              <a class="nav-link" href="/inbounds/req">회원 입고 요청</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">출고 입고 요청</a>
@@ -583,7 +583,7 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navDashboard" style="left: 0;">
                   <li><a class="dropdown-item" href="#">입/출고 현황</a></li>
-                  <li><a class="dropdown-item" href="#">입고 관리<span class="badge bg-success ms-1">4</span></a></li>
+                  <li><a class="dropdown-item" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a></li>
                   <li><a class="dropdown-item" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a></li>
                 </ul>
               </li>
@@ -655,7 +655,7 @@
                     class="dropdown-menu dropdown-menu-end"
                     aria-labelledby="navQuick"
                 >
-                  <li><a class="dropdown-item" href="#">입고 요청</a></li>
+                  <li><a class="dropdown-item" href="/inbounds/req">입고 요청</a></li>
                   <li><a class="dropdown-item" href="#">출고 요청</a></li>
                   <li>
                     <hr class="dropdown-divider"/>
