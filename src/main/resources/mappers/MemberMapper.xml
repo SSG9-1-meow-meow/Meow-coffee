@@ -113,6 +113,44 @@
     select * from deliverymen where delivId = #{userId}
   </select>
 
+  <select id="findUserId" resultType="com.ssg.meowcoffee.dto.FindIDResultDTO">
+    select userId, userRole from users
+    <choose>
+      <when test="#{userInfo.targetRole == 'COMPANY'}">
+        where userCode = (
+          select comCode
+          from companies
+          where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <when test="#{userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'}">
+        where userCode = (
+          select managerCode
+          from managers
+          where managerName = #{userInfo.userName} and managerEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <otherwise>
+        where userCode = (
+          select delivCode
+          from deliverymen
+          where delivCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </otherwise>
+    </choose>
+  </select>
+
+  <insert id="insertUser" >
+    insert into
+    users (
+      userId, userPwd, userCompanyName, userName, userPhone,
+      userEmail, userCode, userRoadAddr, userDetailAddr, userRole
+    )
+    values(
+      #{userInfo.userId}, #{userInfo.userPwd}, #{userInfo.userCompanyName}, #{userInfo.userName}, #{userInfo.userPhone},
+      #{userInfo.userEmail}, #{userInfo.userCode}, #{userInfo.userRoadAddr}, #{userInfo.userDetailAddr}, #{userInfo.userRole}
+    )
+  </insert>
 
   <update id="updateUser">
     update users
@@ -132,6 +170,9 @@
   <update id="updateUserStatus">
     update users
     set userStatus = #{userStat.userStatus}
+    <if test="#{userStat.userStatus == 'APPROVAL'}">
+      , userJoinDate = now()
+    </if>
     where userId = #{userStat.userId}
   </update>
 
