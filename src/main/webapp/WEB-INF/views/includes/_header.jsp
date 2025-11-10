@@ -537,10 +537,6 @@
                   </li>
                   <li>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">내 프로필 조회</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">프로필 정보 수정</a>
-                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#">로그 아웃</a>
                   </li>
                 </div>
@@ -680,8 +676,9 @@
                     class="dropdown-menu dropdown-menu-end"
                     aria-labelledby="navUser"
                 >
-                  <li><a class="dropdown-item" href="#">내 프로필</a></li>
-                  <li><a class="dropdown-item" href="#">알림</a></li>
+                  <li><a class="dropdown-item" href="/members/profile/${userId}">내 프로필</a></li>
+                  <%-- 관리자 전용 메뉴 --%>
+                  <li><a class="dropdown-item" href="/members/list">회원리스트 조회</a></li>
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>

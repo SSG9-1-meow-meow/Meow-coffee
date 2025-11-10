@@ -46,9 +46,9 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             criteria = UserCriteria.builder().build();
         }
-        UserPageDTO<UserDetailDTO> userList = memberService.getUserList(criteria);
-        model.addAttribute("userList", userList);
-        return ResponseEntity.ok(userList);
+        UserPageDTO<UserDetailDTO> userPageDTO = memberService.getUserList(criteria);
+        model.addAttribute("userPageDTO", userPageDTO);
+        return ResponseEntity.ok(userPageDTO);
     }
 
     // 승인대기, 휴면대기, 휴면상태 회원까지 조회하기 위한 관리자 기능
