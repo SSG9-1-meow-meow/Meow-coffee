@@ -18,6 +18,8 @@ build/
 .idea/sqldialects.xml
 .idea/workspace.xml
 .idea/misc.xml
+.idea/gradle.xml
+.idea/artifacts/
 *.iws
 *.iml
 *.ipr
