@@ -6,9 +6,8 @@ import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
-import com.ssg.meowcoffee.dto.UserCriteria;
-import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
-import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
+import com.ssg.meowcoffee.dto.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
@@ -86,6 +85,41 @@ public class MemberMapperTests {
         DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
         log.info(deliverymanVO);
         Assertions.assertEquals(userId, deliverymanVO.getDelivId());
+    }
+
+    @Test
+    @DisplayName("입력한 이메일, 사업자등록번호에 해당하는 거래처 찾기")
+    public void testFindUserId() {
+        String userCode = "123-45-67890";
+        String userEmail = "ceo1@meowcoffee.com";
+        FindIDDTO findIDDTO = FindIDDTO.builder()
+                .targetRole(UserRole.COMPANY.getRoleName())
+                .userCode(userCode)
+                .userEmail(userEmail)
+                .build();
+
+        FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
+        Assertions.assertEquals("coffeebiz01", found.getUserId());
+        Assertions.assertEquals(UserRole.COMPANY, found.getUserRole());
+    }
+
+    @Test
+    @DisplayName("새로운 거래처 회원 등록")
+    public void testInsertUser() {
+        UserDetailDTO newUser = UserDetailDTO.builder()
+                .userId("company5678")
+                .userPwd("123456")
+                .userCompanyName("이디야")
+                .userName("홍길동")
+                .userPhone("010-2345-6789")
+                .userCode("987-65-43210")
+                .userEmail("company1234@test.com")
+                .userRoadAddr("서울시 강남구 테헤란로 46")
+                .userDetailAddr("1층")
+                .userRole(UserRole.COMPANY)
+                .build();
+        int affected = memberMapper.insertUser(newUser);
+        Assertions.assertEquals(1, affected);
     }
 
     @Test
