@@ -676,9 +676,9 @@
                     class="dropdown-menu dropdown-menu-end"
                     aria-labelledby="navUser"
                 >
-                  <li><a class="dropdown-item" href="#">내 프로필</a></li>
+                  <li><a class="dropdown-item" href="/members/profile/${userId}">내 프로필</a></li>
                   <%-- 관리자 전용 메뉴 --%>
-                  <li><a class="dropdown-item" href="#">회원리스트 조회</a></li>
+                  <li><a class="dropdown-item" href="/members/list">회원리스트 조회</a></li>
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
