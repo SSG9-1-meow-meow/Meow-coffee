@@ -218,8 +218,7 @@
                         <div class="modal-content">
                             <div class="modal-header border-0">
                                 <h5 class="modal-title">
-                                    <span class="fw-mediumbold"> New</span>
-                                    <span class="fw-light"> Row </span>
+                                    <span class="fw-mediumbold">회원정보</span>
                                 </h5>
                                 <button
                                         type="button"
@@ -231,46 +230,224 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <p class="small">
-                                    Create a new row using this form, make sure you
-                                    fill them all
-                                </p>
+                                <p>회원정보</p>
                                 <form>
                                     <div class="row">
+                                        <label>기본 인적사항</label>
                                         <div class="col-sm-12">
                                             <div class="form-group form-group-default">
-                                                <label>Name</label>
+                                                <label>아이디</label>
                                                 <input
-                                                        id="addName"
+                                                        id="userId"
                                                         type="text"
                                                         class="form-control"
                                                         placeholder="fill name"
+                                                        readonly
                                                 />
                                             </div>
                                         </div>
                                         <div class="col-md-6 pe-0">
                                             <div class="form-group form-group-default">
-                                                <label>Position</label>
+                                                <label>회원유형</label>
                                                 <input
                                                         id="addPosition"
                                                         type="text"
                                                         class="form-control"
                                                         placeholder="fill position"
+                                                        readonly
                                                 />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group form-group-default">
-                                                <label>Office</label>
+                                                <label>계정상태</label>
+                                                <select
+                                                        class="form-select form-control"
+                                                        id="userStatus"
+                                                >
+                                                    <option>APPROVAL</option>
+                                                    <option>WAITING_APPROVAL</option>
+                                                    <option>DEACTIVATED</option>
+                                                    <option>WAITING_DEACTIVATE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-group-default">
+                                                <label>이메일</label>
                                                 <input
-                                                        id="addOffice"
+                                                        id="userEmail"
+                                                        type="email"
+                                                        class="form-control"
+                                                        placeholder="fill name"
+                                                        readonly
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-group-default">
+                                                <label>연락처</label>
+                                                <input
+                                                        id="userPhone"
                                                         type="text"
                                                         class="form-control"
-                                                        placeholder="fill office"
+                                                        placeholder="fill name"
+                                                        readonly
                                                 />
                                             </div>
                                         </div>
                                     </div>
+
+                                    <%--  이 부분은 회원권한에 따라 선택적으로 출력할 부분 --%>
+                                    <c:choose>
+                                        <c:when test="${userRole.getName() == 'COMPANY'}">
+                                            <div class="row">
+                                                <label>거래처 확인 정보</label>
+                                                <div class="col-sm-12">
+                                                    <div class="form-group form-group-default">
+                                                        <label>업체명</label>
+                                                        <input
+                                                                id="userCompanyName"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 pe-0">
+                                                    <div class="form-group form-group-default">
+                                                        <label>대표자명</label>
+                                                        <input
+                                                                id="userName"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill position"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group form-group-default">
+                                                        <label>사업자등록번호</label>
+                                                        <input
+                                                                id="userCode"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 pe-0">
+                                                    <div class="form-group form-group-default">
+                                                        <label>도로명주소</label>
+                                                        <input
+                                                                id="userRoadAddr"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group form-group-default">
+                                                        <label>상세주소</label>
+                                                        <input
+                                                                id="userDetailAddr"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${userRole.getName() == 'DELIVERYMAN'}">
+                                            <div class="row">
+                                                <label>배송기사 확인 정보</label>
+                                                <div class="col-sm-12">
+                                                    <div class="form-group form-group-default">
+                                                        <label>사업자등록번호</label>
+                                                        <input
+                                                                id="delivCode"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 pe-0">
+                                                    <div class="form-group form-group-default">
+                                                        <label>차량번호</label>
+                                                        <input
+                                                                id="delivVhcCode"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill position"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group form-group-default">
+                                                        <label>차종모델</label>
+                                                        <input
+                                                                id="delivVhcModel"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="row">
+                                                <label>관리자 확인 정보</label>
+                                                <div class="col-sm-12">
+                                                    <div class="form-group form-group-default">
+                                                        <label>관리자명</label>
+                                                        <input
+                                                                id="managerName"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 pe-0">
+                                                    <div class="form-group form-group-default">
+                                                        <label>사번</label>
+                                                        <input
+                                                                id="managerCode"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill position"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group form-group-default">
+                                                        <label>직급</label>
+                                                        <input
+                                                                id="managerRole"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="fill name"
+                                                                readonly
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </form>
                             </div>
                             <div class="modal-footer border-0">
