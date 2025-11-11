@@ -85,9 +85,9 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/cfName")
-    public String stockCfNamePage() {
-       return "stock/stockCfName";
+    @GetMapping("/stocks/{cfName}")
+    public String stockCfNamePage(@PathVariable("cfName") String cfName) {
+       return "/stock/stockCfName";
     }
 
     @GetMapping("/api/stocks/{cfName}") //품목별 재고 조회
@@ -150,7 +150,7 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/dueDilgences")
+    @GetMapping("/dueDiligences")
     public String dueDiligenceListPage() {
         return "/stock/dueDiligenceList";
     }
@@ -168,6 +168,11 @@ public class StockController {
         response.put("pageDTO", pageDTO);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/dueDiligences/{ddId}")
+    public String dueDiligencePage(@PathVariable("ddId") Long ddId) {
+        return "/stock/dueDiligence";
     }
 
     @GetMapping("/api/dueDiligences/{ddId}") //재고 실사 상세 페이지

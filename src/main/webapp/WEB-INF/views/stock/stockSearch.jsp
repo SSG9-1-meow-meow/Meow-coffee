@@ -184,7 +184,7 @@
         {data: "cfName",
           render: function (data, type, row) {
             // row 객체 안에 링크용 ID(stkId 등)가 포함돼있다고 가정
-            return '<a href="/api/stocks/' + row.cfName + '" class="text-primary text-decoration-underline">' + data + '</a>';
+            return '<a href="/stocks/' + row.cfName + '" class="text-primary text-decoration-underline">' + data + '</a>';
           }},
         { data: "cfCategory" },
         { data: "whName" },
@@ -195,9 +195,9 @@
 
     //데이터 가져오기
     const filterData = {
-      cfCategory: ["[대분류] 식품", "[대분류] 가전", "[대분류] 의류"],
-      cfType: ["[중분류] 과일", "[중분류] TV", "[중분류] 아우터"],
-      cfGrade: ["[소분류] 사과", "[소분류] QLED", "[소분류] 패딩"]
+      cfCategory: ["B01", "B02", "B03"],
+      cfType: ["아라비카", "로부스타"],
+      cfGrade: ["스페셜티", "프리미엄", "레귤러"]
     };
 
     // 1. name이 'type-stocklist'인 radio 버튼에 'change' 이벤트 리스너 추가
@@ -272,6 +272,7 @@
       type: "GET",
       dataType: "json",
       success: function(response) {
+        console.log("서버 응답:", response);
         table.clear();
 
         table.rows.add(response.list);
@@ -291,7 +292,7 @@
     const $pagination = $(".pagination");
 
     // pageDTO가 없거나 total이 0이면 숨기기
-    if (!pageDTO || pageDTO.total === 0) {
+    if (!pageDTO || pageDTO.total <= pageDTO.cri.amount) {
       $pagination.addClass("d-none");
       return;
     }
@@ -311,6 +312,7 @@
 
     // 페이지 번호 버튼
     for (let i = startPage; i <= endPage; i++) {
+        const activeClass = (i === currentPage) ? "active" : "";
       $pagination.append('<li class="page-item ' + activeClass + '">'
               + '<a class="page-link" onclick="submitListBtn(' + i + ')">' + i + '</a>'
               + '</li>');
