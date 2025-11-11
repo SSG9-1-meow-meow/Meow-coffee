@@ -1,5 +1,4 @@
 package com.ssg.meowcoffee.domain;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

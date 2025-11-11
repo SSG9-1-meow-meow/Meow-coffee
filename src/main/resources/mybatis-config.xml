@@ -15,5 +15,9 @@
         <!-- javaType에 Enum 클래스를, handler에 핸들러 클래스를 지정합니다. -->
         <typeHandler javaType="com.ssg.meowcoffee.domain.InboundStatus"
                      handler="com.ssg.meowcoffee.util.InboundStatusTypeHandler"/>
+
+        <typeHandler
+                javaType="com.ssg.meowcoffee.domain.OutboundStatus"
+                handler="com.ssg.meowcoffee.util.OutboundStatusTypeHandler"/>
     </typeHandlers>
 </configuration>
