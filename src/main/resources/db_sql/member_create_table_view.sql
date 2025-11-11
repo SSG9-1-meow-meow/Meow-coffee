@@ -23,6 +23,8 @@ CREATE TABLE users (
 
 ALTER TABLE users ADD CONSTRAINT PK_USERS PRIMARY KEY (userId);
 
+# userStatus의 초기값 지정
+ALTER TABLE users ALTER COLUMN userStatus SET DEFAULT 'WAITING_APPROVAL';
 
 # 원본 테이블인 users를 먼저 생성해야 관리자 뷰를 생성할 수 있습니다.
 # erdcloud에서 생성된 sql문의 create table managers ~ 대신 아래의 create view문을 사용

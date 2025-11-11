@@ -2,20 +2,21 @@ package com.ssg.meowcoffee.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
+
+import lombok.*;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 
 // 회원 입고 요청시 활용 DTO (VO의 필드를 확장)
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class InboundReqInputDTO {
+
+  // 내부 클래스로 Item DTO 정의
 
   private Long _inReqId;
 
@@ -31,6 +32,7 @@ public class InboundReqInputDTO {
   // IN 파라미터 (아이템 목록 JSON)
   @NotBlank(message = "입고 요청 상세 항목(inItemsJson)은 필수 입력 항목입니다.")
   private String _inItemsJson;
+
 
   // OUT 파라미터 (프로시저 실행 후 반환 받을 ID)
   private Long generatedInReqId;

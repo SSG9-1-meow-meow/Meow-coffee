@@ -23,7 +23,7 @@ public interface InboundMapper {
 
   // 입고 관리 목록 전체 필터링, 권한별 조회를 위함.
   List<InboundReqItemDTO> selectInReqItemList(
-      @Param("criteria") CriteriaInbound criteria,
+      @Param("criteria") InboundCriteria criteria,
       @Param("userId") String userId,
       @Param("userRole") UserRole userRole
   );
@@ -126,19 +126,22 @@ public interface InboundMapper {
   // 상세 페이지 조회를 위한 메서드
   InboundDetailDTO selectInboundDetailById(@Param("inReqItemsId") long inReqItemsId);
 
+  // 전체 입고 페이지 조회를 위한 메서드
+  List<InboundDetailDTO> selectInboundDetailsByCriteria(
+          @Param("criteria") InboundCriteria criteria,
+          @Param("userId") String userId,
+          @Param("userRole") UserRole userRole
+  );
 
+  // 지정된 조건에 맞는 입고 상세 항목의 전체 개수를 조회
+  int getTotalCountByCriteria(
+          @Param("criteria") InboundCriteria criteria,
+          @Param("userId") String userId,
+          @Param("userRole") UserRole userRole
+  );
 
-
-
-
-
-
-
-
-
-
-
-
+  // 기존 selectInItemsByReqId 대신 이 메서드를 사용
+  List<InboundItemDetailDTO> selectInboundItemDetailsByReqId(@Param("inReqId") long inReqId);
 
 
 

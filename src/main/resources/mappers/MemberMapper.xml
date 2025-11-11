@@ -50,17 +50,15 @@
       </if>
 
       <!--  이름/아이디 키워드 검색  -->
-      <if test="cri.types != null and cri.keyword != null">
-        <foreach collection="cri.types" item="type" open="(" separator="OR" close=")">
-          <choose>
-            <when test="cri.type.equals('N')">
-              and userName like concat('%', #{keyword}, '%')
-            </when>
-            <when test="cri.type.equals('I')">
-              and userId like concat('%', #{keyword}, '%')
-            </when>
-          </choose>
-        </foreach>
+      <if test="cri.type != null and cri.keyword != null">
+        <choose>
+          <when test="cri.type == 'N'.toString()">
+            and userName like concat('%', #{cri.keyword}, '%')
+          </when>
+          <when test="cri.type == 'I'.toString()">
+            and userId like concat('%', #{cri.keyword}, '%')
+          </when>
+        </choose>
       </if>
 
       <!--  기간별 필터링  -->
@@ -87,17 +85,16 @@
     </where>
   </sql>
 
-
-  <select id="getCount" resultType="int">
-    select count(userId) from users
-    <include refid="search"/>
-  </select>
-
   <!-- resultMap Enum 매핑 테스트용 조회 쿼리 -->
   <select id="selectUsers" resultMap="userResultMap">
     select * from users
     <include refid="search"/>
     limit #{cri.skip}, #{cri.amount}
+  </select>
+
+  <select id="getCount" resultType="int">
+    select count(userId) from users
+    <include refid="search"/>
   </select>
 
   <select id="selectUserById" resultMap="userResultMap">
@@ -116,6 +113,45 @@
     select * from deliverymen where delivId = #{userId}
   </select>
 
+  <select id="findUserId" resultType="com.ssg.meowcoffee.dto.FindIDResultDTO">
+    select userId, userRole from users
+    <choose>
+      <when test="#{userInfo.targetRole == 'COMPANY'}">
+        where userCode = (
+          select comCode
+          from companies
+          where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <when test="#{userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'}">
+        where userCode = (
+          select managerCode
+          from managers
+          where managerName = #{userInfo.userName} and managerEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <otherwise>
+        where userCode = (
+          select delivCode
+          from deliverymen
+          where delivCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </otherwise>
+    </choose>
+  </select>
+
+  <insert id="insertUser" >
+    insert into
+    users (
+      userId, userPwd, userCompanyName, userName, userPhone,
+      userEmail, userCode, userRoadAddr, userDetailAddr, userRole
+    )
+    values(
+      #{userInfo.userId}, #{userInfo.userPwd}, #{userInfo.userCompanyName}, #{userInfo.userName}, #{userInfo.userPhone},
+      #{userInfo.userEmail}, #{userInfo.userCode}, #{userInfo.userRoadAddr}, #{userInfo.userDetailAddr}, #{userInfo.userRole}
+    )
+  </insert>
+
   <update id="updateUser">
     update users
     set userPwd = #{userInfo.userPwd}
@@ -133,9 +169,13 @@
 
   <update id="updateUserStatus">
     update users
-    set userStatus = #{userStat.newStatus}
-    where userId = #{userStat.userId} and userStatus = #{userStat.oldStatus}
+    set userStatus = #{userStat.userStatus}
+    <if test="#{userStat.userStatus == 'APPROVAL'}">
+      , userJoinDate = now()
+    </if>
+    where userId = #{userStat.userId}
   </update>
+
 
   <update id="deleteUser">
     <!-- 현재 로그인한 회원의 아이디를 휴면대기상태로 전환 -->

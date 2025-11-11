@@ -73,22 +73,26 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void modifyUser(UserInfoUpdateDTO userInfoUpdateDTO) {
-        memberMapper.updateUser(userInfoUpdateDTO);
+    public boolean modifyUser(UserInfoUpdateDTO userInfoUpdateDTO) {
+        int affected = memberMapper.updateUser(userInfoUpdateDTO);
+        return affected == 1;
     }
 
     @Override
-    public void modifyUserStatus(UserStatUpdateDTO userStatUpdateDTO) {
-        memberMapper.updateUserStatus(userStatUpdateDTO);
+    public boolean modifyUserStatus(UserStatUpdateDTO userStatUpdateDTO) {
+        int affected = memberMapper.updateUserStatus(userStatUpdateDTO);
+        return affected == 1;
     }
 
     @Override
-    public void deactivateUser(String currentId) {
-        memberMapper.deleteUser(currentId);
+    public boolean deactivateUser(String currentId) {
+        int affected = memberMapper.deleteUser(currentId);
+        return affected == 1;
     }
 
     @Override
-    public void deactivateUserByAdmin(String targetId) {
-        memberMapper.deleteUserByAdmin(targetId);
+    public boolean deactivateUserByAdmin(String targetId) {
+        int affected = memberMapper.deleteUserByAdmin(targetId);
+        return affected == 1;
     }
 }
