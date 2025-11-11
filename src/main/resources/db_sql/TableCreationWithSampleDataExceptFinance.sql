@@ -385,46 +385,46 @@ VALUES
     (5, 2, 'admin01');    -- 부산창고 → 정총관리자 (복수 창고 관리 가능)
 
 
--- 13. 일별 처리용량
-CREATE TABLE dailyCapacity (
-dateId	date	PRIMARY KEY ,
-maxCapa	INT	NULL,
-usedCapa	INT	NULL,
-staffAvailable	INT	NULL,
-staffAssign	INT	NULL,
-equipAvailable	INT	NULL,
-equipAssign	INT	NULL
+-- 1. 기존 테이블 삭제 (데이터 백업 후 진행)
+DROP TABLE IF EXISTS dailyCapacity;
+DROP TABLE IF EXISTS warehouseCapaSchedule;
+
+-- 2. 창고별 일일 수용량/부하 통합 테이블 생성
+CREATE TABLE daily_warehouse_capacity (
+dateId              DATE    NOT NULL,
+whId                BIGINT  NOT NULL,
+
+    -- 기존 warehouseCapaSchedule의 컬럼들 (보관 용량)
+used_storage_capacity   INT     NULL,
+available_storage_capacity INT  NULL,
+
+    -- 기존 dailyCapacity의 컬럼들 (처리/인력/장비 부하)
+max_processing_capacity   INT     NULL,
+used_processing_capacity  INT     NULL,
+staff_available     INT     NULL,
+staff_assigned      INT     NULL,
+equip_available     INT     NULL,
+equip_assigned      INT     NULL,
+
+    -- 제약조건
+PRIMARY KEY (dateId, whId),
+FOREIGN KEY (whId) REFERENCES warehouse(whId)
 );
 
-INSERT INTO dailyCapacity (dateId, maxCapa, usedCapa, staffAvailable, staffAssign, equipAvailable, equipAssign)
+INSERT INTO daily_warehouse_capacity
+(dateId, whId, used_storage_capacity, available_storage_capacity, max_processing_capacity, used_processing_capacity, staff_available, staff_assigned, equip_available, equip_assigned)
 VALUES
-    ('2025-11-08', 1000, 600, 10, 8, 5, 4),
-    ('2025-11-09', 1000, 850, 10, 10, 5, 5),
-    ('2025-11-10', 1000, 400, 12, 6, 6, 3),
-    ('2025-11-11', 1000, 700, 9, 7, 4, 4),
-    ('2025-11-12', 1000, 500, 11, 5, 5, 2);
+-- 2025-11-18 데이터
+('2025-11-18', 1, 500, 500, 30, 25, 8, 6, 4, 3), -- 서울창고: 처리량 경고
+('2025-11-18', 2, 300, 500, 20, 5, 5, 1, 3, 1),  -- 부산창고: 처리량 안전
 
+-- 2025-11-19 데이터
+('2025-11-19', 1, 800, 200, 30, 28, 8, 8, 4, 4), -- 서울창고: 처리량 위험
+('2025-11-19', 2, 600, 200, 20, 18, 5, 4, 3, 3), -- 부산창고: 처리량 경고
+('2025-11-19', 3, 700, 200, 25, 10, 6, 2, 3, 1), -- 대구창고: 처리량 안전
 
--- 14. 창고별 예정 수용량
-CREATE TABLE `warehouseCapaSchedule` (
-dateId	DATE	NOT NULL,
-whId	bigint	NOT NULL,
-used_capacity	INT	NULL,
-available_capacity	INT	NULL
-);
-
-INSERT INTO warehouseCapaSchedule (dateId, whId, used_capacity, available_capacity)
-VALUES
-    ('2025-11-08', 1, 300, 700),
-    ('2025-11-08', 2, 500, 500),
-    ('2025-11-09', 1, 600, 400),
-    ('2025-11-10', 3, 200, 800),
-    ('2025-11-11', 2, 400, 600);
-
-ALTER TABLE `warehouseCapaSchedule` ADD CONSTRAINT `PK_WAREHOUSECAPASCHEDULE` PRIMARY KEY (`dateId`, `whId`);
-ALTER TABLE `warehouseCapaSchedule` ADD CONSTRAINT `FK_warehouse_TO_warehouseCapaSchedule_1` FOREIGN KEY (`whId`) REFERENCES `warehouse` (`whId`);
-
-
+-- 2025-11-20 데이터
+('2025-11-20', 1, 100, 900, 30, 5, 8, 1, 4, 1);  -- 서울창고: 처리량 안전
 
 
 -- 회원 입고관리 메인에 표시되는 리스트 데이터 select 문

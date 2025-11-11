@@ -3,10 +3,7 @@ package com.ssg.meowcoffee.service;
 import com.ssg.meowcoffee.domain.CoffeeVO;
 import com.ssg.meowcoffee.domain.InboundRequestVO;
 import com.ssg.meowcoffee.domain.UserRole;
-import com.ssg.meowcoffee.dto.InboundCriteria;
-import com.ssg.meowcoffee.dto.InboundDetailDTO;
-import com.ssg.meowcoffee.dto.InboundItemDetailDTO;
-import com.ssg.meowcoffee.dto.InboundReqInputDTO;
+import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.exception.DatabaseTransactionException;
 import com.ssg.meowcoffee.mapper.InboundMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -105,9 +103,42 @@ public class InboundServiceImpl implements InboundService {
     return inboundMapper.selectInboundItemDetailsByReqId(inReqId);
   }
 
+  @Override
+  public InboundItemDetailDTO getInboundItemDetail(long inReqItemsId) {
+    return inboundMapper.selectInboundItemDetailByItemId(inReqItemsId);
+  }
 
+  @Override
+  public List<WarehouseCapacityDTO> selectWarehouseCapacitiesByDate(LocalDate date) {
+    return inboundMapper.selectWarehouseCapacitiesByDate(date);
+  }
 
+  @Override
+  public DailyLoadDTO selectDailyLoadByDate(LocalDate date) {
+    return inboundMapper.selectDailyLoadByDate(date);
+  }
 
+  // InboundServiceImpl.java
+  @Override
+  public List<DailyCapacityEventDTO> getDailyCapacitiesForPeriod(String startDate, String endDate) {
+    return inboundMapper.selectDailyCapacitiesForPeriod(startDate, endDate);
+  }
+
+  @Override
+  public List<DailyCapacityEventDTO> getAggregatedDailyCapacitiesForPeriod(String startDate, String endDate) {
+    return inboundMapper.selectAggregatedDailyCapacitiesForPeriod(startDate, endDate);
+  }
+
+  @Override
+  public List<DailyWarehouseCapacityDTO> getDailyWarehouseCapacitiesByDate(LocalDate selectedDate) {
+    return inboundMapper.selectDailyWarehouseCapacitiesByDate(selectedDate);
+  }
+
+  // InboundServiceImpl.java
+  @Override
+  public List<AvailableLocationDTO> findAvailableLocations(LocalDate selectedDate, int requiredQty) {
+    return inboundMapper.findAvailableLocations(selectedDate, requiredQty);
+  }
 
 
 

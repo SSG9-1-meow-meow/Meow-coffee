@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.ibatis.annotations.Param;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -809,6 +810,25 @@ public class InboundMapperTests {
     assertEquals("과테말라 안티구아", firstItem.getCoffeeName(), "커피 이름이 올바르게 조인되어야 합니다.");
 
     log.info("기본 조회 테스트 성공. 첫 항목의 거래처명: {}", firstItem.getCompanyName());
+  }
+
+  @Test
+  @DisplayName("입고 상세 아이템 1건 조회")
+  void testSelectInboundDetailsByItemId() {
+    log.info("--- 입고 상세 한건 기본 조회 테스트 시작 ---");
+    InboundItemDetailDTO inboundItemDetailDTO = inboundMapper.selectInboundItemDetailByItemId(3);
+    log.info(inboundItemDetailDTO);
+  }
+
+
+  @Test
+  @DisplayName("하루 창고별 처리 부하 조회")
+  void testSelectDailyCapacitiesForMonth_Basic() {
+
+    List<DailyWarehouseCapacityDTO> dailyWarehouseCapacityDTOList =
+            inboundMapper.selectDailyWarehouseCapacitiesByDate(LocalDate.now());
+
+    dailyWarehouseCapacityDTOList.forEach(log::info);
   }
 
 
