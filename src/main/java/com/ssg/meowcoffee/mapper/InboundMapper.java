@@ -140,6 +140,9 @@ public interface InboundMapper {
           @Param("userRole") UserRole userRole
   );
 
+  // 기존 selectInItemsByReqId 대신 이 메서드를 사용
+  List<InboundItemDetailDTO> selectInboundItemDetailsByReqId(@Param("inReqId") long inReqId);
+
 
 
 

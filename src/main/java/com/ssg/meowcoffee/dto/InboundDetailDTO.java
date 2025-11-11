@@ -35,6 +35,9 @@ public class InboundDetailDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime inDttmAppr;
 
+    private Boolean isTempo; // TINYINT(1)은 Boolean 타입으로 매핑
+
+
     // Stock 정보 (JOIN)
     // '입고완료' 상태일 때만 이 값이 채워집니다.
     private String stkId; // QR 코드 생성을 위한 재고 ID

@@ -114,7 +114,8 @@
   <!-- 회원 입고 요청 프로시저 호출문 (회원은 임시 저장 혹은 그냥 등록 신청 가능)  -->
   <select id="callCreateInReq" statementType="CALLABLE"
           parameterType="com.ssg.meowcoffee.dto.InboundReqInputDTO"
-          resultType="long">CALL CreateInReq(
+          resultType="long">
+    CALL CreateInReq(
     -- IN 파라미터 (DTO 필드 이름 사용)
     #{_comId, mode=IN, jdbcType=VARCHAR},
     #{_inDttmReq, mode=IN, jdbcType=TIMESTAMP},
@@ -528,7 +529,7 @@
     SELECT
     II.inReqItemsId, II.status, II.inQtyReq, II.inQty, II.inDttmSchd,
     C.cfName, C.cfCategory,
-    IR.inReqId, U.userCompanyName, IR.inDttmReq, IR.inDttmAppr,
+    IR.inReqId, U.userCompanyName, IR.inDttmReq, IR.inDttmAppr, IR.isTempo,
     S.stkId
     FROM
     inboundItems II
@@ -629,6 +630,55 @@
     </where>
   </select>
 
+
+  <!-- InboundItemDetailDTO를 위한 범용 ResultMap 정의 -->
+  <resultMap id="inboundItemDetailMap" type="com.ssg.meowcoffee.dto.InboundItemDetailDTO">
+    <!-- InboundItemVO 필드 -->
+    <id property="inReqItemsId" column="inReqItemsId"/>
+    <result property="inReqId" column="inReqId"/>
+    <result property="cfId" column="cfId"/>
+    <result property="locationId" column="locationId"/>
+    <result property="status" column="status"
+            javaType="com.ssg.meowcoffee.domain.InboundStatus"
+            typeHandler="com.ssg.meowcoffee.util.InboundStatusTypeHandler"/>
+    <result property="inQtyReq" column="inQtyReq"/>
+    <result property="inOrderAddr" column="inOrderAddr"/>
+    <result property="inQty" column="inQty"/>
+    <result property="inDttmSchd" column="inDttmSchd"/>
+    <result property="inDttmInsp" column="inDttmInsp"/>
+    <result property="inDttmRecv" column="inDttmRecv"/>
+
+    <!-- InboundRequestVO 필드 -->
+    <result property="comId" column="comId"/>
+    <result property="managerId" column="managerId"/>
+    <result property="inDttmReq" column="inDttmReq"/>
+    <result property="inDateWish" column="inDateWish"/>
+    <result property="inDttmAppr" column="inDttmAppr"/>
+    <result property="isDelete" column="isDelete"/>
+    <result property="isTempo" column="isTempo"/>
+
+    <!-- CoffeeVO 추가 필드 -->
+    <result property="cfName" column="cfName"/>
+    <result property="cfCategory" column="cfCategory"/>
+    <result property="cfGrade" column="cfGrade"/>
+  </resultMap>
+
+  <!-- inReqId로 모든 상세 정보를 조인하여 조회 -->
+  <select id="selectInboundItemDetailsByReqId" resultMap="inboundItemDetailMap">
+    SELECT
+    -- 각 테이블의 모든 컬럼을 조회하거나, 필요한 컬럼만 명시
+    II.*,
+    IR.comId, IR.managerId, IR.inDttmReq, IR.inDateWish, IR.inDttmAppr, IR.IsDelete, IR.IsTempo,
+    C.cfName, C.cfCategory, C.cfGrade
+    FROM
+    inboundItems II
+    INNER JOIN
+    inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN
+    coffee C ON II.cfId = C.cfId
+    WHERE
+    II.inReqId = #{inReqId}
+  </select>
 
 </mapper>
 
