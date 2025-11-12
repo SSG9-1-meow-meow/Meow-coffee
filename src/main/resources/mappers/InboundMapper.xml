@@ -661,6 +661,10 @@
     <result property="cfName" column="cfName"/>
     <result property="cfCategory" column="cfCategory"/>
     <result property="cfGrade" column="cfGrade"/>
+
+    <!-- UsersVO 추가 필드   -->
+    <result property="companyName" column="userCompanyName"/>
+
   </resultMap>
 
   <!-- inReqId로 모든 상세 정보를 조인하여 조회 -->
@@ -669,16 +673,152 @@
     -- 각 테이블의 모든 컬럼을 조회하거나, 필요한 컬럼만 명시
     II.*,
     IR.comId, IR.managerId, IR.inDttmReq, IR.inDateWish, IR.inDttmAppr, IR.IsDelete, IR.IsTempo,
-    C.cfName, C.cfCategory, C.cfGrade
+    C.cfName, C.cfCategory, C.cfGrade,
+    U.userCompanyName
     FROM
     inboundItems II
     INNER JOIN
     inboundRequests IR ON II.inReqId = IR.inReqId
     INNER JOIN
     coffee C ON II.cfId = C.cfId
+    INNER JOIN
+    users U ON IR.comId = U.userId
     WHERE
     II.inReqId = #{inReqId}
   </select>
+
+  <select id="selectInboundItemDetailByItemId" resultMap="inboundItemDetailMap">
+    SELECT
+    II.*,
+    IR.comId, IR.managerId, IR.inDttmReq, IR.inDateWish, IR.inDttmAppr, IR.IsDelete, IR.IsTempo,
+    C.cfName, C.cfCategory, C.cfGrade,
+    U.userCompanyName
+    FROM
+    inboundItems II
+    INNER JOIN
+    inboundRequests IR ON II.inReqId = IR.inReqId
+    INNER JOIN
+    coffee C ON II.cfId = C.cfId
+    INNER JOIN
+    users U ON IR.comId = U.userId
+    WHERE
+    II.inReqItemsId = #{inReqItemsId}
+  </select>
+
+  <select id="selectDailyCapacitiesForPeriod" resultType="com.ssg.meowcoffee.dto.DailyCapacityEventDTO">
+    SELECT
+    dateId AS date,
+    usedCapa
+    FROM
+    dailyCapacity
+    WHERE
+    dateId BETWEEN #{startDate} AND #{endDate}
+  </select>
+
+  <!-- DTO 필드명 변경에 따른 ResultMap 수정 -->
+  <resultMap id="dailyCapacityEventMap" type="com.ssg.meowcoffee.dto.DailyCapacityEventDTO">
+    <result property="date" column="date"/>
+    <result property="totalUsedCapacity" column="total_used_capacity"/>
+    <result property="totalAvailableCapacity" column="total_available_capacity"/>
+  </resultMap>
+
+  <!-- 달력 아이콘 표시를 위해, 기간 내의 '전체' 일별 처리 사용량 및 가용량 합산 -->
+  <select id="selectAggregatedDailyCapacitiesForPeriod" resultMap="dailyCapacityEventMap">
+    SELECT
+    dateId AS date,
+    SUM(used_processing_capacity) AS total_used_capacity,
+    SUM(max_processing_capacity - used_processing_capacity) AS total_available_capacity
+    FROM
+    daily_warehouse_capacity
+    WHERE
+    dateId BETWEEN #{startDate} AND #{endDate}
+    GROUP BY
+    dateId
+  </select>
+
+  <!-- DailyWarehouseCapacityDTO를 위한 ResultMap -->
+  <resultMap id="dailyWarehouseCapacityMap" type="com.ssg.meowcoffee.dto.DailyWarehouseCapacityDTO">
+    <result property="dateId" column="dateId"/>
+    <result property="whId" column="whId"/>
+    <result property="warehouseName" column="whName"/>
+    <result property="usedStorageCapacity" column="used_storage_capacity"/>
+    <result property="availableStorageCapacity" column="available_storage_capacity"/>
+    <result property="totalStorageCapacity" column="whTotalCapa"/>
+    <result property="maxProcessingCapacity" column="max_processing_capacity"/>
+    <result property="usedProcessingCapacity" column="used_processing_capacity"/>
+    <result property="staffAvailable" column="staff_available"/>
+    <result property="staffAssigned" column="staff_assigned"/>
+    <result property="equipAvailable" column="equip_available"/>
+    <result property="equipAssigned" column="equip_assigned"/>
+  </resultMap>
+
+  <!-- 특정 날짜의 '창고별' 상세 부하/수용량 정보를 모두 조회 -->
+  <select id="selectDailyWarehouseCapacitiesByDate" resultMap="dailyWarehouseCapacityMap">
+    SELECT
+    DWC.*,
+    W.whName,
+    W.whTotalCapa
+    FROM
+    daily_warehouse_capacity DWC
+    INNER JOIN
+    warehouse W ON DWC.whId = W.whId
+    WHERE
+    DWC.dateId = #{selectedDate}
+  </select>
+
+  <!-- AvailableZoneDTO를 위한 ResultMap -->
+  <resultMap id="availableLocationMap" type="com.ssg.meowcoffee.dto.AvailableLocationDTO">
+    <result property="lpId" column="lpId"/>
+    <result property="zoneName" column="zoneName"/>
+    <result property="warehouseName" column="whName"/>
+    <result property="currentStock" column="current_stock"/>
+    <result property="scheduledInbound" column="scheduled_inbound"/>
+    <result property="scheduledOutbound" column="scheduled_outbound"/>
+  </resultMap>
+
+  <!-- 할당 가능한 Zone 목록 조회 -->
+  <select id="findAvailableLocations" resultMap="availableLocationMap">
+    <![CDATA[
+    WITH
+    scheduled_inbounds AS (
+    SELECT L.lpId, SUM(II.inQtyReq) as total_in_qty
+    FROM inboundItems II JOIN locations L ON II.locationId = L.locationId
+    WHERE II.status = '승인완료'
+    AND DATE(II.inDttmSchd) = #{selectedDate}
+    GROUP BY L.lpId
+    ),
+    scheduled_outbounds AS (
+    SELECT S.lpId, SUM(OI.outQtyReq) as total_out_qty
+    FROM outboundItems OI JOIN stock S ON OI.stkId = S.stkId
+    WHERE OI.status = '승인완료'
+    AND DATE(OI.outDttmSchd) = #{selectedDate}
+    GROUP BY S.lpId
+    )
+    SELECT
+    LP.lpId,
+    LP.zoneName,
+    W.whName,
+        IFNULL(S.stkQuantity, 0) AS current_stock,
+        IFNULL(SI.total_in_qty, 0) AS scheduled_inbound,
+        IFNULL(SO.total_out_qty, 0) AS scheduled_outbound
+    FROM
+    location_places LP
+    JOIN locations L ON LP.lpId = L.lpId
+    JOIN warehouse W ON L.whId = W.whId
+    LEFT JOIN daily_warehouse_capacity DWC ON W.whId = DWC.whId AND DWC.dateId = #{selectedDate}
+    LEFT JOIN stock S ON LP.lpId = S.lpId
+    LEFT JOIN scheduled_inbounds SI ON LP.lpId = SI.lpId
+    LEFT JOIN scheduled_outbounds SO ON LP.lpId = SO.lpId
+    WHERE
+    (IFNULL(DWC.used_processing_capacity, 0) + #{requiredQty}) <= IFNULL(DWC.max_processing_capacity, 50)
+    AND (IFNULL(DWC.used_storage_capacity, 0) + #{requiredQty}) <= W.whTotalCapa
+    HAVING
+    (current_stock + scheduled_inbound - scheduled_outbound + #{requiredQty}) <= 20
+    ORDER BY
+    W.whName, LP.zoneName, LP.lpId;
+    ]]>
+  </select>
+
 
 </mapper>
 

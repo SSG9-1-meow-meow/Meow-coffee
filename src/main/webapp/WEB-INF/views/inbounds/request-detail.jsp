@@ -59,6 +59,8 @@
     let requestItems = [];
     let isEditMode = false;
     const inReqId = "${inReqId}";
+    // ★★★ [추가] 컨트롤러가 전달한 사용자 권한 정보를 JS 변수로 받음 ★★★
+    const currentUserRole = "${currentUserRole}";
 
     /**
      * 오늘로부터 특정 일수(days) 후의 날짜를 'YYYY-MM-DD' 형식의 문자열로 반환합니다.
@@ -111,15 +113,36 @@
                 '</div>' +
                 '</div>';
         } else {
-            // 읽기 모드 로직 (이전과 동일)
+            // 읽기 모드 로직
+            // '처리하기' 버튼을 조건부로 생성
+            let processButtonHtml = '';
+            if (currentUserRole === 'MANAGER' && item.status === 'PENDING') {
+                processButtonHtml =
+                    '<a href="/inbounds/items/' + item.inReqItemsId + '" class="btn btn-sm btn-outline-primary ms-3">' +
+                    '처리하기 <i class="fas fa-arrow-right"></i>' +
+                    '</a>';
+            }
+
+            // 상태 배지 클래스 결정
+            let statusBadgeClass = 'bg-secondary';
+            if (item.status === 'PENDING') statusBadgeClass = 'bg-warning text-dark';
+            if (item.status === 'APPROVED') statusBadgeClass = 'bg-primary';
+            if (item.status === 'RECEIVED') statusBadgeClass = 'bg-success';
+            if (item.status === 'REJECTED') statusBadgeClass = 'bg-danger';
+
             return (
                 '<div class="request-item-box border p-3 mb-3 rounded">' +
-                '<div class="d-flex justify-content-between">' +
-                    '<div>'+
-                      '<strong>' + coffeeName + '</strong>' + '(' + item.cfId + ')' + '&nbsp;' +
-                      '<small class="text-muted">카테고리: ' + item.cfCategory + '/ 등급 : ' + item.cfGrade + '</small>'+
-                    '</div>'+
-                '<span>신청 수량: ' + selectedQty + '</span>' +
+                '<div class="d-flex w-100 justify-content-between align-items-center">' +
+                '<div>' +
+                '<strong>' + coffeeName + '</strong> (' + item.cfId + ')&nbsp;' +
+                '<small class="text-muted">카테고리: ' + item.cfCategory + ' / 등급 : ' + item.cfGrade + '</small><br>' +
+                '<p class="mb-0 mt-1">신청 수량: <strong>' + selectedQty + '</strong> PLT</p>' +
+                '</div>' +
+                // 상태 배지와 처리하기 버튼을 함께 묶음
+                '<div class="d-flex align-items-center">' +
+                '<span class="badge ' + statusBadgeClass + ' fs-6">' + item.statusValue + '</span>' +
+                processButtonHtml + // 조건에 따라 버튼 HTML이 여기에 추가됨
+                '</div>' +
                 '</div>' +
                 '</div>'
             );

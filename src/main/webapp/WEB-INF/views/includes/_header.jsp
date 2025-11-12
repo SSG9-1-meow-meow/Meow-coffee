@@ -15,6 +15,9 @@
       type="image/x-icon"
   />
 
+  <!-- FullCalendar CSS & JS : 관리자 입고관리를 위해 추가 (박기웅) -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
   <!-- Fonts and icons -->
   <script src="/resources/assets/js/plugin/webfont/webfont.min.js"></script>
   <script>

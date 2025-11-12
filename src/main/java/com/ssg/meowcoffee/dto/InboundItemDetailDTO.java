@@ -42,4 +42,10 @@ public class InboundItemDetailDTO {
     private String cfName;
     private String cfCategory;
     private String cfGrade;
+
+    private String companyName;
+    public String getStatusValue() {
+        return this.status != null ? this.status.getValue() : null;
+    }
+
 }
