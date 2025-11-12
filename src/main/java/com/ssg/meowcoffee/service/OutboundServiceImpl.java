@@ -69,4 +69,9 @@ public class OutboundServiceImpl implements OutboundService {
                 .PageMaker(pm)
                 .build();
     }
+
+    @Override
+    public List<OutboundItemDTO> getOutboundItems(Long outReqId) {
+        return mapper.selectOutboundItemsByReqId(outReqId);
+    }
 }
