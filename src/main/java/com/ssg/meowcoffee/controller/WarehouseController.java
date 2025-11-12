@@ -6,6 +6,7 @@ import com.ssg.meowcoffee.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @Log4j2
 public class WarehouseController {
@@ -24,12 +25,12 @@ public class WarehouseController {
 //    페이지 이동
     @GetMapping("/warehouses")
     public String warehouseListPage(){
-        return "warehouse/warehouseMain";
+        return "/warehouse/warehouseMain";
     }
 
     @GetMapping("/warehouses/map")
     public String warehouseMapPage(){
-        return "warehouse/warehouseMap";
+        return "/warehouse/warehouseMap";
     }
 
     @GetMapping("/api/warehouses/search")
@@ -133,9 +134,9 @@ public class WarehouseController {
     }
 
     // MODIFY2: 창고 수정(모달로 처리)
-    @PutMapping("/api/warehouses/{whId}/update")
-    public ResponseEntity<Integer> updateWarehouse(@PathVariable("whId") Long whId, @RequestBody WarehouseUpdateDTO warehouse) {
-        warehouse.setWhId(whId);
+    @PutMapping("/api/warehouses/{whCode}/update")
+    public ResponseEntity<Integer> updateWarehouse(@PathVariable("whCode") String whCode, @RequestBody WarehouseUpdateDTO warehouse) {
+        warehouse.setWhCode(whCode);
 
         Integer result = warehouseService.modifyWarehouse(warehouse);
         return ResponseEntity.ok(result);

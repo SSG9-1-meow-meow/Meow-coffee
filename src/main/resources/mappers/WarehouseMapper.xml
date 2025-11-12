@@ -46,7 +46,7 @@
             whName = #{whName},
             whField = #{whField},
             whTelephone = #{whTelephone}
-        WHERE whId = #{whId}
+        WHERE whCode = #{whCode}
     </update>
 
     <!-- 창고 조건 검색 -->
