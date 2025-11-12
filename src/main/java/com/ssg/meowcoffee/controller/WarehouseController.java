@@ -33,8 +33,19 @@ public class WarehouseController {
     }
 
     @GetMapping("/api/warehouses/search")
-    public ResponseEntity<List<WarehouseDTO>> readWarehouseSearchList(){
+    public ResponseEntity<Map<String, Object>> readWarehouseSearchList(){
+        WarehouseSearchDTO searchDTO = WarehouseSearchDTO.builder().whAddress("address").build();
+        List<WarehouseDTO> addressList = warehouseService.getWarehouseSearchList(searchDTO); //주소 목록
+        searchDTO.setWhAddress(null); searchDTO.setWhName("name");
+        List<WarehouseDTO> nameList = warehouseService.getWarehouseSearchList(searchDTO); //창고명 목록
+        searchDTO.setWhName(null); searchDTO.setWhGrade("grade");
+        List<WarehouseDTO> gradeList = warehouseService.getWarehouseSearchList(searchDTO); //창고 등급 목록
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("addressList", addressList);
+        response.put("nameList", nameList);
+        response.put("gradeList", gradeList);
+        return ResponseEntity.ok(response);
     }
 
     // MAIN: 전체 창고 조회
