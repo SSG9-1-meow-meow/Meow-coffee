@@ -42,7 +42,7 @@
               <a class="nav-link" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a>
+              <a class="nav-link" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1"></span></a>
             </li>
           </ul>
         </div>
@@ -530,7 +530,7 @@
                 <ul class="dropdown-menu" aria-labelledby="navDashboard" style="left: 0;">
                   <li><a class="dropdown-item" href="#">입/출고 현황</a></li>
                   <li><a class="dropdown-item" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a></li>
-                  <li><a class="dropdown-item" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a></li>
+                  <li><a class="dropdown-item" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1"></span></a></li>
                 </ul>
               </li>
 
@@ -602,7 +602,7 @@
                     aria-labelledby="navQuick"
                 >
                   <li><a class="dropdown-item" href="/inbounds/req">입고 요청</a></li>
-                  <li><a class="dropdown-item" href="#">출고 요청</a></li>
+                  <li><a class="dropdown-item" href="/outbounds/req">출고 요청</a></li>
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
