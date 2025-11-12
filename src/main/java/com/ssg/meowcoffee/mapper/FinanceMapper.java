@@ -3,6 +3,7 @@ import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
 import com.ssg.meowcoffee.dto.ExpenseInputDTO;
+import com.ssg.meowcoffee.dto.ExpenseUpdateDTO;
 import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,6 +23,8 @@ public interface FinanceMapper {
 
     // ===== Expense 생성/수정 =====
     int insertExpense(ExpenseInputDTO expenseInputDTO); // 생성 시 카테고리 ‘management’ 고정
+
+    int updateExpense(ExpenseUpdateDTO expenseUpdateDTO);
 
     int updateExpensePosted(@Param("expenseId") Long expenseId);
 

@@ -78,6 +78,13 @@
     </insert>
 
     <!-- ===== Expense: 수정 ===== -->
+    <!--expense Update-->
+    <update id="updateExpense" parameterType="com.ssg.meowcoffee.dto.ExpenseUpdateDTO">
+        UPDATE expense
+        SET totalAmt = #{totalAmt}
+        WHERE expenseId = #{expenseId}
+    </update>
+
     <!--'posted' 변경-->
     <update id="updateExpensePosted">
         UPDATE expense

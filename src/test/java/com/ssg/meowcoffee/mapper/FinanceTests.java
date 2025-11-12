@@ -4,6 +4,7 @@ import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
 import com.ssg.meowcoffee.dto.ExpenseInputDTO;
+import com.ssg.meowcoffee.dto.ExpenseUpdateDTO;
 import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import com.ssg.meowcoffee.service.FinanceService;
 import lombok.extern.log4j.Log4j2;
@@ -64,6 +65,17 @@ public class FinanceTests {
 
         int rows = financeMapper.insertExpense(expenseInputDTO);
         log.info(rows);
+    }
+
+    @Test
+    void updateExpenseTest() {
+        ExpenseUpdateDTO expenseUpdateDTO = ExpenseUpdateDTO.builder()
+                .expenseId(19L)
+                .totalAmt(new BigDecimal("1000.00"))
+                .build();
+
+        int raws = financeMapper.updateExpense(expenseUpdateDTO);
+        log.info(raws);
     }
 
     @Test // 지출내역 확정 (draft -> posted) -> Check!
@@ -155,6 +167,16 @@ public class FinanceTests {
                 .whId(1L).build();
         long getKey = financeService.registerExpense(expenseInputDTO);
         log.info(getKey);
+    }
+
+    @Test
+    void modifyExpenseTest() {
+        ExpenseUpdateDTO expenseUpdateDTO = ExpenseUpdateDTO.builder()
+                .expenseId(19L)
+                .totalAmt(new BigDecimal("10000.00"))
+                .build();
+        int raws = financeService.modifyExpense(expenseUpdateDTO);
+        log.info(raws);
     }
 
     @Test

@@ -61,7 +61,7 @@ DELIMITER ;
 
 -- 가정2.3. 출고가 완료됐을때
 SELECT * FROM outboundItems;
-SELECT * FROM outboundCost;ㅡ메ㅔㄷ
+SELECT * FROM outboundCost;
 SELECT * FROM deliveryCost;
 
 UPDATE outboundItems
