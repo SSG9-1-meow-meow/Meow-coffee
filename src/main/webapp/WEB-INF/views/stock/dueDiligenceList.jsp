@@ -345,8 +345,8 @@ background-color: #000;
         whCode: $("#whCode").val(),
         stkId: $("#stkId").val(),
         realStkQuantity: $("#realStock").val(),
-        ddLog: $("#ddLog").val()
-        // 현재 접속한 사람의 maId
+        ddLog: $("#ddLog").val(),
+        maId: "manager_lee"
         };
 
         if (!data.realStkQuantity) {
@@ -359,8 +359,9 @@ background-color: #000;
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify(data),
-        success: function() {
-        alert("등록 성공!");
+        success: function(response) {
+            if(response.data === -1) {alert("권한이 없습니다.")}
+            alert("등록 성공!");
         $("#dueDiligenceModal").modal("hide");
         clickPageNum(1); // 새로고침
         },

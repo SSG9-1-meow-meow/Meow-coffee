@@ -172,7 +172,11 @@ public class StockController {
 
     @GetMapping("/dueDiligences/{ddId}")
     public String dueDiligencePage(@PathVariable("ddId") Long ddId) {
-        return "/stock/dueDiligence";
+        //권한 확인 필요 (총관리자 , 일반관리자)
+        //일반관리자
+        return "/stock/dueDiligenceWh";
+        //총관리자
+        //return "/stock/dueDiligenceTop";
     }
 
     @GetMapping("/api/dueDiligences/{ddId}") //재고 실사 상세 페이지
@@ -213,15 +217,13 @@ public class StockController {
     }
 
     @PutMapping("/api/dueDiligences/{ddId}/update") //받은 객체가 null인 경우 권한 없음 띄우기
-    public ResponseEntity<DueDiligenceReadDTO> updateDueDiligence(@PathVariable("ddId") Long ddId,
+    public ResponseEntity<Integer> updateDueDiligence(@PathVariable("ddId") Long ddId,
                                                                   @Valid @RequestBody DueDiligenceDTO dto) {
         dto.setDdId(ddId);
 
         Integer result = stockService.modifyDueDiligence(dto);
-        if(result == -1) return ResponseEntity.ok(null);
 
-        DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //수정한 실사로그 부분 가져와서 보여주기 위해
-        return ResponseEntity.ok(readDTO);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/api/dueDiligences/{ddId}") //String id는 현재 로그인한 id를 말함
