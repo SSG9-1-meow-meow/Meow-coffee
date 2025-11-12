@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssg.meowcoffee.mapper.WarehouseMapper">
+
+    <!-- 창고 전체 조회 -->
+    <select id="selectWarehouseList" resultType="com.ssg.meowcoffee.domain.warehouse.WarehouseVO">
+        SELECT whCode, whName, whAddress, whGrade, whTelephone, whField, whTotalCapa, whUseCapa
+        FROM warehouse
+        <where>
+            <if test="searchDTO.whAddress != null and searchDTO.whAddress != ''">
+                AND whAddress LIKE CONCAT('%', #{searchDTO.whAddress}, '%')
+            </if>
+            <if test="searchDTO.whName != null and searchDTO.whName != ''">
+                AND whName = #{searchDTO.whName}
+            </if>
+            <if test="searchDTO.whGrade != null and searchDTO.whGrade != ''">
+                AND whGrade = #{searchDTO.whGrade}
+            </if>
+        </where>
+        ORDER BY whName ASC
+        LIMIT #{criteria.skip}, #{criteria.amount}
+    </select>
+
+    <!-- 창고 단건 조회 -->
+    <select id="selectWarehouse" resultType="com.ssg.meowcoffee.domain.warehouse.WarehouseVO">
+        SELECT whCode, whName, whAddress, whGrade, whTelephone, whField, whTotalCapa, whUseCapa
+        FROM warehouse
+        WHERE whName = #{whName}
+    </select>
+
+    <!-- 창고 등록 -->
+    <insert id="insertWarehouse">
+        INSERT INTO warehouse (whCode, whName, whAddress, whTelephone, whField, whTotalCapa, whGrade, whUseCapa)
+        VALUES (#{whCode}, #{whName}, #{whAddress}, #{whTelephone}, #{whField}, #{whTotalCapa}, #{whGrade},
+                #{whUseCapa})
+    </insert>
+
+
+    <!-- 창고 수정 -->
+    <update id="updateWarehouse">
+        UPDATE warehouse
+        SET
+            whName = #{whName},
+            whField = #{whField},
+            whTelephone = #{whTelephone}
+        WHERE whId = #{whId}
+    </update>
+
+    <!-- 창고 조건 검색 -->
+    <select id="selectSearchList" resultType="com.ssg.meowcoffee.domain.warehouse.WarehouseVO">
+        <choose>
+            <when test="searchDTO.whAddress != null and searchDTO.whAddress != ''">
+                SELECT DISTINCT SUBSTRING_INDEX(whAddress, ' ', 2) AS whAddress
+                FROM warehouse
+            </when>
+
+            <when test="searchDTO.whName != null and searchDTO.whName != ''">
+                SELECT DISTINCT whName
+                FROM warehouse
+            </when>
+
+            <when test="searchDTO.whGrade != null and searchDTO.whGrade != ''">
+                SELECT DISTINCT whGrade
+                FROM warehouse
+            </when>
+        </choose>
+    </select>
+
+
+    <select id="countWarehouseTotal" resultType="int">
+        select count(*) from warehouse
+        <where>
+            <if test="searchDTO.whAddress != null and searchDTO.whAddress != ''">
+                AND whAddress LIKE CONCAT('%', #{searchDTO.whAddress}, '%')
+            </if>
+            <if test="searchDTO.whName != null and searchDTO.whName != ''">
+                AND whName = #{searchDTO.whName}
+            </if>
+            <if test="searchDTO.whGrade != null and searchDTO.whGrade != ''">
+                AND whGrade = #{searchDTO.whGrade}
+            </if>
+        </where>
+    </select>
+
+</mapper>
