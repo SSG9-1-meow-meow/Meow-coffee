@@ -8,7 +8,10 @@ import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+
 @Mapper
 public interface FinanceMapper {
 
@@ -42,4 +45,15 @@ public interface FinanceMapper {
 
     // ===== Revenue 조회 =====
     List<RevenueVO> selectRevenues(); // 전체
+
+//    BigDecimal selectMonthExpenseTotal();
+//    int selectPendingExpenseCount();
+//    int selectWarehouseCount();
+//
+//    Map<String,Object> selectInvoiceKpisForThisMonth();
+//
+//    Map<String,Object> selectRevenueKpisForThisMonth();
+//    List<Map<String,Object>> selectRevenueMonthlySeries();
+
+
 }

@@ -83,10 +83,13 @@
         <div class="collapse" id="oc-sidebarLayouts">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">매출 현황</a>
+              <a class="nav-link" href="/finance/expense">지출 현황</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">지출 현황</a>
+              <a class="nav-link" href="/finance/invoice">청구 현황</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/finance/revenue">매출 현황</a>
             </li>
           </ul>
         </div>
@@ -642,4 +645,4 @@
     <!-- 여기부터 각 JSP 파일의 메인 컨텐츠가 시작됩니다. -->
     <div class="container">
       <div class="page-inner">
-        <!-- _header.jsp 종료 -->
+<%--        <!-- _header.jsp 종료 -->--%>

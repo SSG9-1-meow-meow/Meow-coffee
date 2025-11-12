@@ -5,32 +5,32 @@
 <mapper namespace="com.ssg.meowcoffee.mapper.FinanceMapper">
 
     <resultMap id="ExpenseMap" type="com.ssg.meowcoffee.domain.ExpenseVO">
-        <id     property="expenseId"       column="expenseId"/>
-        <result property="expenseDt"       column="expenseDt"/>
+        <id property="expenseId" column="expenseId"/>
+        <result property="expenseDt" column="expenseDt"/>
         <result property="expenseCategory" column="expenseCategory"/>
-        <result property="totalAmt"        column="totalAmt"/>
-        <result property="expenseStatus"   column="expenseStatus"/>
-        <result property="confirmDt"       column="confirmDt"/>
-        <result property="isDelete"        column="isDelete"/>
-        <result property="whId"            column="whId"/>
-        <result property="userId"          column="userId"/>
+        <result property="totalAmt" column="totalAmt"/>
+        <result property="expenseStatus" column="expenseStatus"/>
+        <result property="confirmDt" column="confirmDt"/>
+        <result property="isDelete" column="isDelete"/>
+        <result property="whId" column="whId"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <resultMap id="InvoiceMap" type="com.ssg.meowcoffee.domain.InvoiceVO">
-        <id     property="invoiceId"     column="invoiceId"/>
-        <result property="invoiceDt"     column="invoiceDt"/>
-        <result property="totalAmt"      column="totalAmt"/>
+        <id property="invoiceId" column="invoiceId"/>
+        <result property="invoiceDt" column="invoiceDt"/>
+        <result property="totalAmt" column="totalAmt"/>
         <result property="invoiceStatus" column="invoiceStatus"/>
-        <result property="depositDt"     column="depositDt"/>
-        <result property="userId"        column="userId"/>
+        <result property="depositDt" column="depositDt"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <resultMap id="RevenueMap" type="com.ssg.meowcoffee.domain.RevenueVO">
-        <id     property="revenueId" column="revenueId"/>
-        <result property="totalAmt"  column="totalAmt"/>
+        <id property="revenueId" column="revenueId"/>
+        <result property="totalAmt" column="totalAmt"/>
         <result property="revenueDt" column="revenueDt"/>
-        <result property="whId"      column="whId"/>
-        <result property="userId"    column="userId"/>
+        <result property="whId" column="whId"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <!-- ===== Expense: 조회 ===== -->
@@ -47,7 +47,7 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND whId = #{whId}
+          AND whId = #{whId}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
@@ -56,7 +56,7 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND expenseCategory = #{expenseCategory}
+          AND expenseCategory = #{expenseCategory}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
@@ -65,16 +65,16 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND userId = #{userId}
+          AND userId = #{userId}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
     <!-- ===== Expense: 생성 (카테고리 고정: management) ===== -->
-    <insert id="insertExpense" parameterType="com.ssg.meowcoffee.dto.ExpenseInputDTO" useGeneratedKeys="true" keyProperty="expenseId" keyColumn="expenseId">
+    <insert id="insertExpense" parameterType="com.ssg.meowcoffee.dto.ExpenseInputDTO" useGeneratedKeys="true"
+            keyProperty="expenseId" keyColumn="expenseId">
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId)
-        VALUES
-        (CURDATE(), 'management', #{totalAmt}, 'draft', #{whId})
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId)
+        VALUES (CURDATE(), 'management', #{totalAmt}, 'draft', #{whId})
     </insert>
 
     <!-- ===== Expense: 수정 ===== -->
@@ -88,7 +88,8 @@
     <!--'posted' 변경-->
     <update id="updateExpensePosted">
         UPDATE expense
-        SET confirmDt = CURDATE(), expenseStatus = 'posted'
+        SET confirmDt     = CURDATE(),
+            expenseStatus = 'posted'
         WHERE expenseId = #{expenseId}
     </update>
 
@@ -124,9 +125,13 @@
     </select>
 
     <!-- ===== Invoice: 수정 ===== -->
-    <update id="updateInvoiceStatus" parameterType="com.ssg.meowcoffee.dto.InvoiceUpdateDTO">
+    <update id="updateInvoiceStatus"
+            parameterType="com.ssg.meowcoffee.dto.InvoiceUpdateDTO">
         UPDATE invoice
         SET invoiceStatus = #{invoiceStatus}
+        <if test="invoiceStatus == 'paid'">
+            , depositDt = CURDATE()
+        </if>
         WHERE invoiceId = #{invoiceId}
     </update>
 
@@ -136,5 +141,137 @@
         FROM revenue
         ORDER BY revenueDt DESC, revenueId DESC
     </select>
+
+
+<!--    &lt;!&ndash; ===== Expense: 차트 ===== &ndash;&gt;-->
+<!--    <select id="selectMonthExpenseTotal" resultType="bigdecimal">-->
+<!--        SELECT IFNULL(SUM(totalAmt), 0)-->
+<!--        FROM expense-->
+<!--        WHERE expenseStatus = 'posted'-->
+
+<!--    </select>-->
+
+<!--    <select id="selectPendingExpenseCount" resultType="int">-->
+<!--        SELECT COUNT(*)-->
+<!--        FROM expense-->
+<!--        WHERE expenseStatus = 'draft'-->
+<!--          AND expenseDt BETWEEN DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY) &#45;&#45; 이번 달 1일-->
+<!--            AND LAST_DAY(CURDATE()) &#45;&#45; 이번 달 말일-->
+<!--    </select>-->
+
+<!--    <select id="selectWarehouseCount" resultType="int">-->
+<!--        &lt;!&ndash; 별도 warehouses 테이블 없으면 지출 발생 창고 수로 대체 &ndash;&gt;-->
+<!--        SELECT COUNT(DISTINCT whId) FROM expense-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; ===== Invoice: 차트 ===== &ndash;&gt;-->
+<!--    <select id="selectInvoiceKpisForThisMonth" resultType="hashmap">-->
+<!--  <![CDATA[-->
+<!--        SELECT-->
+<!--            /* 이번 달 총 청구 금액 */-->
+<!--            IFNULL(SUM(IF(-->
+<!--                    i.invoiceStatus <> 'canceled'-->
+<!--                        AND i.invoiceDt >= d.s AND i.invoiceDt < d.e,-->
+<!--                    i.totalAmt, 0-->
+<!--                       )), 0) AS monthInvoiceTotal,-->
+
+<!--            /* 입금 완료율(%) */-->
+<!--            IFNULL(-->
+<!--                    FLOOR(-->
+<!--                            100 * SUM(IF(-->
+<!--                                    i.invoiceStatus = 'paid'-->
+<!--                                        AND i.invoiceDt >= d.s AND i.invoiceDt < d.e, 1, 0-->
+<!--                                      )) / NULLIF(SUM(IF(-->
+<!--                                    i.invoiceStatus <> 'canceled'-->
+<!--                                        AND i.invoiceDt >= d.s AND i.invoiceDt < d.e, 1, 0-->
+<!--                                                      )), 0)-->
+<!--                    ), 0-->
+<!--            )                 AS paidRatePct,-->
+
+<!--            /* 발행 중 건수 */-->
+<!--            SUM(IF(-->
+<!--                    i.invoiceStatus IN ('issued')-->
+<!--                        AND i.invoiceDt >= d.s AND i.invoiceDt < d.e, 1, 0-->
+<!--                ))            AS issuingCount,-->
+
+<!--            /* 미발행 건수 */-->
+<!--            SUM(IF(-->
+<!--                    i.invoiceStatus IN ('draft')-->
+<!--                        AND i.invoiceDt >= d.s AND i.invoiceDt < d.e, 1, 0-->
+<!--                ))            AS unpaidCount-->
+
+<!--        FROM invoice i-->
+<!--                 JOIN (SELECT DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY) AS s, /* 이번 달 1일 00:00:00 */-->
+<!--                              DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)        AS e /* 다음 달 1일 00:00:00 */-->
+<!--        ) d-->
+<!--        ]]>-->
+<!--</select>-->
+
+<!--    &lt;!&ndash; ===== Revenue: 차트 ===== &ndash;&gt;-->
+<!--    &lt;!&ndash; 이번 달 KPI &ndash;&gt;-->
+<!--    <select id="selectRevenueKpisForThisMonth" resultType="hashmap">-->
+<!--  <![CDATA[-->
+<!--        SELECT-->
+<!--            /* 이번 달 매출 합계 */-->
+<!--            IFNULL(SUM(IF(r.revenueDt >= d.s AND r.revenueDt < d.e, r.totalAmt, 0)), 0)   AS monthRevenueTotal,-->
+<!--            /* 전월 매출 합계 */-->
+<!--            IFNULL(SUM(IF(r.revenueDt >= d.ps AND r.revenueDt < d.pe, r.totalAmt, 0)), 0) AS prevMonthTotal,-->
+<!--            /* 이번 달 매출 건수 */-->
+<!--            COUNT(IF(r.revenueDt >= d.s AND r.revenueDt < d.e, 1, NULL))                  AS revenueCount-->
+<!--        FROM revenue r-->
+<!--                 JOIN (-->
+<!--            /* 이번 달 [s,e), 전월 [ps,pe) */-->
+<!--            SELECT DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY)                             AS s, /* 이번 달 1일 00:00:00 */-->
+<!--                   DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)                                    AS e, /* 다음 달 1일 00:00:00 */-->
+<!--                   DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY), INTERVAL 1 MONTH) AS ps, /* 전월 1일 */-->
+<!--                   DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY), INTERVAL 0 DAY)   AS pe /* 이번 달 1일 */-->
+<!--        ) d-->
+<!--        ]]>-->
+<!--</select>-->
+
+<!--    &lt;!&ndash; 최근 12개월 월별 합계 시리즈 (yyyy-MM 형식) &ndash;&gt;-->
+<!--    <select id="selectRevenueMonthlySeries" resultType="hashmap">-->
+<!--  <![CDATA[-->
+<!--        SELECT DATE_FORMAT(x.y, '%Y-%m')  AS ym,-->
+<!--               IFNULL(SUM(r.totalAmt), 0) AS total-->
+<!--        FROM (-->
+<!--                 /* 최근 12개월의 월 첫날 목록 */-->
+<!--                 SELECT DATE_FORMAT(-->
+<!--                                DATE_SUB(-->
+<!--                                        DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY),-->
+<!--                                        INTERVAL n.n MONTH-->
+<!--                                ),-->
+<!--                                '%Y-%m-01'-->
+<!--                        ) AS y-->
+<!--                 FROM (SELECT 0 n-->
+<!--                       UNION ALL-->
+<!--                       SELECT 1-->
+<!--                       UNION ALL-->
+<!--                       SELECT 2-->
+<!--                       UNION ALL-->
+<!--                       SELECT 3-->
+<!--                       UNION ALL-->
+<!--                       SELECT 4-->
+<!--                       UNION ALL-->
+<!--                       SELECT 5-->
+<!--                       UNION ALL-->
+<!--                       SELECT 6-->
+<!--                       UNION ALL-->
+<!--                       SELECT 7-->
+<!--                       UNION ALL-->
+<!--                       SELECT 8-->
+<!--                       UNION ALL-->
+<!--                       SELECT 9-->
+<!--                       UNION ALL-->
+<!--                       SELECT 10-->
+<!--                       UNION ALL-->
+<!--                       SELECT 11) n) x-->
+<!--                 LEFT JOIN revenue r-->
+<!--                           ON r.revenueDt >= x.y-->
+<!--                               AND r.revenueDt < DATE_ADD(x.y, INTERVAL 1 MONTH)-->
+<!--        GROUP BY x.y-->
+<!--        ORDER BY x.y-->
+<!--        ]]>-->
+<!--</select>-->
 
 </mapper>

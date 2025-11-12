@@ -4,8 +4,11 @@ import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
 import com.ssg.meowcoffee.dto.ExpenseInputDTO;
 import com.ssg.meowcoffee.dto.ExpenseUpdateDTO;
+import com.ssg.meowcoffee.dto.FinanceChartDTO;
 import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import java.util.List;
+import java.util.Map;
+
 public interface FinanceService {
 
     // ===== Expense 조회 =====
@@ -28,4 +31,10 @@ public interface FinanceService {
 
     // ===== Revenue 조회 =====
     List<RevenueVO> getRevenues();                         // 전체
+
+    // ===== Chart =====
+//    FinanceChartDTO getFinanceChart();
+//    Map<String,Object> getInvoiceKpisForThisMonth();
+//    Map<String,Object> getKpis();
+//    List<Map<String,Object>> getMonthlySeries();
 }
