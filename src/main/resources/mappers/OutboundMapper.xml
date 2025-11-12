@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssg.meowcoffee.mapper.OutboundMapper">
+
+    <!-- 출고 요청 생성 프로시저 호출 -->
+    <select id="callCreateOutReq" statementType="CALLABLE" parameterType="com.ssg.meowcoffee.dto.OutboundReqInputDTO">
+        { CALL CreateOutReq(
+                #{comId, jdbcType=VARCHAR},
+                #{managerId, jdbcType=VARCHAR},
+                #{outDateWish, jdbcType=DATE},
+                #{isTempo, jdbcType=TINYINT},
+                #{outItemsJson, jdbcType=LONGVARCHAR},
+                #{outDttmReq, jdbcType=TIMESTAMP},
+                #{generatedOutReqId, mode=OUT, jdbcType=BIGINT}
+               ) }
+    </select>
+
+    <!-- 출고 요청 수정 프로시저 -->
+    <update id="callModifyOutReq" statementType="CALLABLE" parameterType="com.ssg.meowcoffee.dto.OutboundReqInputDTO">
+        { CALL ModifyOutReq(
+                #{outReqId, jdbcType=BIGINT},
+                #{outDateWish, jdbcType=DATE}
+               ) }
+    </update>
+
+    <!-- 단일 출고 요청 조회 -->
+    <select id="selectOutboundReqById" resultType="com.ssg.meowcoffee.dto.OutboundReqItemDTO">
+        SELECT *
+        FROM outboundrequest o
+                 LEFT JOIN outbounditems i ON o.outReqId = i.outReqId
+        WHERE o.outReqId = #{outReqId}
+    </select>
+
+    <!-- soft delete -->
+    <update id="softDeleteOutReq" parameterType="map">
+        UPDATE outboundrequest
+        SET isDelete = 1
+        WHERE outReqId = #{outReqId} AND comId = #{comId}
+    </update>
+
+    <!-- 출고 승인 -->
+    <update id="approveOutReq" parameterType="map" statementType="CALLABLE">
+        {CALL ApproveOutReq(#{outReqId, mode=IN, jdbcType=BIGINT}, #{managerId, mode=IN, jdbcType=VARCHAR})}
+    </update>
+
+    <!-- 출고 배차 등록/수정 -->
+    <update id="registerDispatch" parameterType="map" statementType="CALLABLE">
+        {CALL RegisterDispatch(#{outReqId, mode=IN, jdbcType=BIGINT}, #{vehicleId, mode=IN, jdbcType=CHAR})}
+    </update>
+
+    <!-- 출고 배차 취소 -->
+    <update id="cancelDispatch" parameterType="long" statementType="CALLABLE">
+        {CALL CancelDispatch(#{outReqId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <!-- 출고 지시서 생성 -->
+    <update id="createOrder" parameterType="long" statementType="CALLABLE">
+        {CALL CreateOrder(#{outReqId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <!-- 운송장 생성 -->
+    <update id="createWaybill" parameterType="long" statementType="CALLABLE">
+        {CALL CreateWaybill(#{outReqId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <!-- 실물 출고완료 처리 -->
+    <update id="markReceived" parameterType="long" statementType="CALLABLE">
+        {CALL MarkReceived(#{outReqId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <!-- 출고 목록 조회 -->
+    <select id="selectOutboundList" parameterType="string" resultType="com.ssg.meowcoffee.dto.OutboundReqItemDTO">
+        SELECT *
+        FROM outboundrequest r
+        LEFT JOIN outboundItems i ON r.outReqId = i.outReqId
+        <where>
+            <if test="status != null and status != ''">
+                i.status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

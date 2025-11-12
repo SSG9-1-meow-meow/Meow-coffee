@@ -15,6 +15,9 @@
       type="image/x-icon"
   />
 
+  <!-- FullCalendar CSS & JS : 관리자 입고관리를 위해 추가 (박기웅) -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
   <!-- Fonts and icons -->
   <script src="/resources/assets/js/plugin/webfont/webfont.min.js"></script>
   <script>
@@ -136,10 +139,13 @@
         <div class="collapse" id="oc-sidebarLayouts">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">매출 현황</a>
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/expense">지출 현황</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">지출 현황</a>
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/invoice">청구 현황</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/revenue">매출 현황</a>
             </li>
           </ul>
         </div>

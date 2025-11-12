@@ -143,6 +143,39 @@ public interface InboundMapper {
   // 기존 selectInItemsByReqId 대신 이 메서드를 사용
   List<InboundItemDetailDTO> selectInboundItemDetailsByReqId(@Param("inReqId") long inReqId);
 
+  InboundItemDetailDTO selectInboundItemDetailByItemId(@Param("inReqItemsId") long inReqItemsId);
+
+
+  List<DailyCapacityEventDTO> selectDailyCapacitiesForPeriod(
+          @Param("startDate") String startDate,
+          @Param("endDate") String endDate
+  );
+
+  // [달력 아이콘용] 특정 기간의 '전체' 일별 처리 사용량을 합산하여 조회
+  List<DailyCapacityEventDTO> selectAggregatedDailyCapacitiesForPeriod(
+          @Param("startDate") String startDate,
+          @Param("endDate") String endDate
+  );
+
+  // [하단 정보용] 특정 날짜의 '창고별' 상세 부하 정보를 모두 조회
+  List<DailyWarehouseCapacityDTO> selectDailyWarehouseCapacitiesByDate(
+          @Param("selectedDate") LocalDate selectedDate
+  );
+
+
+      /**
+     * 특정 날짜와 요청 수량을 기준으로 할당 가능한 Zone 목록을 조회합니다.
+     * @param selectedDate 조회할 날짜
+     * @param requiredQty  요청된 입고 수량
+     * @return 할당 가능한 Zone DTO 리스트
+     */
+    List<AvailableLocationDTO> findAvailableLocations(
+            @Param("selectedDate") LocalDate selectedDate,
+            @Param("requiredQty") int requiredQty
+    );
+
+
+
 
 
 

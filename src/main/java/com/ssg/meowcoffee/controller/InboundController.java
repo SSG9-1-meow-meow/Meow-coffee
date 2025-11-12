@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import com.ssg.meowcoffee.service.QrCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,19 +38,16 @@ public class InboundController {
   private final InboundService inboundService;
   private final QrCodeService qrCodeService;
 
-  // --- 1. 페이지 렌더링 메서드 ---
-  /**
-   * 입고 관리 목록 '페이지'를 반환합니다. (데이터 없음)
-   * 이 메서드는 빈 껍데기 JSP 페이지만 렌더링합니다.
-   */
+  // --- [회원/관리자] 입고 관리 페이지 렌더링 메서드 ---
   @GetMapping
   public String inboundListPage() {
     log.info("GET /inbounds - 입고 목록 페이지 렌더링 요청");
     return "inbounds/list"; // /WEB-INF/views/inbounds/list.jsp 렌더링
   }
 
+  // --- [회원/관리자] 입고 관리 페이지 데이터 메소드
   @GetMapping("/api")
-  @ResponseBody // 이 어노테이션이 메서드의 반환값을 JSON으로 변환해줍니다.
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> getInboundListData(InboundCriteria criteria) {
     log.info("GET /inbounds/api - 입고 목록 데이터 API 요청. Criteria: {}", criteria);
 
@@ -79,6 +77,7 @@ public class InboundController {
     }
   }
 
+  // --- [회원] 입고 요청 폼 페이지 렌더링
   @GetMapping("/req")
   public String getInboundRequestForm(Model model) throws JsonProcessingException {
     log.info("GET /inbounds/req - 입고 요청 폼 페이지 요청");
@@ -98,6 +97,7 @@ public class InboundController {
   }
 
 
+  // --- [회원] 입고 요청 처리 API
   @PostMapping("/req")
   public String createInboundRequest(@Valid @RequestBody InboundReqInputDTO inputDTO,
                                        RedirectAttributes redirectAttributes) {
@@ -107,10 +107,7 @@ public class InboundController {
     // 서버에서 요청 시각을 설정
     inputDTO.set_inDttmReq(LocalDateTime.now());
 
-    // 서비스 계층 호출
     long newInReqId = inboundService.registerInboundRequest(inputDTO);
-
-    // --- 성공 로직 (예외가 발생하지 않은 경우) ---
     log.info("입고 요청이 성공적으로 등록되었습니다. (새 ID: {})", newInReqId);
 
     // 리다이렉트된 페이지에 일회성 성공 메시지 전달
@@ -121,18 +118,24 @@ public class InboundController {
     return "redirect:/inbounds";
   }
 
-  // --- 상세 '페이지' 렌더링 메서드 ---
+  // --- [회원/관리자] 입고 요청 상세 페이지 렌더링 메서드 ---
   @GetMapping("/{inReqId}")
   public String inboundRequestDetailPage(@PathVariable long inReqId, Model model) {
     log.info("GET /inbounds/{} - 입고 요청 상세 페이지 렌더링 요청", inReqId);
 
+    // --- TODO: 실제 로그인한 사용자 정보로 대체 ---
+    UserRole currentUserRole = UserRole.MANAGER; // 또는 UserRole.COMPANY
+    // ---------------------------------------------
+
     // 페이지 자체는 inReqId가 필요할 수 있으므로 모델에 담아 전달
     model.addAttribute("inReqId", inReqId);
+    // ★★★ [추가] 현재 사용자 권한 정보를 모델에 추가 ★★★
+    model.addAttribute("currentUserRole", currentUserRole.name()); // "MANAGER", "COMPANY" 등 문자열로 전달
 
     return "inbounds/request-detail";
   }
 
-  // --- 2. 상세 '데이터' 제공 API 메서드 ---
+  // --- [회원/관리자] 입고 요청 상세 데이터 제공 API 메서드 ---
   @GetMapping("/api/{inReqId}")
   @ResponseBody
   public ResponseEntity<Map<String, Object>> getInboundRequestData(@PathVariable long inReqId) {
@@ -158,7 +161,7 @@ public class InboundController {
   }
 
 
-  // 입고 요청 수정
+  // --- [회원/관리자] 입고 요청 상세 입고 요청 수정(PUT) 처리 메소드
   @PutMapping("/{inReqId}")
   @ResponseBody
   public ResponseEntity<Map<String, String>> modifyInboundRequest(@PathVariable long inReqId,
@@ -177,12 +180,7 @@ public class InboundController {
     return ResponseEntity.ok(Map.of("message", message));
   }
 
-  /**
-   * 입고 요청을 취소(논리적 삭제)합니다. (DELETE)
-   *
-   * @param inReqId URL 경로에서 받은 취소할 입고 요청 ID
-   * @return 성공 시 200 OK와 함께 성공 메시지를 담은 ResponseEntity
-   */
+  // [회원/관리자] 입고 요청을 취소(논리적 삭제) 처리 메소드 (DELETE)
   @DeleteMapping("/{inReqId}")
   @ResponseBody
   public ResponseEntity<Map<String, String>> cancelInboundRequest(@PathVariable long inReqId) {
@@ -192,16 +190,38 @@ public class InboundController {
     // TODO: 실제 로그인한 사용자 정보 사용
     String currentUserId = "coffeebiz01";
     UserRole currentUserRole = UserRole.COMPANY;
-    // -----------------------------------------------------------------
 
-    // 예외(권한 없음 등)는 GlobalExceptionHandler가 처리
     inboundService.cancelInboundRequest(inReqId, currentUserId, currentUserRole);
 
     return ResponseEntity.ok(Map.of("message", "요청이 성공적으로 취소되었습니다."));
   }
 
+  /**
+   * [관리자] 개별 입고 항목 처리 '페이지'를 렌더링합니다.
+   */
+  @GetMapping("/items/{inReqItemsId}")
+  public String getAdminProcessItemPage(@PathVariable long inReqItemsId, Model model) {
+    log.info("GET /inbounds/items/{} - 관리자 입고 처리 페이지 요청", inReqItemsId);
+
+    // JSP에서 API를 호출할 때 사용할 ID를 모델에 담아 전달
+    model.addAttribute("inReqItemsId", inReqItemsId);
+
+    return "inbounds/admin/process-item";
+  }
 
 
+  /**
+   * [API] 단일 입고 항목의 상세 정보를 JSON으로 반환합니다.
+   */
+  @GetMapping("/api/items/{inReqItemsId}")
+  @ResponseBody
+  public ResponseEntity<InboundItemDetailDTO> getInboundItemData(@PathVariable long inReqItemsId) {
+    InboundItemDetailDTO itemDetail = inboundService.getInboundItemDetail(inReqItemsId);
+    if (itemDetail == null) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(itemDetail);
+  }
 
 
 
@@ -271,6 +291,42 @@ public class InboundController {
       e.printStackTrace();
       return ResponseEntity.internalServerError().build();
     }
+  }
+
+  /**
+   * [API for Calendar Icons]
+   * 특정 기간 동안의 '전체 창고 합산' 일별 처리 사용량을 반환합니다.
+   */
+  @GetMapping("/api/capacity-events")
+  @ResponseBody
+  public ResponseEntity<List<DailyCapacityEventDTO>> getAggregatedCapacityEvents(
+          @RequestParam String startDate, @RequestParam String endDate) {
+
+    List<DailyCapacityEventDTO> events = inboundService.getAggregatedDailyCapacitiesForPeriod(startDate, endDate);
+    return ResponseEntity.ok(events);
+  }
+
+  /**
+   * [API for Click Details]
+   * 특정 날짜의 '창고별' 상세 부하 정보를 모두 반환합니다.
+   */
+  @GetMapping("/api/load/{date}")
+  @ResponseBody
+  public ResponseEntity<List<DailyWarehouseCapacityDTO>> getDailyWarehouseLoadData(
+          @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+
+    List<DailyWarehouseCapacityDTO> dailyLoads = inboundService.getDailyWarehouseCapacitiesByDate(date);
+    return ResponseEntity.ok(dailyLoads);
+  }
+
+  @GetMapping("/api/available-locations")
+  @ResponseBody
+  public ResponseEntity<List<AvailableLocationDTO>> getAvailableLocations(
+          @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+          @RequestParam int quantity) {
+
+    List<AvailableLocationDTO> availableLocations = inboundService.findAvailableLocations(date, quantity);
+    return ResponseEntity.ok(availableLocations);
   }
 
 
