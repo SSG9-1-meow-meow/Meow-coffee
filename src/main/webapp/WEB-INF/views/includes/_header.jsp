@@ -136,10 +136,13 @@
         <div class="collapse" id="oc-sidebarLayouts">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">매출 현황</a>
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/expense">지출 현황</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">지출 현황</a>
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/invoice">청구 현황</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/finance/revenue">매출 현황</a>
             </li>
           </ul>
         </div>

@@ -3,6 +3,7 @@ import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
 import com.ssg.meowcoffee.dto.ExpenseInputDTO;
+import com.ssg.meowcoffee.dto.ExpenseUpdateDTO;
 import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import java.util.List;
 public interface FinanceService {
@@ -15,6 +16,7 @@ public interface FinanceService {
 
     // ===== Expense 생성/수정 =====
     long registerExpense(ExpenseInputDTO expenseInputDTO);            // 카테고리 'management' 고정
+    int modifyExpense(ExpenseUpdateDTO expenseUpdateDTO);
     int modifyExpenseStatus(Long expenseId);                          // draft|posted
     int removeExpense(Long expenseId);
 

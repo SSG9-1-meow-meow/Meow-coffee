@@ -147,7 +147,7 @@ CREATE EVENT ev_close_monthly_revenue_all
     ON SCHEDULE EVERY 1 MONTH
         STARTS '2025-01-15 00:10:00'
     ON COMPLETION PRESERVE
-    DO CALL create_revenue(NOW());
+    DO CALL create_revenue(CURDATE());
 
 
 -- 수동 테스트

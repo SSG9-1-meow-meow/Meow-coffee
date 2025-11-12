@@ -3,6 +3,7 @@ import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
 import com.ssg.meowcoffee.dto.ExpenseInputDTO;
+import com.ssg.meowcoffee.dto.ExpenseUpdateDTO;
 import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import com.ssg.meowcoffee.mapper.FinanceMapper;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,13 @@ public class FinanceServiceImpl implements FinanceService {
         Objects.requireNonNull(expenseInputDTO, "expenseInputDTO : 값이 존재하지 않습니다.");
         financeMapper.insertExpense(expenseInputDTO);
         return expenseInputDTO.getExpenseId();
+    }
+
+    @Override
+    public int modifyExpense(ExpenseUpdateDTO expenseUpdateDTO) {
+        log.info("modifyExpense() 호출");
+        Objects.requireNonNull(expenseUpdateDTO, "expenseUpdateDTO : 값이 존재하지 않습니다.");
+        return financeMapper.updateExpense(expenseUpdateDTO);
     }
 
     @Override
