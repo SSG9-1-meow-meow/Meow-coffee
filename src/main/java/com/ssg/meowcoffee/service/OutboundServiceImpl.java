@@ -1,119 +1,72 @@
 package com.ssg.meowcoffee.service;
 
-import com.ssg.meowcoffee.dto.OutboundReqInputDTO;
-import com.ssg.meowcoffee.dto.OutboundReqItemDTO;
-import com.ssg.meowcoffee.exception.DatabaseTransactionException;
+import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.mapper.OutboundMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@Log4j2
 @RequiredArgsConstructor
+@Log4j2
 public class OutboundServiceImpl implements OutboundService {
 
     private final OutboundMapper mapper;
 
-    @Override
-    @Transactional
-    public void createOutReq(OutboundReqInputDTO dto) {
-        try {
-            mapper.callCreateOutReq(dto);
-        } catch (DataAccessException e) {
-            log.error("출고 요청 생성 실패", e);
-            throw new DatabaseTransactionException("출고 요청 생성 실패", e);
-        }
+    // ===== 생성/변경/처리 =====
+    @Override public void createOutReq(OutboundReqInputDTO dto){ mapper.callCreateOutReq(dto); }
+    @Override public void modifyOutReq(OutboundReqInputDTO dto){ mapper.callModifyOutReq(dto); }
+    @Override public void softDeleteOutReq(Long outReqId, String comId){ mapper.softDeleteOutReq(outReqId, comId); }
+    @Override public void approveOutReq(Long outReqId, String managerId){ mapper.approveOutReq(outReqId, managerId); }
+    @Override public void registerDispatch(Long outReqId, String vehicleId){ mapper.registerDispatch(outReqId, vehicleId); }
+    @Override public void cancelDispatch(Long outReqId){ mapper.cancelDispatch(outReqId); }
+    @Override public void createOrder(Long outReqId){ mapper.createOrder(outReqId); }
+    @Override public void createWaybill(Long outReqId){ mapper.createWaybill(outReqId); }
+    @Override public void markReceived(Long outReqId){ mapper.markReceived(outReqId); }
 
-        if (dto.getGeneratedOutReqId() == null || dto.getGeneratedOutReqId() == 0) {
-            throw new DatabaseTransactionException("출고 요청 ID 생성 실패 (프로시저 오류)");
-        }
-    }
-
-    @Override
-    @Transactional
-    public void modifyOutReq(OutboundReqInputDTO dto) {
-        try {
-            mapper.callModifyOutReq(dto);
-        } catch (DataAccessException e) {
-            log.error("출고 요청 수정 실패", e);
-            throw new DatabaseTransactionException("출고 요청 수정 실패", e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void softDeleteOutReq(Long outReqId, String comId) {
-        try {
-            int affected = mapper.softDeleteOutReq(outReqId, comId);
-            if (affected == 0) {
-                throw new DatabaseTransactionException("출고 요청 삭제 실패: 권한 없거나 존재하지 않음");
-            }
-        } catch (DataAccessException e) {
-            log.error("출고 요청 삭제 실패", e);
-            throw new DatabaseTransactionException("출고 요청 삭제 실패", e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void approveOutReq(Long outReqId, String managerId) {
-        try { mapper.approveOutReq(outReqId, managerId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("출고 승인 실패", e); }
-    }
-
-    @Override
-    @Transactional
-    public void registerDispatch(Long outReqId, String vehicleId) {
-        try { mapper.registerDispatch(outReqId, vehicleId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("배차 등록 실패", e); }
-    }
-
-    @Override
-    @Transactional
-    public void cancelDispatch(Long outReqId) {
-        try { mapper.cancelDispatch(outReqId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("배차 취소 실패", e); }
-    }
-
-    @Override
-    @Transactional
-    public void createOrder(Long outReqId) {
-        try { mapper.createOrder(outReqId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("출고지시서 생성 실패", e); }
-    }
-
-    @Override
-    @Transactional
-    public void createWaybill(Long outReqId) {
-        try { mapper.createWaybill(outReqId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("운송장 생성 실패", e); }
-    }
-
-    @Override
-    @Transactional
-    public void markReceived(Long outReqId) {
-        try { mapper.markReceived(outReqId); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("실물 출고완료 실패", e); }
-    }
-
+    // ===== 조회 =====
     @Override
     public OutboundReqItemDTO getOutboundReqById(Long outReqId) {
-        try {
-            List<OutboundReqItemDTO> list = mapper.selectOutboundReqById(outReqId);
-            return list.isEmpty() ? null : list.get(0); // 첫 번째 DTO 반환
-        } catch (DataAccessException e) {
-            throw new DatabaseTransactionException("단일 출고 조회 실패", e);
-        }
+        List<OutboundReqItemDTO> list = mapper.selectOutboundReqById(outReqId);
+        return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
     @Override
-    public List<OutboundReqItemDTO> getOutboundList(String status) {
-        try { return mapper.selectOutboundList(status); }
-        catch (DataAccessException e) { throw new DatabaseTransactionException("출고 목록 조회 실패", e); }
+    public List<OutboundReqListDTO> getOutboundList(String comName, String status, LocalDate startDate, LocalDate endDate) {
+        return mapper.selectOutboundList(comName, status, startDate, endDate);
+    }
+
+    // ===== 참고(폼) =====
+    @Override public List<StockReadDTO> getAvailableStocksForUser(String role, String userId){
+        return mapper.selectAvailableStocksForUser(role, userId);
+    }
+    @Override public List<VehicleDTO> getVehiclesForUser(String role, String userId){
+        return mapper.selectVehiclesForUser(role, userId);
+    }
+    @Override public List<ManagerDetailDTO> getManagers(){ return mapper.selectManagers(); }
+
+    @Override
+    public OutboundPageResponse<OutboundReqListDTO> getOutboundListPaged(String comName, String status, LocalDate startDate, LocalDate endDate, String sortCol, String sortDir, OutboundCriteria criteria) {
+        // 정렬 화이트리스트
+        if(!"comName".equals(sortCol) && !"outDateWish".equals(sortCol) && !"createdAt".equals(sortCol)){
+            sortCol = "createdAt";
+        }
+        if(!"ASC".equalsIgnoreCase(sortDir)) sortDir = "DESC";
+
+        int total = mapper.countOutboundList(comName, status, startDate, endDate);
+        List<OutboundReqListDTO> list = mapper.selectOutboundListPaged(
+                comName, status, startDate, endDate,
+                sortCol, sortDir,
+                Math.max(criteria.getSize(),1),
+                criteria.getOffset()
+        );
+        OutboundPageMaker pm = OutboundPageMaker.of(criteria, total);
+        return OutboundPageResponse.<OutboundReqListDTO>builder()
+                .list(list)
+                .PageMaker(pm)
+                .build();
     }
 }
