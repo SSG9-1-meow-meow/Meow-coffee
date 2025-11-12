@@ -17,6 +17,13 @@
 
   <!-- FullCalendar CSS & JS : 관리자 입고관리를 위해 추가 (박기웅) -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+  <!-- flatpickr CSS : 관리자 입고관리를 위해 추가 (박기웅) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- (선택) flatpickr 한글 언어팩 -->
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/ko.js"></script>
+
 
   <!-- Fonts and icons -->
   <script src="/resources/assets/js/plugin/webfont/webfont.min.js"></script>
@@ -56,7 +63,32 @@
       .wrapper {
           padding-left: 0 !important;
       }
+
+      /* ★★★ [추가] FullCalendar 헤더 버튼 스타일 개선 (박기웅) ★★★ */
+      .fc .fc-button {
+          background-color: #1a2035; /* Kaiadmin 기본 버튼 배경색 */
+          color: #ffffff;            /* 흰색 글자 */
+          border: 1px solid #1a2035;
+          border-radius: 50px;       /* 둥근 버튼 */
+          padding: 0.4rem 0.8rem;
+          font-size: 1rem;
+          text-transform: none;      /* 대문자 변환 해제 */
+          box-shadow: none !important; /* 그림자 제거 */
+      }
+
+      .fc .fc-button:hover {
+          background-color: #28304e; /* 마우스 오버 시 약간 밝게 */
+          border-color: #28304e;
+      }
+
+      .fc .fc-button:active, .fc .fc-button:focus {
+          background-color: #28304e;
+          border-color: #28304e;
+          box-shadow: none !important;
+      }
   </style>
+
+
 </head>
 <body>
 <!-- Offcanvas Sidebar (toggle로 확장 표시) -->
