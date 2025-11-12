@@ -41,11 +41,15 @@ public class WarehouseController {
         List<WarehouseDTO> nameList = warehouseService.getWarehouseSearchList(searchDTO); //창고명 목록
         searchDTO.setWhName(null); searchDTO.setWhGrade("grade");
         List<WarehouseDTO> gradeList = warehouseService.getWarehouseSearchList(searchDTO); //창고 등급 목록
+        searchDTO.setWhGrade(null);
+        //지도에 띄울 전체 주소 가져오기
+        List<WarehouseDTO> fullAddressList = warehouseService.getWarehouseSearchList(searchDTO);
 
         Map<String, Object> response = new HashMap<>();
         response.put("addressList", addressList);
         response.put("nameList", nameList);
         response.put("gradeList", gradeList);
+        response.put("fullAddressList", fullAddressList);
         return ResponseEntity.ok(response);
     }
 

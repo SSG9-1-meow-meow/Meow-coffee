@@ -85,7 +85,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional(readOnly = true)
     public List<WarehouseDTO> getWarehouseSearchList(WarehouseSearchDTO searchDTO) {
         try {
-            log.info("창고 조건 검색 요청: searchDTO={}, criteria={}", searchDTO);
+            log.info("창고 조건 검색 요청: searchDTO={}", searchDTO);
 
             List<WarehouseDTO> list = warehouseMapper.selectSearchList(searchDTO).stream()
                     .map(vo -> modelMapper.map(vo, WarehouseDTO.class)).collect(Collectors.toList());
