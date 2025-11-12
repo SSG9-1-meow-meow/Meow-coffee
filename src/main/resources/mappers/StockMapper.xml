@@ -22,7 +22,7 @@
 
     <select id="selectStockList" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
         select stk.stkId, stk.stkQuantity, cf.cfName, cf.cfCategory, cf.cfGrade, cf.cfType,
-        lp.zoneName, lp.rackName, lp.cellName, wh.whName
+        lp.zoneName, lp.rackName, lp.cellName, wh.whName, wh.whCode
         from stock stk join coffee cf on stk.cfId = cf.cfId
         join location_places lp on stk.lpId = lp.lpId
         join locations l on l.lpId = lp.lpId
@@ -63,7 +63,7 @@
 
     <select id="selectDueDiligence" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
         select stk.stkId, wh.whCode, lp.zoneName, lp.rackName, lp.cellName, stk.stkQuantity, dd.realStkQuantity,
-        dd.ddDate, dd.maId, dd.ddLog
+        dd.ddDate, dd.maId, dd.ddLog, dd.ddApproval
         from stock stk join due_diligence dd on dd.stkId = stk.stkId
         join location_places lp on lp.lpId = stk.lpId
         join locations l on l.lpId = lp.lpId

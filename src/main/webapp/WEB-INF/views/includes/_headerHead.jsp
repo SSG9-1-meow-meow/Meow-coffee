@@ -15,6 +15,11 @@
       type="image/x-icon"
   />
 
+  <!-- 1. jQuery 라이브러리 (Bootstrap JS보다 먼저 와야 함) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- 2. Bootstrap JavaScript 번들 (모달 등의 기능을 위해 필요) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <!-- Fonts and icons -->
   <script src="/resources/assets/js/plugin/webfont/webfont.min.js"></script>
   <script>
