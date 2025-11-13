@@ -350,6 +350,11 @@ window.getOptionList = async function () {
 try {
 const response = await axios.get('/api/warehouses/search');
 
+if(!response.data){
+    alert("관리자만 접근 가능한 페이지입니다.");
+    window.location.href="/";
+}
+
 filterData.whAddress = response.data.addressList;
 filterData.whName = response.data.nameList;
 filterData.whGrade = response.data.gradeList;
@@ -546,6 +551,11 @@ return;
 
 axios.post("/api/warehouse", data).then(
 (response) => {
+if(response.data === -1) {
+    alert("창고 등록 권한이 없습니다.");
+    return;
+}
+
 alert("창고가 등록되었습니다.");
 $("#createWarehouseModal").modal("hide");
 window.location.href = "/warehouses";
@@ -642,7 +652,7 @@ return;
 try{
 const response = await axios.put("/api/warehouses/" + getWhCode+"/update", updateData);
 
-if(response == -1) {alert("권한이 없습니다."); return;}
+if(response == -1) {alert("수정 권한이 없습니다."); return;}
 alert("창고 정보가 수정되었습니다.");
 $("#detailWarehouseModal").modal("hide");
 location.reload();
