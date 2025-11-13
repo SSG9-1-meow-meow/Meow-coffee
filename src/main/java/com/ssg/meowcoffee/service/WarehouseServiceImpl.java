@@ -35,6 +35,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
             return list;
         } catch (Exception e) {
+            log.error("창고 리스트 조회 중 실제 예외: {}", e.getMessage(), e);
             throw new DatabaseTransactionException("창고 리스트를 DB에서 불러오는 중 오류 발생");
         }
     }
@@ -84,7 +85,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional(readOnly = true)
     public List<WarehouseDTO> getWarehouseSearchList(WarehouseSearchDTO searchDTO) {
         try {
-            log.info("창고 조건 검색 요청: searchDTO={}, criteria={}", searchDTO);
+            log.info("창고 조건 검색 요청: searchDTO={}", searchDTO);
 
             List<WarehouseDTO> list = warehouseMapper.selectSearchList(searchDTO).stream()
                     .map(vo -> modelMapper.map(vo, WarehouseDTO.class)).collect(Collectors.toList());

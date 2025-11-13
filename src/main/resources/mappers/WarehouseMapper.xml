@@ -46,11 +46,11 @@
             whName = #{whName},
             whField = #{whField},
             whTelephone = #{whTelephone}
-        WHERE whId = #{whId}
+        WHERE whCode = #{whCode}
     </update>
 
     <!-- 창고 조건 검색 -->
-    <select id="selectSearchList" resultType="com.ssg.meowcoffee.domain.WarehouseVO">
+    <select id="selectSearchList" parameterType="com.ssg.meowcoffee.dto.WarehouseSearchDTO" resultType="com.ssg.meowcoffee.domain.WarehouseVO">
         <choose>
             <when test="searchDTO.whAddress != null and searchDTO.whAddress != ''">
                 SELECT DISTINCT SUBSTRING_INDEX(whAddress, ' ', 2) AS whAddress
@@ -66,6 +66,10 @@
                 SELECT DISTINCT whGrade
                 FROM warehouse
             </when>
+
+            <otherwise>
+                SELECT whCode, whName, whGrade, whAddress, whTotalCapa, whUseCapa FROM warehouse
+            </otherwise>
         </choose>
     </select>
 
