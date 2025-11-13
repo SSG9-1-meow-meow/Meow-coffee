@@ -1,0 +1,30 @@
+package com.ssg.meowcoffee.domain;
+
+import com.ssg.meowcoffee.util.UserEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum VehicleModel implements UserEnum {
+
+    WING_BODY("5톤 윙바디", 5000);
+
+    private static final int PLT = 500;
+
+    private final String model;
+    private final int totalCapa;     // 저장 가능한 파레트수
+
+    public int getPLTCount() {
+        return totalCapa / PLT;
+    }
+
+    @Override
+    public String getName() {
+        return model;
+    }
+
+    public String getValue() {
+        return Integer.toString(totalCapa);
+    }
+}

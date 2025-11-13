@@ -48,6 +48,36 @@ $(".changeTopBarColor").on("click", function () {
   getCheckmark();
 });
 
+// kwp add
+$(".changeNavBarColor").on("click", function () {
+  if ($(this).attr("data-color") == "default") {
+    $(".navbar-bottom").removeAttr("data-background-color");
+  } else {
+    $(".navbar-bottom").attr("data-background-color", $(this).attr("data-color"));
+  }
+
+  $(this).parent().find(".changeNavBarColor").removeClass("selected");
+  $(this).addClass("selected");
+  layoutsColors();
+  getCheckmark();
+});
+
+// kwp add
+$(".changeNavBarFontSize").on("click", function () {
+  if ($(this).attr("data-font") == "default") {
+    $(".navbar-bottom").removeAttr("data-font-size");
+  } else {
+    $(".navbar-bottom").attr("data-font-size", $(this).attr("data-font"));
+  }
+
+  $(this).parent().find(".changeNavBarFontSize").removeClass("selected");
+  $(this).addClass("selected");
+  // layoutsColors();
+  getCheckmark();
+});
+
+
+
 $(".changeSideBarColor").on("click", function () {
   if ($(this).attr("data-color") == "default") {
     $(".sidebar").removeAttr("data-background-color");
@@ -56,6 +86,20 @@ $(".changeSideBarColor").on("click", function () {
   }
 
   $(this).parent().find(".changeSideBarColor").removeClass("selected");
+  $(this).addClass("selected");
+  layoutsColors();
+  getCheckmark();
+});
+
+// kwp add
+$(".changeOffCanvasColor").on("click", function () {
+  if ($(this).attr("data-color") == "default") {
+    $(".offcanvas").removeAttr("data-background-color");
+  } else {
+    $(".offcanvas").attr("data-background-color", $(this).attr("data-color"));
+  }
+
+  $(this).parent().find(".changeOffCanvasColor").removeClass("selected");
   $(this).addClass("selected");
   layoutsColors();
   getCheckmark();

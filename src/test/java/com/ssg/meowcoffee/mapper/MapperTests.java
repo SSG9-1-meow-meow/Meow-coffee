@@ -1,5 +1,6 @@
 package com.ssg.meowcoffee.mapper;
 
+import com.ssg.meowcoffee.domain.UserRole;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

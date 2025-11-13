@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssg.meowcoffee.mapper.MemberMapper">
+  <resultMap id="userResultMap" type="UserVO">
+    <id column="userId" property="userId"/>
+    <result column="userPwd" property="userPwd"/>
+    <result column="userCompanyName" property="userCompanyName"/>
+    <result column="userName" property="userName"/>
+    <result column="userPhone" property="userPhone"/>
+    <result column="userEmail" property="userEmail"/>
+    <result column="userCode" property="userCode"/>
+    <result column="userRoadAddr" property="userRoadAddr"/>
+    <result column="userDetailAddr" property="userDetailAddr"/>
+    <result column="userImgPath" property="userImgPath"/>
+    <result column="userJoinDate" property="userJoinDate"/>
+    <result column="userLastLogin" property="userLastLogin"/>
+
+    <!--  회원 관련 테이블/뷰의 enum 타입을 VO에서 저장할 경우에는 반드시 지정한 TypeHandler를 명시해주세요.  -->
+    <result column="userRole" property="userRole" typeHandler="CustomEnumTypeHandler"/>
+    <result column="userStatus" property="userStatus" typeHandler="CustomEnumTypeHandler"/>
+    <result column="vehicleId" property="vehicleId"/>
+  </resultMap>
+
+  <resultMap id="deliverymanMap" type="DeliverymanVO">
+    <id property="delivId" column="delivId" />
+    <result property="delivName"    column="delivName" />
+    <result property="delivPwd"     column="delivPwd" />
+    <result property="delivPhone"   column="delivPhone" />
+    <result property="delivCode"    column="delivCode" />
+    <result property="delivImgPath" column="delivImgPath" />
+    <result property="delivVhcId"   column="delivVhcId" />
+    <result property="delivVhcModel" column="delivVhcModel" typeHandler="CustomEnumTypeHandler" />
+    <result property="delivStatus"   column="delivStatus"   typeHandler="CustomEnumTypeHandler" />
+    <result property="delivLastLogin" column="delivLastLogin"/>
+  </resultMap>
+
+  <!-- 검색필터 조건 -->
+  <sql id="search">
+    <where>
+      <!--  회원권한 필터링  -->
+      <if test="cri.roleType != null and cri.roleType.name != 'ALL'">
+        and userRole = #{cri.roleType}
+      </if>
+      <!--  회원상태 필터링  -->
+      <if test="cri.statusType != null and cri.statusType.name != 'ALL'">
+        and userStatus = #{cri.statusType}
+      </if>
+
+      <!--  이름/아이디 키워드 검색  -->
+      <if test="cri.type != null and cri.keyword != null">
+        <choose>
+          <when test="cri.type == 'N'.toString()">
+            and userName like concat('%', #{cri.keyword}, '%')
+          </when>
+          <when test="cri.type == 'I'.toString()">
+            and userId like concat('%', #{cri.keyword}, '%')
+          </when>
+        </choose>
+      </if>
+
+      <!--  기간별 필터링  -->
+      <if test="cri.from != null">
+        <choose>
+          <when test="cri.periodFilter == 'reg'">
+            and userJoinDate >= #{cri.from}
+          </when>
+          <otherwise>
+            and userLastLogin >= #{cri.from}
+          </otherwise>
+        </choose>
+      </if>
+      <if test="cri.to != null">
+        <choose>
+          <when test="cri.periodFilter == 'reg'">
+            and userJoinDate <![CDATA[ <= ]]> #{cri.to}
+          </when>
+          <otherwise>
+            and userLastLogin <![CDATA[ <= ]]> #{cri.to}
+          </otherwise>
+        </choose>
+      </if>
+    </where>
+  </sql>
+
+  <!-- resultMap Enum 매핑 테스트용 조회 쿼리 -->
+  <select id="selectUsers" resultMap="userResultMap">
+    select * from users
+    <include refid="search"/>
+    limit #{cri.skip}, #{cri.amount}
+  </select>
+
+  <select id="getCount" resultType="int">
+    select count(userId) from users
+    <include refid="search"/>
+  </select>
+
+  <select id="selectUserById" resultMap="userResultMap">
+    select * from users where userId = #{userId}
+  </select>
+
+  <select id="selectManagerById" resultType="ManagerVO">
+    select * from managers where managerId = #{userId}
+  </select>
+
+  <select id="selectCompanyById" resultType="CompanyVO">
+    select * from companies where comId = #{userId}
+  </select>
+
+  <select id="selectDeliverymenById" resultMap="deliverymanMap">
+    select * from deliverymen where delivId = #{userId}
+  </select>
+
+  <select id="findUserId" resultType="com.ssg.meowcoffee.dto.FindIDResultDTO">
+    select userId, userRole from users
+    <choose>
+      <when test="#{userInfo.targetRole == 'COMPANY'}">
+        where userCode = (
+          select comCode
+          from companies
+          where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <when test="#{userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'}">
+        where userCode = (
+          select managerCode
+          from managers
+          where managerName = #{userInfo.userName} and managerEmail = #{userInfo.userEmail}
+        )
+      </when>
+      <otherwise>
+        where userCode = (
+          select delivCode
+          from deliverymen
+          where delivCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+        )
+      </otherwise>
+    </choose>
+  </select>
+
+  <insert id="insertUser" >
+    insert into
+    users (
+      userId, userPwd, userCompanyName, userName, userPhone,
+      userEmail, userCode, userRoadAddr, userDetailAddr, userRole
+    )
+    values(
+      #{userInfo.userId}, #{userInfo.userPwd}, #{userInfo.userCompanyName}, #{userInfo.userName}, #{userInfo.userPhone},
+      #{userInfo.userEmail}, #{userInfo.userCode}, #{userInfo.userRoadAddr}, #{userInfo.userDetailAddr}, #{userInfo.userRole}
+    )
+  </insert>
+
+  <update id="updateUser">
+    update users
+    set userPwd = #{userInfo.userPwd}
+    <if test="#{userInfo.userEmail} != null">
+      , userEmail = #{userInfo.userEmail}
+    </if>
+    <if test="#{userInfo.userPhone} != null">
+      , userPhone = #{userInfo.userPhone}
+    </if>
+    <if test="#{userInfo.userImgPath} != null">
+      , userImgPath = #{userInfo.userImgPath}
+    </if>
+    where userId = #{userInfo.userId}
+  </update>
+
+  <update id="updateUserStatus">
+    update users
+    set userStatus = #{userStat.userStatus}
+    <if test="#{userStat.userStatus == 'APPROVAL'}">
+      , userJoinDate = now()
+    </if>
+    where userId = #{userStat.userId}
+  </update>
+
+
+  <update id="deleteUser">
+    <!-- 현재 로그인한 회원의 아이디를 휴면대기상태로 전환 -->
+    update users
+    set userStatus = 'WAITING_DEACTIVATE' where userId = #{currentId}
+  </update>
+  
+  <update id="deleteUserByAdmin">
+    <!-- 회원리스트에서 지정한 회원을 휴면상태로 전환(총관리자 전용 기능) -->
+    update users
+    set userStatus = 'DEACTIVATED'
+    where userId = #{targetId} and userStatus in ('APPROVAL', 'WAITING_DEACTIVATE')
+  </update>
+</mapper>

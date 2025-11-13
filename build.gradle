@@ -14,11 +14,17 @@ ext {
   junitVersion = '5.10.2'
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17) // 또는 14 이상
+  }
 }
 
 dependencies {
@@ -65,6 +71,10 @@ dependencies {
 
   // 유효성 검증 어노테이션
   implementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'
+
+  // QR 코드 출력 의존성 추가(박기웅)
+  implementation("com.google.zxing:core:3.5.3")
+  implementation("com.google.zxing:javase:3.5.3")
 }
 
 test {

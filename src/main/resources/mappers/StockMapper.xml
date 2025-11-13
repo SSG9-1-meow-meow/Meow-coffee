@@ -22,7 +22,7 @@
 
     <select id="selectStockList" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
         select stk.stkId, stk.stkQuantity, cf.cfName, cf.cfCategory, cf.cfGrade, cf.cfType,
-        lp.zoneName, lp.rackName, lp.cellName, wh.whName
+        lp.zoneName, lp.rackName, lp.cellName, wh.whName, wh.whCode
         from stock stk join coffee cf on stk.cfId = cf.cfId
         join location_places lp on stk.lpId = lp.lpId
         join locations l on l.lpId = lp.lpId
@@ -36,16 +36,129 @@
     </select>
 
     <select id="selectWarehouses" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
-        select wh.whCode, wh.whName, wh.whGrade, wh.whAddress, sum(stk.stkQuantity) as stkQuantity
-        from warehouse wh join locations l on wh.whId = l.whId
-        join location_places lp on l.lpId = lp.lpId
-        join stock stk on stk.lpId = lp.lpId
+        select wh.whCode, wh.whName, wh.whGrade, wh.whAddress, IFNULL(sum(stk.stkQuantity), 0) as stkQuantity
+        from warehouse wh
+        left join locations l on wh.whId = l.whId
+        left join location_places lp on l.lpId = lp.lpId
+        left join stock stk on stk.lpId = lp.lpId
         group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress
+        limit #{skip}, #{amount}
     </select>
 
     <select id="selectCompanyList" resultType="com.ssg.meowcoffee.dto.CompanyReadDTO">
         select comId, comName, comCode, comEmail, comPhone, comStartDate, comExpiredDate
         from companies
+        limit #{skip}, #{amount}
     </select>
+
+    <select id="selectDueDiligenceList" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
+        select dd.ddId, wh.whCode, stk.stkId, dd.ddStatus, dd.ddApproval, dd.ddDate, dd.ddUpdateDate
+        from stock stk join due_diligence dd on dd.stkId = stk.stkId
+        join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where dd.isDelete = 0
+        order by dd.ddId desc
+        limit #{skip}, #{amount}
+    </select>
+
+    <select id="selectDueDiligence" resultType="com.ssg.meowcoffee.dto.DueDiligenceReadDTO">
+        select stk.stkId, wh.whCode, lp.zoneName, lp.rackName, lp.cellName, stk.stkQuantity, dd.realStkQuantity,
+        dd.ddDate, dd.maId, dd.ddLog, dd.ddApproval
+        from stock stk join due_diligence dd on dd.stkId = stk.stkId
+        join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where dd.ddId = #{ddId} and dd.isDelete = 0
+    </select>
+
+    <insert id="insertDueDiligence" statementType="CALLABLE">
+        {call insertDueDiligence( #{insertDTO.stkId, mode=IN, jdbcType=VARCHAR},
+        #{insertDTO.realStkQuantity, mode=IN, jdbcType=INTEGER},
+        #{insertDTO.ddLog, mode=IN, jdbcType=VARCHAR},
+        #{insertDTO.maId, mode=IN, jdbcType=VARCHAR})}
+    </insert>
+
+    <update id="updateDueDiligence" statementType="CALLABLE">
+        {call updateDueDiligence(#{updateDTO.ddId, mode=IN, jdbcType=BIGINT},
+        #{updateDTO.stkQuantity, mode=IN, jdbcType=INTEGER},
+        #{updateDTO.realStkQuantity, mode=IN, jdbcType=INTEGER},
+        #{updateDTO.ddLog, mode=IN, jdbcType=VARCHAR})}
+    </update>
+
+    <delete id="deleteDueDiligence">
+        update due_diligence set isDelete = 1 where ddId = #{ddId}
+    </delete>
+
+    <select id="selectDueDiligenceInfo" resultType="com.ssg.meowcoffee.dto.DueDiligenceDTO">
+        select stk.stkQuantity
+        from stock stk join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where stk.stkId = #{stkId} and wh.whCode = #{whCode}
+    </select>
+
+    <update id="updateApprovalStatus" statementType="CALLABLE">
+        {call updateApprovalStatus(#{ddApproval, mode=IN, jdbcType=VARCHAR},
+        #{ddId, mode=IN, jdbcType=BIGINT})}
+    </update>
+
+    <select id="selectDueDiligenceAuthority" resultType="int">
+        select count(*)
+        from warehouse wh join warehouse_management wm on wh.whId = wm.whId
+        where wh.whCode = #{whCode} and wm.userId = #{maId}
+    </select>
+
+    <select id="selectWarehouseCodeList" resultType="string">
+        select distinct whCode from warehouse
+    </select>
+
+    <select id="countStockTotal" resultType="int">
+        select count(*)
+        from stock stk join coffee cf on stk.cfId = cf.cfId
+        join location_places lp on stk.lpId = lp.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        <include refid="search"/>
+    </select>
+
+    <select id="countDueDiligenceTotal" resultType="int">
+        select count(*)
+        from stock stk join due_diligence dd on dd.stkId = stk.stkId
+        join location_places lp on lp.lpId = stk.lpId
+        join locations l on l.lpId = lp.lpId
+        join warehouse wh on wh.whId = l.whId
+        where dd.isDelete = 0
+    </select>
+
+    <select id="countWarehouseTotal" resultType="int">
+        select count(*)
+        from ( select wh.whCode, wh.whName, wh.whGrade, wh.whAddress
+        from warehouse wh
+        left join locations l on wh.whId = l.whId
+        left join location_places lp on l.lpId = lp.lpId
+        left join stock stk on stk.lpId = lp.lpId
+        group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress) as mySub
+    </select>
+
+    <select id="countCompanyTotal" resultType="int">
+        select count(*) from companies
+    </select>
+
+    <!-- StockMapper.xml -->
+    <update id="updateWarehouseUseCapa">
+        UPDATE warehouse w
+        LEFT JOIN (
+        SELECT
+        wh.whId,
+        IFNULL(SUM(stk.stkQuantity), 0) AS totalQuantity
+        FROM warehouse wh
+        LEFT JOIN locations l ON wh.whId = l.whId
+        LEFT JOIN location_places lp ON l.lpId = lp.lpId
+        LEFT JOIN stock stk ON stk.lpId = lp.lpId
+        GROUP BY wh.whId
+        ) t ON w.whId = t.whId
+        SET w.whUseCapa = t.totalQuantity;
+    </update>
 
 </mapper>
