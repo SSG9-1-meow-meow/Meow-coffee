@@ -58,6 +58,9 @@ public class OutboundController {
         model.addAttribute("outReqId", outReqId);
         model.addAttribute("sessionUserId", userId);
         model.addAttribute("sessionRole", role);
+
+        model.addAttribute("vehicleList", outboundService.getVehiclesForUser(role, userId));
+
         return "outbounds/out_request-detail"; // ← 파일명과 동일
     }
 
@@ -215,4 +218,13 @@ public class OutboundController {
     public ResponseEntity<List<OutboundItemDTO>> getOutboundItems(@PathVariable Long outReqId) {
         return ResponseEntity.ok(outboundService.getOutboundItems(outReqId));
     }
+
+    // 차량 목록 조회 (세션 role/userId 기준)
+    @GetMapping("/api/vehicles")
+    @ResponseBody
+    public List<VehicleDTO> getVehicles(@SessionAttribute(value="role", required=false) String role,
+                                        @SessionAttribute(value="userId", required=false) String userId) {
+        return outboundService.getVehiclesForUser(role, userId);
+    }
+
 }

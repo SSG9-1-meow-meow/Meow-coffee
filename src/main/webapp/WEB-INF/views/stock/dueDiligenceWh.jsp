@@ -184,6 +184,7 @@ alert("실사 정보를 불러오지 못했습니다.");
 btnEdit.addEventListener("click", async () => {
 try{
 const response2 = await axios.get("/api/dueDiligences/"+ddId+"/update");
+
 const dto2 = response2.data;
 
 document.getElementById("stkId").value = dto2.stkId || "-";

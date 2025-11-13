@@ -159,3 +159,4 @@ ORDER BY o.outDttmReq DESC;
 
 SELECT * FROM outboundrequest ORDER BY outReqId DESC LIMIT 3;
 SELECT * FROM outbounditems  ORDER BY outReqItemsId DESC LIMIT 5;
+

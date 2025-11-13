@@ -262,6 +262,7 @@ ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (inReqId) REFERENCES inbound
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (cfId) REFERENCES Coffee(CFID);
 ALTER TABLE inboundItems ADD adminMemo VARCHAR(500);
 
+
 -- 8. 입고 상세 샘플 데이터
 INSERT INTO inboundItems (inReqId, cfId, locationId, status, inQtyReq, inOrderAddr, inQty, inDttmSchd, inDttmInsp, inDttmRecv)
 VALUES

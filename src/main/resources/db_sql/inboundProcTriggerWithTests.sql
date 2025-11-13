@@ -1,4 +1,5 @@
 use meowcoffeedb;
+
 /*
  회원의 입고 요청을 받고 DB 테이블에 저장하는 프로시저
  */
@@ -156,6 +157,9 @@ select * from inboundItems where inReqId = @inReqIdToModify;
 -- 기존 두 트리거를 모두 삭제 .. 이거 안해서 한시간 반쯤 날림 ㅎㅎ
 DROP TRIGGER IF EXISTS trg_upsert_daily_capacity;
 DROP TRIGGER IF EXISTS trg_upsert_warehouse_capacity;
+
+DROP TRIGGER IF EXISTS trg_update_daily_warehouse_capacity;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_update_daily_warehouse_capacity
@@ -241,6 +245,9 @@ CREATE TRIGGER trg_add_stock_on_inbound_complete
 BEGIN
     DECLARE v_lpId CHAR(40);
     DECLARE v_stock_count INT;
+    DECLARE v_today_prefix CHAR(11);
+    DECLARE v_next_seq INT;
+    DECLARE v_new_stkId CHAR(20);
 
     -- status가 '입고완료'로 변경되었고, 실제 입고수량(inQty)이 0보다 큰 경우에만 실행
     IF OLD.status != '입고완료' AND NEW.status = '입고완료' AND NEW.inQty > 0 THEN
@@ -265,11 +272,26 @@ BEGIN
                 SET stkQuantity = stkQuantity + NEW.inQty
                 WHERE lpId = v_lpId AND cfId = NEW.cfId;
             ELSE
+                -- ==========================================================
+                -- [수정된 부분] 새로운 stkId 생성 로직
+                -- ==========================================================
+                -- 오늘 날짜 기반으로 접두사 생성 (예: 'stk20251113')
+                SET v_today_prefix = CONCAT('stk', DATE_FORMAT(CURDATE(), '%Y%m%d'));
+
+                -- 오늘 날짜로 입고된 재고 중 가장 큰 순번 + 1을 다음 순번으로 결정
+                SELECT IFNULL(MAX(CAST(SUBSTRING(stkId, 12) AS UNSIGNED)), 0) + 1
+                INTO v_next_seq
+                FROM stock
+                WHERE stkId LIKE CONCAT(v_today_prefix, '%');
+
+                -- 새로운 stkId 조합 (예: 'stk20251113' + '00001')
+                SET v_new_stkId = CONCAT(v_today_prefix, LPAD(v_next_seq, 5, '0'));
+                -- ==========================================================
+
                 -- 재고가 없으면, 새로 추가 (INSERT)
                 INSERT INTO stock (stkId, lpId, cfId, stkQuantity)
                 VALUES (
-                           -- 참고: 실제 운영환경에서는 더 안전한 PK 생성 방식이 필요
-                           CONCAT('STKNEW', LPAD(FLOOR(RAND() * 100000), 5, '0')),
+                           v_new_stkId, -- 생성된 신규 ID 사용
                            v_lpId,
                            NEW.cfId,
                            NEW.inQty

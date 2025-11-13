@@ -164,6 +164,13 @@ url: myUrl,
 type: 'GET',
 dataType: 'json',
 success: function (response) {
+
+if(response.authorized === false) {
+alert("관리자만 접근 가능한 페이지입니다.");
+window.location.href="/stocks";
+return;
+}
+
 table.clear();
 
 table.rows.add(response.list);
