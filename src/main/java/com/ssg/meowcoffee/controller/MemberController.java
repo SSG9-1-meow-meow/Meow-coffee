@@ -106,18 +106,20 @@ public class MemberController {
 
     // 임시 구현 코드 - 이 부분은 스프링시큐리티를 적용해서 변경할 예정입니다.
     @GetMapping("/profile/{id}")
-    public String readUserProfile(@PathVariable("id") String userId) {
+    public String readUserProfile(@PathVariable("id") String userId, Model model) {
+        // 1) 현재 회원 정보 조회
         UserDetailDTO userDetailDTO = memberService.getUserById(userId);
-        switch (userDetailDTO.getUserRole()) {
-            case COMPANY:
-                return "redirect:/member/profile/" + userId + ":company";
-            case MANAGER:
-            case ADMIN:
-                return "redirect:/member/profile/" + userId + ":manager";
-            case DELIVERY:
-                return "redirect:/member/profile/" + userId + ":deliveryman";
+
+        // 2) 없으면 홈이나 에러 페이지로 보냄
+        if (userDetailDTO == null) {
+            return "redirect:/index";
         }
-        return "redirect:/index";
+
+        // 3) JSP에서 사용할 모델 세팅
+        model.addAttribute("userInfo", userDetailDTO);
+
+        // 4) 프로필 JSP로 포워딩
+        return "member/profile";   // /WEB-INF/views/member/profile.jsp
     }
 
     // 승인완료 상태인 현재 회원정보 조회
