@@ -74,15 +74,23 @@
                 <div class="card-footer d-flex flex-wrap gap-2 justify-content-between align-items-center">
                     <!-- 좌측: 배차/승인 -->
                     <div class="d-flex align-items-center gap-2 flex-wrap" id="mgr-actions">
-                        <!-- 드롭다운: 차량 선택 -->
+                        <!-- DB에서 넘어온 차량 리스트 사용 -->
                         <select id="vehicleSelect" class="form-select form-select-sm" style="min-width:240px">
                             <option value="" selected disabled>배차할 차량을 선택하세요</option>
+                            <c:forEach var="v" items="${vehicleList}">
+                                <option value="${v.vehicleId}">
+                                        ${v.vehicleId}
+                                    <c:if test="${not empty v.vehicleModel}">
+                                        · ${v.vehicleModel}
+                                    </c:if>
+                                </option>
+                            </c:forEach>
                         </select>
                         <button type="button" class="btn btn-outline-primary btn-sm" id="btnDispatch">배차 등록</button>
                         <button type="button" class="btn btn-primary btn-sm" id="btnApprove">출고 승인</button>
                     </div>
 
-                    <!-- 우측: 출고완료/새로고침 (운송장 생성 제거) -->
+                    <!-- 우측: 출고완료/새로고침 -->
                     <div class="d-flex align-items-center gap-2 flex-wrap" id="mgr-actions-2">
                         <button type="button" class="btn btn-success btn-sm d-none" id="btnReceived">출고 완료 처리</button>
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="btnReload">새로고침</button>
@@ -118,10 +126,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    const ctx           = '${pageContext.request.contextPath}';
     const outReqId      = '<c:out value="${outReqId}" default=""/>';
     const sessionRole   = '<c:out value="${sessionRole}" default=""/>';
     const sessionUserId = '<c:out value="${sessionUserId}" default=""/>';
-    const apiBase       = '/outbounds/api/' + encodeURIComponent(outReqId);
+    const apiBase       = ctx + '/outbounds/api/' + encodeURIComponent(outReqId);
 
     // 날짜 도우미
     function toKDate(value, withTime){
@@ -131,7 +140,9 @@
             if (Array.isArray(value)) {
                 const y=value[0], m=value[1], dd=value[2], hh=value[3]||0, mi=value[4]||0, ss=value[5]||0;
                 d = new Date(y, m-1, dd, hh, mi, ss);
-            } else { d = new Date(value); }
+            } else {
+                d = new Date(value);
+            }
             return withTime ? d.toLocaleString('ko-KR') : d.toLocaleDateString('ko-KR');
         }catch(e){ return '-'; }
     }
@@ -216,73 +227,75 @@
         show(wrap); show(sep);
     }
 
-    // API
-    async function get(url){ const r=await axios.get(url); return r.data; }
-    async function post(url){ const r=await axios.post(url); return (r.data&&(r.data.message||r.data))||'처리되었습니다.'; }
+    // 공통 API 래퍼
+    async function get(url){
+        const r = await axios.get(url);
+        return r.data;
+    }
+    async function post(url){
+        const r = await axios.post(url);
+        return (r.data && (r.data.message || r.data)) || '처리되었습니다.';
+    }
 
+    // 에러 표시 (HTML 에러 페이지는 깔끔하게 처리)
     function showError(e){
         const box = document.getElementById('error');
-        const msg = e?.response?.data
-            ? (typeof e.response.data === 'string' ? e.response.data : JSON.stringify(e.response.data))
-            : (e?.message || '요청 중 오류가 발생했습니다.');
+        let msg = '요청 중 오류가 발생했습니다.';
+
+        if (e?.response) {
+            const data = e.response.data;
+            if (typeof data === 'string' && data.toLowerCase().includes('<html')) {
+                msg = `서버 오류 (HTTP ${e.response.status})`;
+            } else if (typeof data === 'string') {
+                msg = data;
+            } else if (data) {
+                msg = JSON.stringify(data);
+            }
+        } else if (e?.message) {
+            msg = e.message;
+        }
+
         box.textContent = msg;
         box.classList.remove('d-none');
     }
 
-    // 차량 드롭다운 로딩
-    async function loadVehicles(){
-        try{
-            const sel = document.getElementById('vehicleSelect');
-            sel.innerHTML = '<option value="" selected disabled>배차할 차량을 선택하세요</option>';
-            const list = await get('/outbounds/api/vehicles');
-            if(Array.isArray(list) && list.length){
-                list.forEach(v=>{
-                    const opt = document.createElement('option');
-                    opt.value = v.vehicleId;
-                    opt.textContent = v.vehicleId + (v.vehicleModel ? (' · ' + v.vehicleModel) : '');
-                    sel.appendChild(opt);
-                });
-            }else{
-                const opt = document.createElement('option');
-                opt.disabled = true;
-                opt.textContent = '등록된 차량이 없습니다';
-                sel.appendChild(opt);
-            }
-        }catch(e){ showError(e); }
-    }
-
-    // 액션
+    // 배차 등록
     async function actionDispatch(){
         try{
             const v = document.getElementById('vehicleSelect').value;
-            if(!v){ alert('배차할 차량을 선택하세요.'); return; }
+            if(!v){
+                alert('배차할 차량을 선택하세요.');
+                return;
+            }
             const msg = await post(apiBase + '/dispatch?vehicleId=' + encodeURIComponent(v));
             alert(msg);
             await loadDetail();
         }catch(e){ showError(e); }
     }
 
+    // 출고 승인
     async function actionApprove(){
         try{
             let mid = (sessionUserId || '').trim();
-            if(!mid){ mid = prompt('승인 관리자 ID를 입력하세요:') || ''; }
+            if(!mid){
+                mid = prompt('승인 관리자 ID를 입력하세요:') || '';
+            }
             if(!mid) return;
 
             const msg = await post(apiBase + ':approve?managerId=' + encodeURIComponent(mid));
             alert(msg);
-
-            // 승인 완료 후 목록 페이지로 이동
-            window.location.href = '/outbounds';
+            window.location.href = ctx + '/outbounds';
         }catch(e){
             showError(e);
         }
     }
 
+    // 출고 완료 처리
     async function actionReceived(){
         try{
             if(!confirm('출고 완료로 처리하시겠습니까?')) return;
             alert(await post(apiBase + ':received'));
-            location.href = '/outbounds';
+            window.location.href = ctx + '/outbounds';
         }catch(e){ showError(e); }
     }
 
@@ -310,7 +323,6 @@
         document.getElementById('btnReceived').addEventListener('click', actionReceived);
         document.getElementById('btnReload').addEventListener('click', loadDetail);
 
-        loadVehicles();
         loadDetail();
     });
 </script>
