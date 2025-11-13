@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindIDDTO {
+public class ForgotPwdDTO {
 
-    private String targetRole;
-    private String userCode;
-    private String userName;
+    private String userId;
     private String userEmail;
 }

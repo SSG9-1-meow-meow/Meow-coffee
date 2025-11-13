@@ -2,15 +2,13 @@ package com.ssg.meowcoffee.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * 회원관리 기능에서 회원정보 수정(+soft delete) 시 사용되는 DTO입니다.
  */
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

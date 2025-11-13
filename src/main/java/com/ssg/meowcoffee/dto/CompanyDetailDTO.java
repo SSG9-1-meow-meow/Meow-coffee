@@ -1,16 +1,15 @@
 package com.ssg.meowcoffee.dto;
 
 import com.ssg.meowcoffee.domain.UserStatus;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.time.LocalDate;
 
 // CompanyVO 데이터를 DTO로 변환하여 조회
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

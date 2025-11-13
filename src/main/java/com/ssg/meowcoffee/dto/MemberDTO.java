@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindIDDTO {
-
-    private String targetRole;
-    private String userCode;
-    private String userName;
-    private String userEmail;
+public class MemberDTO {
+    
+    private String mID;
+    private String mPassword;
+    private String mName;
+    private String mRole;
 }

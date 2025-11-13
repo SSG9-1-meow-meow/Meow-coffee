@@ -1,15 +1,7 @@
 package com.ssg.meowcoffee.mapper;
 
-import com.ssg.meowcoffee.domain.CompanyVO;
-import com.ssg.meowcoffee.domain.DeliverymanVO;
-import com.ssg.meowcoffee.domain.ManagerVO;
-import com.ssg.meowcoffee.domain.UserRole;
-import com.ssg.meowcoffee.domain.UserStatus;
-import com.ssg.meowcoffee.domain.UserVO;
+import com.ssg.meowcoffee.domain.*;
 import com.ssg.meowcoffee.dto.*;
-
-import java.time.LocalDate;
-import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Log4j2
 @ExtendWith(SpringExtension.class)
@@ -52,11 +47,27 @@ public class MemberMapperTests {
     }
 
     @Test
+    @DisplayName("현재 로그인한 사용자의 마지막 로그인 시간을 갱신")
+    public void testLastLoginTime() {
+        String loginId = "coffeebiz01";
+        int affected = memberMapper.updateLoginTime(loginId);
+        Assertions.assertEquals(1, affected);
+    }
+
+    @Test
     @DisplayName("회원 리스트에서의 승인대기 중인 특정 회원정보 조회")
     public void testSelectUserById() {
         String userId = "delivery02";
         UserVO userVO = memberMapper.selectUserById(userId);
         Assertions.assertEquals(UserStatus.WAITING_APPROVAL, userVO.getUserStatus());
+    }
+
+    @Test
+    @DisplayName("로그인할 회원 아이디에 해당하는 회원정보 불러오기")
+    public void testSelectLoginUser() {
+        String userId = "company_good";
+        UserVO userVO = memberMapper.selectLoginUser(userId);
+        Assertions.assertNotNull(userVO);
     }
 
     @Test
@@ -88,8 +99,8 @@ public class MemberMapperTests {
     }
 
     @Test
-    @DisplayName("입력한 이메일, 사업자등록번호에 해당하는 거래처 찾기")
-    public void testFindUserId() {
+    @DisplayName("입력한 이메일, 사업자등록번호에 해당하는 거래처 아이디 찾기")
+    public void testFindCompanyId() {
         String userCode = "123-45-67890";
         String userEmail = "ceo1@meowcoffee.com";
         FindIDDTO findIDDTO = FindIDDTO.builder()
@@ -104,10 +115,63 @@ public class MemberMapperTests {
     }
 
     @Test
+    @DisplayName("입력한 이름, 이메일에 해당하는 창고관리자 아이디 찾기")
+    public void testFindManagerId() {
+        String userName = "최출고";
+        String userEmail = "manager.choi@wms.com";
+        FindIDDTO findIDDTO = FindIDDTO.builder()
+                .targetRole(UserRole.MANAGER.getRoleName())
+                .userName(userName)
+                .userEmail(userEmail)
+                .build();
+        FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
+        Assertions.assertEquals("manager_choi", found.getUserId());
+        Assertions.assertEquals(UserRole.MANAGER, found.getUserRole());
+    }
+
+    @Test
+    @DisplayName("입력한 사업자등록번호와 이메일에 해당하는 배송기사 아이디 찾기")
+    public void testFindDeliverymanId() {
+        String userCode = "120-10-12345";
+        String userEmail = "delivery.park@wms.com";
+        FindIDDTO findIDDTO = FindIDDTO.builder()
+                .targetRole(UserRole.DELIVERY.getRoleName())
+                .userCode(userCode)
+                .userEmail(userEmail)
+                .build();
+        FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
+        log.info(found.getUserId() + ":" + found.getUserRole());
+        Assertions.assertEquals("delivery_park", found.getUserId());
+        Assertions.assertEquals(UserRole.DELIVERY, found.getUserRole());
+    }
+
+    @Test
+    @DisplayName("입력한 아이디, 이메일에 해당하는 회원의 아이디 찾기")
+    public void testSelectUserByIdAndEmail() {
+        String userId = "company_happy";
+        String userEmail = "happy@happy.net";
+
+        ForgotPwdDTO forgotPwdDTO = ForgotPwdDTO.builder()
+                .userId(userId)
+                .userEmail(userEmail)
+                .build();
+        FindIDResultDTO findIDResultDTO = memberMapper.selectUserByIdAndEmail(forgotPwdDTO);
+        Assertions.assertNotNull(findIDResultDTO);
+    }
+
+    @Test
+    @DisplayName("입력한 아이디를 사용하는 회원이 이미 존재")
+    public void testExistUser() {
+        String userId = "company_happy";
+        boolean result = memberMapper.existsId(userId);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
     @DisplayName("새로운 거래처 회원 등록")
     public void testInsertUser() {
         UserDetailDTO newUser = UserDetailDTO.builder()
-                .userId("company5678")
+                .userId("company123")
                 .userPwd("123456")
                 .userCompanyName("이디야")
                 .userName("홍길동")
@@ -161,6 +225,17 @@ public class MemberMapperTests {
     public void testDeleteUserByAdmin() {
         String targetId = "manager01";
         int affected = memberMapper.deleteUserByAdmin(targetId);
+        Assertions.assertEquals(1, affected);
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 작업 수행")
+    public void testUpdatePwd() {
+        ResetPwdDTO resetPwdDTO = ResetPwdDTO.builder()
+                .targetId("company5678")
+                .newPwd("12345")
+                .build();
+        int affected = memberMapper.updatePwd(resetPwdDTO);
         Assertions.assertEquals(1, affected);
     }
 }
