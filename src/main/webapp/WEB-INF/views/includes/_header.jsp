@@ -149,7 +149,7 @@
         <div class="collapse" id="oc-base">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">창고 관리</a>
+              <a class="nav-link" href="/warehouses">창고 관리</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/stocks">재고 관리</a>
@@ -634,8 +634,8 @@
                   <i class="fas fa-warehouse"></i> &nbsp; 창고/재고 관리
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navBase">
-                  <li><a class="dropdown-item" href="#">창고 관리</a></li>
-                  <li><a class="dropdown-item" href="#">재고 관리</a></li>
+                  <li><a class="dropdown-item" href="/warehouses">창고 관리</a></li>
+                  <li><a class="dropdown-item" href="/stocks">재고 관리</a></li>
                 </ul>
               </li>
 

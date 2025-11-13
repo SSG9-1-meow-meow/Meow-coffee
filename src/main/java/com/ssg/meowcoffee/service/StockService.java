@@ -20,4 +20,5 @@ public interface StockService {
 
     List<String> getWarehouseCodeList();
     Integer getListCount(StockSearchDTO stockSearchDTO, String menu);
+    void updateWarehouseUseCapaDaily();
 }

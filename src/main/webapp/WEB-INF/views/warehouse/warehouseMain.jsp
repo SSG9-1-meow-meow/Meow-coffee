@@ -38,6 +38,7 @@ height: 3px;
 background-color: #000;
 }
 <%@include file="/WEB-INF/views/includes/_headerNav.jsp"%>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <nav class="navbar navbar-expand-lg navbar-dark mb-4 py-2 custom-nav">
     <div class="container-fluid">
         <button
@@ -209,7 +210,14 @@ background-color: #000;
                             </div>
                             <div class="mb-3">
                                 <label for="createWhAddress" class="form-label">소재지</label>
-                                <input type="text" class="form-control" id="createWhAddress" name="whAddress">
+                                <div class="input-group mb-2">
+                                    <input type="text" id="sample6_postcode" class="form-control" placeholder="우편번호" readonly>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
+                                </div>
+                                <input type="text" id="sample6_address" class="form-control mb-2" placeholder="기본주소" readonly>
+                                <input type="text" id="sample6_detailAddress" class="form-control mb-2" placeholder="상세주소 입력">
+
+                                <input type="hidden" id="createWhAddress" name="whAddress">
                             </div>
                             <div class="mb-3">
                                 <label for="createWhField" class="form-label">평수</label>
@@ -675,6 +683,36 @@ text: field + "평"
 })
 );
 });
+});
+
+//도로명 주소 api
+window.sample6_execDaumPostcode = function (){
+new daum.Postcode({
+oncomplete: function(data) {
+var addr = ''; // 주소
+if (data.userSelectedType === 'R') {
+addr = data.roadAddress;
+} else {
+addr = data.jibunAddress;
+}
+
+// 기본 주소 입력
+document.getElementById('sample6_address').value = addr;
+document.getElementById('sample6_detailAddress').focus();
+
+// 기본 주소만 먼저 createWhAddress에 넣기
+document.getElementById('createWhAddress').value = addr;
+}
+}).open();
+
+}
+
+// 상세주소 입력 후 전체 주소 자동 결합
+document.getElementById('sample6_detailAddress').addEventListener('input', function() {
+const baseAddr = document.getElementById('sample6_address').value;
+const detail = this.value;
+const full = baseAddr + (detail ? ' ' + detail : '');
+document.getElementById('createWhAddress').value = full;
 });
 
 // 상세 모달 닫힐 때 초기화
