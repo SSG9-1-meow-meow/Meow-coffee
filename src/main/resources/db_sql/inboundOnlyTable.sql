@@ -219,8 +219,8 @@ DROP TABLE if exists inboundItems;
 CREATE TABLE inboundItems (
                               inReqItemsId	bigint AUTO_INCREMENT PRIMARY KEY ,
                               inReqId	bigint	NOT NULL,
-                              cfId	char(12)	NOT NULL,
-                              locationId	char(12)	NULL,
+                              cfId	char(20)	NOT NULL,
+                              locationId	char(50)	NULL,
                               status	ENUM('승인대기', '승인완료', '입고완료', '반려')	NOT NULL,
                               inQtyReq	integer	NULL,
                               inOrderAddr	varchar(255)	NULL,
@@ -232,6 +232,7 @@ CREATE TABLE inboundItems (
 ALTER TABLE inboundItems MODIFY status ENUM('승인대기', '승인완료', '입고완료', '반려');
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (inReqId) REFERENCES inboundRequests (inReqId);
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (cfId) REFERENCES Coffee(CFID);
+ALTER TABLE inboundItems ADD CONSTRAINT FK_locations_TO_inboundItems_1 FOREIGN KEY (locationId) REFERENCES locations (locationId);
 ALTER TABLE inboundItems ADD adminMemo VARCHAR(500); -- 관리자 메모 데이터 추가
 
 
@@ -358,11 +359,8 @@ CREATE TABLE daily_warehouse_capacity (
 dateId              DATE    NOT NULL,
 whId                BIGINT  NOT NULL,
 
-    -- 기존 warehouseCapaSchedule의 컬럼들 (보관 용량)
 used_storage_capacity   INT     NULL,
 available_storage_capacity INT  NULL,
-
-    -- 기존 dailyCapacity의 컬럼들 (처리/인력/장비 부하)
 max_processing_capacity   INT     NULL,
 used_processing_capacity  INT     NULL,
 staff_available     INT     NULL,
