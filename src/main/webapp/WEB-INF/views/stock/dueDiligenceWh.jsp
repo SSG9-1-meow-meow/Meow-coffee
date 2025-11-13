@@ -234,9 +234,7 @@ const updatedData = {
 stkQuantity: document.getElementById("stkQuantity").value,
 realStkQuantity: document.getElementById("realStkQuantity").value,
 ddLog: document.getElementById("ddLog").value,
-whCode: document.getElementById("whCode").value,
-maId : "manager_lee"
-//로그인한 아이디 바꿔주면서 test
+whCode: document.getElementById("whCode").value
 };
 
 
@@ -256,10 +254,7 @@ const resp = await axios.put("/api/dueDiligences/"+ddId+"/update", updatedData);
 //삭제하기 버튼
 btnDelete.addEventListener("click", async () => {
 if (confirm("정말 삭제하시겠습니까?")) {
-const deleteData = {
-maId : "manager_lee"
-// maId : (현재 로그인한 아이디처리)
-};
+const deleteData = {};
 
 try {
 const resp = await axios.put("/api/dueDiligences/"+ddId, deleteData);
