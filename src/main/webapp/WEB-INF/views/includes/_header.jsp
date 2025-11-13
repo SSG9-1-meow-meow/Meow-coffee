@@ -721,7 +721,7 @@
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
-                  <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                  <li><a class="dropdown-item" href="/auth/logout">로그아웃</a></li>
                 </ul>
               </li>
 

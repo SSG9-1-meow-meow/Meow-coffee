@@ -33,6 +33,17 @@
             <li class="nav-item">
                 <a
                         class="nav-link"
+                        href="/auth/login"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="oc-dashboard"
+                >
+                    <i class="fas fa-user-plus"></i> 로그인
+                </a>
+            </li>
+            <li class="nav-item">
+                <a
+                        class="nav-link"
                         href="/auth/register-select"
                         role="button"
                         aria-expanded="false"
