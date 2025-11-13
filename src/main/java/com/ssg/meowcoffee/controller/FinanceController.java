@@ -14,9 +14,6 @@ public class FinanceController {
     // ───── Expense 화면 ─────
     @GetMapping("/expense")
     public String expenseList() {
-        // 창고 ID 를 받아온다는 가정하에 시작. 만약 유저 아이디를 받아온다면 아이디를 통해 해당관리자의 담당 창고 ID 를 가져와 사용
-//        @RequestParam("whId") Long whId, Model model
-//        model.addAttribute("whId", whId);
         return "finance/expense/list";
     }
 
