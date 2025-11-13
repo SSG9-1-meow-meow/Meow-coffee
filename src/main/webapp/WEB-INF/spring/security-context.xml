@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/security
+  http://www.springframework.org/schema/security/spring-security.xsd
+  http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+  <bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
+    <property name="hierarchy">
+      <value>
+        ROLE_ADMIN > ROLE_MANAGER
+        ROLE_MANAGER > ROLE_COMPANY
+      </value>
+    </property>
+  </bean>
+
+  <bean id="webSecurityExpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler">
+    <property name="roleHierarchy" ref="roleHierarchy"/>
+  </bean>
+
+  <security:authentication-manager>
+    <security:authentication-provider user-service-ref="customUserDetailsService">
+      <security:password-encoder ref="bCryptPasswordEncoder"/>
+    </security:authentication-provider>
+  </security:authentication-manager>
+
+  <security:http>
+    <!--  권한별 접근 가능한 url 지정(현재는 테스트를 위해 별도 설정 없음)  -->
+    <security:expression-handler ref="webSecurityExpressionHandler"/>
+    <security:intercept-url pattern="/" access="permitAll()"/>
+    <security:intercept-url pattern="/auth/**" access="permitAll()"/>
+<!--    <security:intercept-url pattern="/members/**" access="hasAnyRole('COMPANY')"/>-->
+    <security:form-login
+      login-page="/auth/login"
+      login-processing-url="/auth/loginProcess"
+      default-target-url="/"
+      authentication-failure-url="/auth/login?error=true"
+      username-parameter="userId"
+      password-parameter="userPwd"/>
+    <security:logout logout-url="/auth/logout" invalidate-session="true" logout-success-url="/auth/login?logout=true"/>
+    <security:session-management
+      invalid-session-url="/auth/login?sessionExpired=true"
+      session-fixation-protection="changeSessionId">
+      <security:concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
+    </security:session-management>
+    <security:csrf disabled="true"/>
+  </security:http>
+
+</beans>
