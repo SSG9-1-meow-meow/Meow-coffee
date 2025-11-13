@@ -16,8 +16,8 @@ import java.util.Iterator;
 public class MainController {
 
     @GetMapping("/")
-    public String home(Authentication authentication, Model model) {
-        String userId = authentication.getName();
+    public String home(Model model) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String role = getRole();
         model.addAttribute("userId", userId);
         model.addAttribute("roleType", role);
