@@ -10,11 +10,12 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <!-- 스프링 시큐리티 관련 설정을 root context에 추가 -->
+    <!-- 설정이란 측면에서, security-context는 root context의 일부 -->
     <import resource="security-context.xml"/>
 
-    <!--  컨트롤러에서 요청을 처리하기 전에 스프링 시큐리티가 검증을 수행해야 하므로, root-context.xml에서 컨트롤러를 스캔하는 것을 방지해야 함 -->
-    <!--  (컨트롤러에 관한 컴포넌트 스캔 시, 컨트롤러에 관한 스프링 빈은 모두 서블릿 컨테이너에 등록되어야 함 -> servlet-context.xml 파일에만 컨트롤러 관련 설정이 포함되어야 함.)  -->
+    <!--  루트 컨텍스트에서는 웹 애플리케이션에서 공통으로 사용되는 서비스, mapper에 관한 스캔만 수행하고, -->
+    <!--  루트 컨텍스트의 자식 컨텍스트인 서블릿 컨텍스트(servlet-context)에서만 컨트롤러를 빈으로 등록하는 작업을 수행하도록 두 컨텍스트룰 분리 -->
+    <!--  (실행의 관점에서는 root-context와 servlet-context 사이에서 security-context가 실행될 수 있어야 함.)-->
     <context:component-scan base-package="com.ssg.meowcoffee">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
