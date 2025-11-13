@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 현재 로그인한 사용자의 보유한 권한을 반환
+        // 현재 로그인한 사용자가 보유한 권한을 반환
         List<GrantedAuthority> collection = new ArrayList<>();
         collection.add(new SimpleGrantedAuthority("ROLE_" + userVO.getUserRole()));
         return collection;
