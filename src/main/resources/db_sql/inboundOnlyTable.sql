@@ -232,6 +232,9 @@ CREATE TABLE inboundItems (
 ALTER TABLE inboundItems MODIFY status ENUM('승인대기', '승인완료', '입고완료', '반려');
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (inReqId) REFERENCES inboundRequests (inReqId);
 ALTER TABLE inboundItems ADD CONSTRAINT FOREIGN KEY (cfId) REFERENCES Coffee(CFID);
+ALTER TABLE inboundItems ADD adminMemo VARCHAR(500); -- 관리자 메모 데이터 추가
+
+
 
 -- 8. 입고 상세 샘플 데이터
 INSERT INTO inboundItems (inReqId, cfId, locationId, status, inQtyReq, inOrderAddr, inQty, inDttmSchd, inDttmInsp, inDttmRecv)

@@ -677,63 +677,6 @@ public class InboundMapperTests {
   }
 
 
-  @Test
-  @DisplayName("관리자 개별 입고 항목 처리 (전체 완료 시 부모 갱신)")
-  @Transactional
-  void testProcessInboundItem_ParentUpdateOnCompletion() {
-    log.info("--- 전체 완료 시 부모 갱신 로직 테스트 시작 ---");
-    // given: inReqId=1 에는 inReqItemsId 1, 2 두 개의 '승인대기' 항목이 있음
-    long parentReqId = 4L;
-    long firstItemId = 8L;
-    long secondItemId = 9L;
-    String managerId = "manager01";
-
-    InboundApprovalDTO firstItemApprovalDTO = InboundApprovalDTO.builder()
-            .inReqItemsId(firstItemId)
-            .managerId(managerId)
-            .newStatus(InboundStatus.APPROVED)
-            .locationId("LOC001")
-            .inDttmSchd(LocalDateTime.now())
-            .isTempo(0) // 최종 처리
-            .build();
-
-    // --- 시나리오 1: 첫 번째 항목만 최종 승인 ---
-    log.info("시나리오 1: 첫 번째 항목(ID:{}) 최종 승인", firstItemId);
-    inboundMapper.processInboundItem(firstItemApprovalDTO);
-
-    // then 1: 첫 번째 항목 자체는 승인완료 상태가 되어야 함
-    InboundItemVO firstItem = inboundMapper.selectInItemById(firstItemId);
-    assertEquals(InboundStatus.APPROVED, firstItem.getStatus());
-
-    // then 2: 하지만 아직 다른 항목이 남아있으므로 부모 요청의 승인일시는 NULL 이어야 함
-    InboundRequestVO parentRequestAfterFirst = inboundMapper.selectInReqById(parentReqId);
-    assertNull(parentRequestAfterFirst.getInDttmAppr(), "아직 처리할 항목이 남아있으면 부모 요청의 승인일시는 NULL이어야 합니다.");
-    log.info("첫 항목 처리 후 부모 요청 승인일시가 NULL임을 확인.");
-
-
-    // --- 시나리오 2: 마지막 남은 항목을 최종 승인 ---
-    log.info("시나리오 2: 마지막 항목(ID:{}) 최종 승인", secondItemId);
-    InboundApprovalDTO secondItemApprovalDTO = InboundApprovalDTO.builder()
-            .inReqItemsId(secondItemId)
-            .managerId(managerId)
-            .newStatus(InboundStatus.APPROVED)
-            .locationId("LOC001")
-            .inDttmSchd(LocalDateTime.now())
-            .isTempo(0) // 최종 처리
-            .build();
-
-    inboundMapper.processInboundItem(secondItemApprovalDTO);
-
-    // then 3: 마지막 항목도 승인완료 상태가 되어야 함
-    InboundItemVO secondItem = inboundMapper.selectInItemById(secondItemId);
-    assertEquals(InboundStatus.APPROVED, secondItem.getStatus());
-
-    // then 4: 이제 모든 항목이 처리되었으므로 부모 요청의 승인일시가 기록되어야 함
-    InboundRequestVO parentRequestAfterAll = inboundMapper.selectInReqById(parentReqId);
-    assertNotNull(parentRequestAfterAll.getInDttmAppr(), "모든 항목 처리가 완료되면 부모 요청의 승인일시가 기록되어야 합니다.");
-    assertEquals(managerId, parentRequestAfterAll.getManagerId());
-    log.info("모든 항목 처리 후 부모 요청 승인일시({})가 기록됨을 확인.", parentRequestAfterAll.getInDttmAppr());
-  }
 
   @Test
   @DisplayName("관리자 실제 입고 수량 조회 및 업데이트")
@@ -830,6 +773,107 @@ public class InboundMapperTests {
 
     dailyWarehouseCapacityDTOList.forEach(log::info);
   }
+
+
+  @Test
+  @DisplayName("FinalizeInboundItem 프로시저 검증 (승인, 반려, 임시저장, 부모 승인)")
+  @Transactional
+  void testFinalizeInboundItem() {
+    log.info("=== FinalizeInboundItem 프로시저 검증 시작 ===");
+
+    // given: 테스트 환경 준비 (샘플 데이터의 inReqId=102, inReqItemsId=203, 204 사용)
+    // 102번 요청: 203(승인완료), 204(승인대기) -> 총 2개 중 1개 남음
+    long inReqId = 102L;
+    long targetItemId1 = 204L; // 남은 '승인대기' 항목
+    long targetItemId2 = 205L; // 다른 '승인대기' 항목 (반려 테스트용)
+    String managerId = "manager01";
+    LocalDate confirmedDate = LocalDate.parse("2025-12-10");
+    String testLpId = "LP001"; // LOC001에 해당
+
+    // DTO for Scenarios 1 & 2
+    InboundProcessDTO approvalDTO = new InboundProcessDTO();
+    approvalDTO.setInReqItemsId(targetItemId1);
+    approvalDTO.setManagerId(managerId);
+    approvalDTO.setNewStatus(InboundStatus.APPROVED);
+    approvalDTO.setConfirmedDate(confirmedDate);
+    approvalDTO.setLpId(testLpId);
+    approvalDTO.setIsTempo(0); // 최종 저장
+
+
+    // --- 시나리오 1: 임시 저장 (Temp Save) ---
+    log.info("--- 시나리오 1: 임시 저장 및 데이터 확인 ---");
+
+    // given: 임시 저장용 DTO
+    InboundProcessDTO tempSaveDTO = new InboundProcessDTO();
+    tempSaveDTO.setInReqItemsId(targetItemId2);
+    tempSaveDTO.setManagerId(managerId);
+    tempSaveDTO.setNewStatus(InboundStatus.APPROVED); // 최종 상태는 APPROVED지만
+    tempSaveDTO.setConfirmedDate(confirmedDate.plusDays(1));
+    tempSaveDTO.setLpId("LP002");
+    tempSaveDTO.setIsTempo(1); // 임시 저장 (IsTempo=1)
+    log.info(tempSaveDTO);
+
+    // when
+    inboundMapper.finalizeInboundItem(tempSaveDTO);
+
+    // then: 상태는 PENDING(승인대기)으로 유지되고 위치/날짜만 업데이트되어야 함
+    InboundItemVO tempItem = inboundMapper.selectInItemById(targetItemId2);
+    assertEquals(InboundStatus.PENDING, tempItem.getStatus(), "임시저장 후 상태는 '승인대기'여야 합니다.");
+    assertEquals("LOC002", tempItem.getLocationId(), "임시저장 후 locationId는 업데이트되어야 합니다.");
+    assertNotNull(tempItem.getInDttmSchd(), "임시저장 후 inDttmSchd는 업데이트되어야 합니다.");
+
+
+    // --- 시나리오 2: 최종 승인 (전체 완료 전) ---
+    log.info("--- 시나리오 2: 최종 승인 및 부모 승인일시 NULL 유지 확인 (inReqId=102) ---");
+    log.info(approvalDTO);
+    // given: targetItemId1 = 204 ('승인대기' 상태, inReqId=102)
+    // when: 최종 승인
+    inboundMapper.finalizeInboundItem(approvalDTO);
+
+    // then: 항목 상태는 승인 완료, 부모 요청 승인일시는 NULL 이어야 함 (다른 항목이 이미 APPROVED 상태로 남아있어 전체 완료 조건 만족)
+    InboundItemVO itemAfterAppr = inboundMapper.selectInItemById(targetItemId1);
+    InboundRequestVO reqAfterAppr = inboundMapper.selectInReqById(inReqId);
+
+    assertEquals(InboundStatus.APPROVED, itemAfterAppr.getStatus(), "항목 상태는 '승인완료'여야 합니다.");
+    assertNotNull(itemAfterAppr.getInDttmSchd(), "inDttmSchd는 업데이트되어야 합니다.");
+    // 부모 요청은 이미 다른 항목(203)이 승인완료이므로, inDttmAppr가 기록되어야 함
+    assertNotNull(reqAfterAppr.getInDttmAppr(), "모든 항목이 처리되었으므로 부모 요청의 승인일시가 기록되어야 합니다.");
+    assertEquals(managerId, reqAfterAppr.getManagerId(), "부모 요청의 관리자 ID가 기록되어야 합니다.");
+
+
+    // --- 시나리오 3: 최종 반려 (REJECTED) ---
+    log.info("--- 시나리오 3: 최종 반려 및 관리자 ID 업데이트 확인 ---");
+    long targetItemId3 = 205L;
+    long parentReqId3 = 103L;
+    String rejectManagerId = "manager02";
+
+    InboundProcessDTO rejectDTO = new InboundProcessDTO();
+    rejectDTO.setInReqItemsId(targetItemId3);
+    rejectDTO.setManagerId(rejectManagerId); // 반려를 처리한 관리자
+    rejectDTO.setNewStatus(InboundStatus.REJECTED);
+    rejectDTO.setIsTempo(0); // 최종 처리
+
+    // when: 최종 반려
+    inboundMapper.finalizeInboundItem(rejectDTO);
+
+    // then: 항목 상태는 REJECTED, 부모 요청의 managerId는 업데이트되고, apprDttm은 NULL
+    InboundItemVO itemAfterReject = inboundMapper.selectInItemById(targetItemId3);
+    InboundRequestVO reqAfterReject = inboundMapper.selectInReqById(parentReqId3);
+
+    assertEquals(InboundStatus.REJECTED, itemAfterReject.getStatus(), "항목 상태는 '반려'여야 합니다.");
+
+    // ★★★ [핵심 수정] managerId는 업데이트되었는지, inDttmAppr는 NULL인지 검증 ★★★
+    assertNotNull(reqAfterReject.getManagerId(), "최종 처리 시 관리자 ID는 항상 기록되어야 합니다.");
+    assertEquals(rejectManagerId, reqAfterReject.getManagerId(), "마지막으로 처리한 관리자의 ID가 기록되어야 합니다.");
+    assertNull(reqAfterReject.getInDttmAppr(), "반려 처리가 포함되어 있으므로 부모 요청의 승인일시는 NULL이어야 합니다.");
+
+    log.info("반려 처리 후 managerId 업데이트 및 inDttmAppr NULL 유지 확인.");
+    log.info("=== FinalizeInboundItem 프로시저 검증 성공 ===");
+  }
+
+
+
+
 
 
 

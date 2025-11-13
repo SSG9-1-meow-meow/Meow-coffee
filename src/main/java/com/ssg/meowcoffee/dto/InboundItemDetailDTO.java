@@ -21,8 +21,10 @@ public class InboundItemDetailDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime inDttmSchd;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime inDttmInsp;
+    
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime inDttmRecv;
 
@@ -44,6 +46,13 @@ public class InboundItemDetailDTO {
     private String cfGrade;
 
     private String companyName;
+
+    // ★★★ [추가] 아래 4개 필드를 추가합니다 ★★★
+    private String lpId;          // 실제 보관 위치 ID (예: LP001)
+    private String warehouseName; // 창고 이름
+    private String zoneName;      // 존 이름
+    private String adminMemo;     // 관리자 메모
+
     public String getStatusValue() {
         return this.status != null ? this.status.getValue() : null;
     }

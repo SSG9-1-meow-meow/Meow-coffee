@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -138,6 +139,36 @@ public class InboundServiceImpl implements InboundService {
   @Override
   public List<AvailableLocationDTO> findAvailableLocations(LocalDate selectedDate, int requiredQty) {
     return inboundMapper.findAvailableLocations(selectedDate, requiredQty);
+  }
+
+  @Override
+  public void finalizeInboundItem(InboundProcessDTO processDTO) {
+// MyBatis의 TypeHandler가 Enum을 String으로 자동 변환해줌
+    inboundMapper.finalizeInboundItem(processDTO);
+  }
+
+  @Override
+  public void startInspection(long inReqItemsId) {
+    int updatedRows = inboundMapper.updateInspectionTime(inReqItemsId);
+    if (updatedRows == 0) {
+      // 이미 검수 시간이 기록되었거나, ID가 존재하지 않는 경우
+      // 필요하다면 예외를 발생시켜 컨트롤러에서 다른 응답을 주게 할 수 있음
+      log.warn("{} 항목의 검수 시작 시각 업데이트에 실패했습니다. (이미 처리되었거나 존재하지 않는 항목)", inReqItemsId);
+    }
+  }
+
+  // ★★★ [추가] 실물 입고 완료 처리 메소드 구현 ★★★
+  @Override
+  @Transactional // 여러 작업이 있다면 트랜잭션 처리
+  public void completePhysicalInbound(long inReqItemsId) {
+    int updatedRows = inboundMapper.completePhysicalInbound(inReqItemsId);
+    if (updatedRows == 0) {
+      // 업데이트가 실패한 경우 (이미 처리되었거나 조건이 맞지 않음)
+      // 예외를 발생시켜 컨트롤러에서 오류 응답을 하도록 할 수 있습니다.
+      throw new IllegalStateException("이미 입고 완료되었거나 처리할 수 없는 상태입니다.");
+    }
+    // 참고: 이 작업은 이전에 만든 'trg_add_stock_on_inbound_complete' 트리거를 자동으로 발동시켜
+    // 'stock' 테이블의 재고를 업데이트하게 됩니다.
   }
 
 
