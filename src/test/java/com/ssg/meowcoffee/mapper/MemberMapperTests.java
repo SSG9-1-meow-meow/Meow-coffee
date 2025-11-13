@@ -47,6 +47,14 @@ public class MemberMapperTests {
     }
 
     @Test
+    @DisplayName("현재 로그인한 사용자의 마지막 로그인 시간을 갱신")
+    public void testLastLoginTime() {
+        String loginId = "coffeebiz01";
+        int affected = memberMapper.updateLoginTime(loginId);
+        Assertions.assertEquals(1, affected);
+    }
+
+    @Test
     @DisplayName("회원 리스트에서의 승인대기 중인 특정 회원정보 조회")
     public void testSelectUserById() {
         String userId = "delivery02";
@@ -163,7 +171,7 @@ public class MemberMapperTests {
     @DisplayName("새로운 거래처 회원 등록")
     public void testInsertUser() {
         UserDetailDTO newUser = UserDetailDTO.builder()
-                .userId("company123456")
+                .userId("company123")
                 .userPwd("123456")
                 .userCompanyName("이디야")
                 .userName("홍길동")

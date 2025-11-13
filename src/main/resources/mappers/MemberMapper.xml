@@ -189,7 +189,7 @@
 
   <update id="updateLoginTime">
     update users
-    set userLastLoginTime = now()
+    set userLastLogin = now()
     where userId = #{userId} and userStatus = 'APPROVAL'
   </update>
 
