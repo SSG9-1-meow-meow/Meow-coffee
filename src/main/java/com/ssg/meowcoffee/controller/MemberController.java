@@ -1,5 +1,7 @@
 package com.ssg.meowcoffee.controller;
 
+import javax.validation.Valid;
+
 import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Log4j2
 @Controller
@@ -93,9 +96,7 @@ public class MemberController {
     }
 
     @PutMapping("/profile/{id}:deactivate")
-    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(
-            @PathVariable("id") String userId,
-            RedirectAttributes redirectAttributes) {
+    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(@PathVariable("id") String userId) {
         boolean result = memberService.deactivateUser(userId);
         if (!result) {
             return ResponseEntity.notFound().build();
@@ -104,44 +105,35 @@ public class MemberController {
         return ResponseEntity.ok(deactivated);
     }
 
-    // 임시 구현 코드 - 이 부분은 스프링시큐리티를 적용해서 변경할 예정입니다.
+    /* 이 컨트롤러의 내용을 아래와 같이 수정하여 사용합니다. */
     @GetMapping("/profile/{id}")
-    public String readUserProfile(@PathVariable("id") String userId) {
+    public String readUserProfile(@PathVariable("id") String userId, Model model) {
         UserDetailDTO userDetailDTO = memberService.getUserById(userId);
-        switch (userDetailDTO.getUserRole()) {
-            case COMPANY:
-                return "redirect:/member/profile/" + userId + ":company";
-            case MANAGER:
-            case ADMIN:
-                return "redirect:/member/profile/" + userId + ":manager";
-            case DELIVERY:
-                return "redirect:/member/profile/" + userId + ":deliveryman";
-        }
-        return "redirect:/index";
+        model.addAttribute("userInfo", userDetailDTO);
+        return "member/profile";
     }
 
-    // 승인완료 상태인 현재 회원정보 조회
-    @GetMapping("/profile/{id}:manager")
-    public ResponseEntity<ManagerDetailDTO> readManager(@PathVariable("id") String userId) {
-        ManagerDetailDTO managerDetail = memberService.getManagerById(userId);
-        return (managerDetail != null)
-                ? ResponseEntity.ok(managerDetail)
-                : ResponseEntity.notFound().build();
-    }
+    /* 아래의 3개 컨트롤러는 사용하지 않습니다. 아래의 주석 처리한 부분은 삭제해주세요. */
 
-    @GetMapping("/profile/{id}:company")
-    public ResponseEntity<CompanyDetailDTO> readCompany(@PathVariable("id") String userId) {
-        CompanyDetailDTO companyDetail = memberService.getCompanyById(userId);
-        return (companyDetail != null)
-                ? ResponseEntity.ok(companyDetail)
-                : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/profile/{id}:deliveryman")
-    public ResponseEntity<DeliverymanDTO> readDeliveryman(@PathVariable("id") String userId) {
-        DeliverymanDTO deliveryman = memberService.getDeliverymenById(userId);
-        return (deliveryman != null)
-                ? ResponseEntity.ok(deliveryman)
-                : ResponseEntity.notFound().build();
-    }
+//    // 승인완료 상태인 현재 회원정보 조회
+//    @GetMapping("/profile/{id}:manager")
+//    public String readManager(@PathVariable("id") String userId, Model model) {
+//        ManagerDetailDTO managerDetail = memberService.getManagerById(userId);
+//        model.addAttribute("profile", managerDetail);
+//        return "member/profile";
+//    }
+//
+//    @GetMapping("/profile/{id}:company")
+//    public String readCompany(@PathVariable("id") String userId, Model model) {
+//        CompanyDetailDTO companyDetail = memberService.getCompanyById(userId);
+//        model.addAttribute("profile", companyDetail);
+//        return "member/profile";
+//    }
+//
+//    @GetMapping("/profile/{id}:deliveryman")
+//    public String readDeliveryman(@PathVariable("id") String userId, Model model) {
+//        DeliverymanDTO deliveryman = memberService.getDeliverymenById(userId);
+//        model.addAttribute("profile", deliveryman);
+//        return "member/profile";
+//    }
 }
