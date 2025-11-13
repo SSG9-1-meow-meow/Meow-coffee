@@ -122,4 +122,9 @@ public class FinanceServiceImpl implements FinanceService {
         log.info("getRevenues() 호출");
         return financeMapper.selectRevenues();
     }
+
+    @Override
+    public List<Map<String, Object>> getWarehouses() {
+        return financeMapper.selectWarehouses();
+    }
 }

@@ -134,7 +134,180 @@
         ]]>
 </select>
 
+    <!-- ===== Net Profit: 순이익(KPI, 이번 달) ===== -->
+    <select id="selectNetProfitForThisMonth" resultType="bigdecimal">
+      <![CDATA[
+        SELECT IFNULL((SELECT SUM(r.totalAmt)
+                       FROM revenue r
+                       WHERE r.revenueDt >= DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY)
+                         AND r.revenueDt < DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)), 0)
+                   -
+               IFNULL((SELECT SUM(e.totalAmt)
+                       FROM expense e
+                       WHERE e.expenseStatus = 'posted'
+                         AND e.expenseDt >= DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY)
+                         AND e.expenseDt < DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)), 0) AS netProfit
+        ]]>
+    </select>
 
+    <!-- ===== Warehouse Utilization: 창고 사용량(%) ===== -->
+    <select id="selectWarehouseUtilization" resultType="hashmap">
+      <![CDATA[
+        SELECT IFNULL(SUM(w.whUseCapa), 0)                                              AS usedCapa,
+               IFNULL(SUM(w.whTotalCapa), 0)                                            AS totalCapa,
+               FLOOR(100 * IFNULL(SUM(w.whUseCapa), 0) / NULLIF(SUM(w.whTotalCapa), 0)) AS usageRatePct
+        FROM warehouse w
+        ]]>
+    </select>
 
+    <!-- 차트 DTO를 위한 ResultMap -->
+    <resultMap id="inoutChartMap" type="com.ssg.meowcoffee.dto.InOutChartDTO">
+        <result property="chartKey" column="chart_key"/>
+        <result property="totalQuantity" column="total_quantity"/>
+    </resultMap>
+
+    <!-- [차트] 최근 한 달(30일) 일별 입고 완료 수량 조회 -->
+    <select id="selectInDailyRecvStatsForLastMonth" resultMap="inoutChartMap">
+        <![CDATA[
+        SELECT DATE_FORMAT(II.inDttmRecv, '%Y-%m-%d') AS chart_key,
+               SUM(II.inQty)                          AS total_quantity
+        FROM inboundItems II
+                 INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+        WHERE II.status = '입고완료'
+          AND (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+          AND II.inDttmRecv >= CURDATE() - INTERVAL 30 DAY
+        GROUP BY chart_key
+        ORDER BY chart_key ASC
+        ]]>
+        </select>
+
+    <!-- ===== Outbound Daily Qty: 최근 한달 출고 수량 현황 ===== -->
+    <!-- 상태는 트리거 파일에 맞춰 '승인완료' 사용 -->
+    <select id="selectOutDailyShipStatsForLastMonth" resultMap="inoutChartMap">
+      <![CDATA[
+        SELECT DATE_FORMAT(OI.outDttmShip, '%Y-%m-%d') AS chart_key,
+               SUM(OI.outQtyReq)                       AS total_quantity
+        FROM outboundItems OI
+                 INNER JOIN outboundrequest ORQ ON OI.outReqId = ORQ.outReqId
+        WHERE OI.status = '승인완료'
+          AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
+          AND OI.outDttmShip >= CURDATE() - INTERVAL 30 DAY
+        GROUP BY chart_key
+        ORDER BY chart_key ASC
+        ]]>
+    </select>
+
+    <!-- [대시보드] 최근 한 달(30일) '평균' 입고 리드타임 조회 -->
+    <select id="selectAvgInLeadTimeForLastMonth" resultType="java.lang.Double">
+        <![CDATA[
+        SELECT AVG(TIMESTAMPDIFF(HOUR, IR.inDttmReq, II.inDttmRecv))
+        FROM inboundItems II
+                 INNER JOIN inboundRequests IR ON II.inReqId = IR.inReqId
+        WHERE II.status = '입고완료'
+          AND (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+          AND II.inDttmRecv >= CURDATE() - INTERVAL 30 DAY
+        ]]>
+        </select>
+
+    <!-- [대시보드] 최근 한 달(30일) '평균' 출고 리드타임 조회 -->
+    <select id="selectAvgOutLeadTimeForLastMonth" resultType="java.lang.Double">
+      <![CDATA[
+        SELECT AVG(TIMESTAMPDIFF(HOUR, ORQ.outDttmReq, OI.outDttmShip))
+        FROM outboundItems OI
+                 INNER JOIN outboundrequest ORQ ON OI.outReqId = ORQ.outReqId
+        WHERE OI.status = '승인완료'
+          AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
+          AND OI.outDttmShip >= CURDATE() - INTERVAL 30 DAY
+        ]]>
+    </select>
+
+    <!-- ===== Inbound Lead Time Monthly: 월별 입고 리드타임 및 추이 ===== -->
+    <resultMap id="inLeadTimeMonthlyMap" type="hashmap">
+        <result property="ym"        column="ym"/>
+        <result property="avgHours"  column="avg_hours"/>
+        <result property="recvCount" column="recv_cnt"/>
+    </resultMap>
+
+    <select id="selectInboundLeadTimeMonthlySeries" resultMap="inLeadTimeMonthlyMap">
+      <![CDATA[
+        /* 최근 12개월 월별 평균 리드타임(요청→입고완료, 시간) */
+        SELECT
+            DATE_FORMAT(X.y, '%Y-%m') AS ym,
+            AVG(TIMESTAMPDIFF(HOUR, IR.inDttmReq, II.inDttmRecv)) AS avg_hours,
+            COUNT(*) AS recv_cnt
+        FROM (
+                 SELECT DATE_FORMAT(
+                                DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY), INTERVAL n.n MONTH),
+                                '%Y-%m-01'
+                        ) AS y
+                 FROM (SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL
+                       SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL
+                       SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) n
+             ) X
+                 LEFT JOIN inboundItems II
+                           ON II.inDttmRecv >= X.y
+                               AND II.inDttmRecv <  DATE_ADD(X.y, INTERVAL 1 MONTH)
+                               AND II.status = '입고완료'
+                 LEFT JOIN inboundRequests IR
+                           ON IR.inReqId = II.inReqId
+                               AND (IR.IsDelete IS NULL OR IR.IsDelete = 0)
+        GROUP BY X.y
+        ORDER BY X.y
+        ]]>
+    </select>
+
+    <!-- ===== Outbound Lead Time Monthly: 월별 출고 리드타임 및 추이 ===== -->
+    <resultMap id="outLeadTimeMonthlyMap" type="hashmap">
+        <result property="ym" column="ym"/>
+        <result property="avgHours" column="avg_hours"/>
+        <result property="shipCount" column="ship_cnt"/>
+    </resultMap>
+
+    <select id="selectOutboundLeadTimeMonthlySeries" resultMap="outLeadTimeMonthlyMap">
+      <![CDATA[
+        /* 최근 12개월 월별 평균 리드타임(요청→출고, 시간단위) */
+        SELECT DATE_FORMAT(X.y, '%Y-%m')                                AS ym,
+               AVG(TIMESTAMPDIFF(HOUR, ORQ.outDttmReq, OI.outDttmShip)) AS avg_hours,
+               COUNT(*)                                                 AS ship_cnt
+        FROM (
+                 /* 최근 12개월의 월 첫날 목록 */
+                 SELECT DATE_FORMAT(
+                                DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY), INTERVAL n.n MONTH),
+                                '%Y-%m-01'
+                        ) AS y
+                 FROM (SELECT 0 n
+                       UNION ALL
+                       SELECT 1
+                       UNION ALL
+                       SELECT 2
+                       UNION ALL
+                       SELECT 3
+                       UNION ALL
+                       SELECT 4
+                       UNION ALL
+                       SELECT 5
+                       UNION ALL
+                       SELECT 6
+                       UNION ALL
+                       SELECT 7
+                       UNION ALL
+                       SELECT 8
+                       UNION ALL
+                       SELECT 9
+                       UNION ALL
+                       SELECT 10
+                       UNION ALL
+                       SELECT 11) n) X
+                 LEFT JOIN outboundItems OI
+                           ON OI.outDttmShip >= X.y
+                               AND OI.outDttmShip < DATE_ADD(X.y, INTERVAL 1 MONTH)
+                               AND OI.status = '승인완료'
+                 LEFT JOIN outboundrequest ORQ
+                           ON ORQ.outReqId = OI.outReqId
+                               AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
+        GROUP BY X.y
+        ORDER BY X.y
+        ]]>
+    </select>
 
 </mapper>

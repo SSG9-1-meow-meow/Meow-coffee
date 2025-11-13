@@ -258,11 +258,16 @@ VALUES ('LOC001', 1, 'LP001'),
 
 -- inboundRequests
 INSERT INTO inboundRequests (comId, managerId, inDttmReq, inDateWish, inDttmAppr, IsDelete, IsTempo)
-VALUES ('coffeebiz01', 'manager01', '2025-11-01 09:00:00', '2025-11-05', '2025-11-02 10:00:00', 0, 0),
-       ('coffeebiz02', 'manager01', '2025-11-02 10:30:00', '2025-11-06', NULL, 0, 1),
-       ('coffeebiz01', 'manager02', '2025-11-03 14:15:00', '2025-11-07', '2025-11-04 09:00:00', 0, 0),
-       ('coffeebiz03', 'manager03', '2025-11-04 08:45:00', '2025-11-08', NULL, 0, 1),
-       ('coffeebiz01', 'manager01', '2025-11-05 11:00:00', '2025-11-09', '2025-11-06 13:00:00', 0, 0);
+VALUES ('coffeebiz01', 'manager01', '2025-01-02 09:00:00', '2025-01-05', '2025-11-02 10:00:00', 0, 0),
+       ('coffeebiz02', 'manager01', '2025-02-02 10:30:00', '2025-10-06', NULL, 0, 1),
+       ('coffeebiz01', 'manager02', '2025-03-03 14:15:00', '2025-11-07', '2025-11-04 09:00:00', 0, 0),
+       ('coffeebiz03', 'manager03', '2025-04-04 08:45:00', '2025-11-08', NULL, 0, 1),
+       ('coffeebiz02', 'manager01', '2025-05-05 11:00:00', '2025-11-09', '2025-11-06 13:00:00', 0, 0),
+       ('coffeebiz01', 'manager01', '2025-06-01 09:00:00', '2025-11-05', '2025-11-02 10:00:00', 0, 0),
+       ('coffeebiz02', 'manager01', '2025-07-02 10:30:00', '2025-11-06', NULL, 0, 1),
+       ('coffeebiz01', 'manager02', '2025-08-03 14:15:00', '2025-11-07', '2025-11-04 09:00:00', 0, 0),
+       ('coffeebiz03', 'manager03', '2025-09-04 08:45:00', '2025-11-08', NULL, 0, 1),
+       ('coffeebiz01', 'manager01', '2025-10-05 11:00:00', '2025-11-09', '2025-11-06 13:00:00', 0, 0);
 
 -- inboundItems
 INSERT INTO inboundItems (inReqId, cfId, locationId, status, inQtyReq, inOrderAddr, inQty, inDttmSchd, inDttmInsp,
@@ -282,6 +287,98 @@ VALUES (1, 'CF001', 'LOC001', '승인대기', 100, '서울 강남 물류센터',
        (5, 'CF005', 'LOC005', '승인완료', 110, '대구 수성 물류센터', 110, '2025-11-09 14:00:00', '2025-11-08 16:00:00',
         '2025-11-09 15:00:00');
 
+-- ============================
+-- inboundRequests (11~40)
+-- ============================
+INSERT INTO inboundRequests (comId, managerId, inDttmReq, inDateWish, inDttmAppr, IsDelete, IsTempo)
+VALUES
+-- 2025-01 ~ 2025-12 균등 배치
+('coffeebiz01', 'manager01', '2025-01-05 09:00:00', '2025-01-10', '2025-01-06 10:00:00', 0, 0), -- 11
+('coffeebiz02', 'manager02', '2025-02-12 10:00:00', '2025-02-18', NULL, 0, 1),                  -- 12
+('coffeebiz03', 'manager03', '2025-03-03 11:00:00', '2025-03-08', '2025-03-04 09:00:00', 0, 0), -- 13
+('coffeebiz01', 'manager02', '2025-03-22 15:00:00', '2025-03-27', NULL, 0, 1),                  -- 14
+('coffeebiz02', 'manager01', '2025-04-01 09:00:00', '2025-04-05', '2025-04-02 13:00:00', 0, 0), -- 15
+('coffeebiz03', 'manager03', '2025-04-17 08:30:00', '2025-04-23', NULL, 0, 1),                  -- 16
+('coffeebiz01', 'manager01', '2025-05-06 14:15:00', '2025-05-12', '2025-05-07 10:00:00', 0, 0), -- 17
+('coffeebiz02', 'manager01', '2025-05-27 12:00:00', '2025-06-02', NULL, 0, 1),                  -- 18
+('coffeebiz03', 'manager02', '2025-06-04 09:10:00', '2025-06-10', '2025-06-05 13:30:00', 0, 0), -- 19
+('coffeebiz01', 'manager03', '2025-06-25 16:00:00', '2025-07-01', NULL, 0, 1),                  -- 20
+('coffeebiz02', 'manager01', '2025-07-07 10:20:00', '2025-07-12', '2025-07-08 08:50:00', 0, 0), -- 21
+('coffeebiz03', 'manager03', '2025-07-19 09:45:00', '2025-07-24', NULL, 0, 1),                  -- 22
+('coffeebiz01', 'manager02', '2025-08-02 15:10:00', '2025-08-08', '2025-08-03 11:00:00', 0, 0), -- 23
+('coffeebiz02', 'manager02', '2025-08-21 10:10:00', '2025-08-27', NULL, 0, 1),                  -- 24
+('coffeebiz03', 'manager01', '2025-09-05 08:30:00', '2025-09-11', '2025-09-06 12:00:00', 0, 0), -- 25
+('coffeebiz01', 'manager03', '2025-09-28 14:40:00', '2025-10-04', NULL, 0, 1),                  -- 26
+('coffeebiz02', 'manager01', '2025-10-09 09:15:00', '2025-10-15', '2025-10-10 13:30:00', 0, 0), -- 27
+('coffeebiz03', 'manager02', '2025-10-20 11:50:00', '2025-10-26', NULL, 0, 1),                  -- 28
+('coffeebiz01', 'manager01', '2025-11-03 09:30:00', '2025-11-09', '2025-11-04 10:10:00', 0, 0), -- 29
+('coffeebiz02', 'manager03', '2025-11-18 14:00:00', '2025-11-24', NULL, 0, 1),                  -- 30
+('coffeebiz03', 'manager02', '2025-12-01 10:25:00', '2025-12-07', '2025-12-02 09:00:00', 0, 0), -- 31
+('coffeebiz01', 'manager01', '2025-12-12 08:00:00', '2025-12-18', NULL, 0, 1),                  -- 32
+('coffeebiz02', 'manager03', '2025-01-18 13:10:00', '2025-01-23', '2025-01-19 09:00:00', 0, 0), -- 33
+('coffeebiz03', 'manager01', '2025-02-25 16:00:00', '2025-03-03', NULL, 0, 1),                  -- 34
+('coffeebiz01', 'manager02', '2025-03-14 09:25:00', '2025-03-20', '2025-03-15 13:10:00', 0, 0), -- 35
+('coffeebiz02', 'manager01', '2025-04-29 10:40:00', '2025-05-05', NULL, 0, 1),                  -- 36
+('coffeebiz03', 'manager03', '2025-07-11 08:10:00', '2025-07-17', '2025-07-12 09:00:00', 0, 0), -- 37
+('coffeebiz01', 'manager02', '2025-08-29 11:00:00', '2025-09-03', NULL, 0, 1),                  -- 38
+('coffeebiz02', 'manager03', '2025-10-30 15:35:00', '2025-11-05', '2025-10-31 10:00:00', 0, 0), -- 39
+('coffeebiz03', 'manager01', '2025-12-22 09:15:00', '2025-12-28', NULL, 0, 1);
+-- 40
+
+
+-- ============================
+-- inboundItems (1개씩 30건)
+-- 월/일 랜덤 분포
+-- ============================
+INSERT INTO inboundItems (inReqId, cfId, locationId, status,
+                          inQtyReq, inOrderAddr, inQty,
+                          inDttmSchd, inDttmInsp, inDttmRecv)
+VALUES (11, 'CF001', 'LOC001', '승인완료', 120, '서울 강남센터', 120, '2025-01-11 09:00:00', '2025-01-10 13:00:00',
+        '2025-01-11 09:40:00'),
+       (12, 'CF002', 'LOC002', '승인대기', 80, '서울 마포센터', NULL, '2025-02-19 10:00:00', NULL, NULL),
+       (13, 'CF003', 'LOC003', '승인완료', 60, '성남센터', 60, '2025-03-09 11:00:00', '2025-03-08 15:00:00',
+        '2025-03-09 11:30:00'),
+       (14, 'CF004', 'LOC004', '승인대기', 90, '부산센터', NULL, '2025-03-28 15:00:00', NULL, NULL),
+       (15, 'CF005', 'LOC005', '승인완료', 110, '대구센터', 110, '2025-04-06 10:00:00', '2025-04-05 14:00:00',
+        '2025-04-06 10:35:00'),
+       (16, 'CF001', 'LOC001', '승인대기', 70, '서울 강북센터', NULL, '2025-04-24 08:30:00', NULL, NULL),
+       (17, 'CF002', 'LOC002', '승인완료', 95, '광주센터', 95, '2025-05-13 14:00:00', '2025-05-12 17:00:00',
+        '2025-05-13 14:35:00'),
+       (18, 'CF003', 'LOC003', '승인대기', 50, '광주센터', NULL, '2025-06-03 09:00:00', NULL, NULL),
+       (19, 'CF004', 'LOC004', '승인완료', 85, '인천센터', 85, '2025-06-11 16:00:00', '2025-06-10 13:00:00',
+        '2025-06-11 16:40:00'),
+       (20, 'CF005', 'LOC005', '승인대기', 40, '인천센터', NULL, '2025-07-02 10:00:00', NULL, NULL),
+       (21, 'CF001', 'LOC001', '승인완료', 60, '서울 강남센터', 60, '2025-07-13 09:20:00', '2025-07-12 14:00:00',
+        '2025-07-13 09:55:00'),
+       (22, 'CF002', 'LOC002', '승인대기', 30, '서울 강남센터', NULL, '2025-07-25 11:00:00', NULL, NULL),
+       (23, 'CF003', 'LOC003', '승인완료', 45, '성남센터', 45, '2025-08-09 10:00:00', '2025-08-08 16:00:00',
+        '2025-08-09 10:25:00'),
+       (24, 'CF004', 'LOC004', '승인대기', 55, '부산센터', NULL, '2025-08-28 15:30:00', NULL, NULL),
+       (25, 'CF005', 'LOC005', '승인완료', 100, '대구센터', 100, '2025-09-12 09:00:00', '2025-09-11 13:00:00',
+        '2025-09-12 09:40:00'),
+       (26, 'CF001', 'LOC001', '승인대기', 40, '서울 강북센터', NULL, '2025-09-30 17:30:00', NULL, NULL),
+       (27, 'CF002', 'LOC002', '승인완료', 70, '광주센터', 70, '2025-10-12 09:00:00', '2025-10-11 14:00:00',
+        '2025-10-12 09:35:00'),
+       (28, 'CF003', 'LOC003', '승인대기', 90, '광주센터', NULL, '2025-10-27 13:00:00', NULL, NULL),
+       (29, 'CF004', 'LOC004', '승인완료', 55, '인천센터', 55, '2025-11-10 14:00:00', '2025-11-09 17:00:00',
+        '2025-11-10 14:30:00'),
+       (30, 'CF005', 'LOC005', '승인대기', 75, '인천센터', NULL, '2025-11-25 09:00:00', NULL, NULL),
+       (31, 'CF001', 'LOC001', '승인완료', 120, '서울 강남센터', 120, '2025-12-08 10:00:00', '2025-12-07 14:00:00',
+        '2025-12-08 10:40:00'),
+       (32, 'CF002', 'LOC002', '승인대기', 80, '서울 마포센터', NULL, '2025-12-19 11:00:00', NULL, NULL),
+       (33, 'CF003', 'LOC003', '승인완료', 60, '성남센터', 60, '2025-01-24 09:00:00', '2025-01-23 13:00:00',
+        '2025-01-24 09:40:00'),
+       (34, 'CF004', 'LOC004', '승인대기', 40, '부산센터', NULL, '2025-02-27 16:00:00', NULL, NULL),
+       (35, 'CF005', 'LOC005', '승인완료', 90, '대구센터', 90, '2025-03-21 10:00:00', '2025-03-20 15:00:00',
+        '2025-03-21 10:35:00'),
+       (36, 'CF001', 'LOC001', '승인대기', 30, '서울 강북센터', NULL, '2025-05-08 13:00:00', NULL, NULL),
+       (37, 'CF002', 'LOC002', '승인완료', 70, '광주센터', 70, '2025-07-18 09:00:00', '2025-07-17 16:00:00',
+        '2025-07-18 09:30:00'),
+       (38, 'CF003', 'LOC003', '승인대기', 50, '광주센터', NULL, '2025-08-31 11:00:00', NULL, NULL),
+       (39, 'CF004', 'LOC004', '승인완료', 85, '인천센터', 85, '2025-11-07 15:00:00', '2025-11-06 13:00:00',
+        '2025-11-07 15:25:00'),
+       (40, 'CF005', 'LOC005', '승인대기', 45, '인천센터', NULL, '2025-12-27 14:00:00', NULL, NULL);
+
 -- outboundrequest
 INSERT INTO outboundrequest (comId, managerID, outDttmReq, outDateWish, outDttmAppr, IsDelete, IsTempo)
 VALUES ('coffeebiz01', 'manager01', '2025-11-06 09:00:00', '2025-11-08', '2025-11-06 14:00:00', 0, NULL),
@@ -289,6 +386,38 @@ VALUES ('coffeebiz01', 'manager01', '2025-11-06 09:00:00', '2025-11-08', '2025-1
        ('coffeebiz01', 'manager02', '2025-11-07 11:15:00', '2025-11-10', '2025-11-07 16:00:00', 0, NULL),
        ('coffeebiz03', 'manager03', '2025-11-07 13:45:00', '2025-11-11', NULL, 0, NULL),
        ('coffeebiz01', 'manager01', '2025-11-08 08:20:00', '2025-11-12', '2025-11-08 12:00:00', 0, NULL);
+INSERT INTO outboundrequest (comId, managerID, outDttmReq, outDateWish, outDttmAppr, IsDelete, IsTempo)
+VALUES ('coffeebiz01', 'manager01', '2025-01-04 09:10:00', '2025-01-06', '2025-01-04 13:20:00', 0, NULL), -- 6
+       ('coffeebiz02', 'manager02', '2025-01-15 10:40:00', '2025-01-18', NULL, 0, NULL),                  -- 7
+       ('coffeebiz03', 'manager03', '2025-02-05 11:00:00', '2025-02-09', '2025-02-05 16:00:00', 0, NULL), -- 8
+       ('coffeebiz01', 'manager02', '2025-02-22 14:15:00', '2025-02-27', NULL, 0, NULL),                  -- 9
+       ('coffeebiz02', 'manager01', '2025-03-01 09:00:00', '2025-03-05', '2025-03-01 12:30:00', 0, NULL), -- 10
+       ('coffeebiz03', 'manager03', '2025-03-18 08:30:00', '2025-03-22', NULL, 0, NULL),                  -- 11
+       ('coffeebiz01', 'manager01', '2025-04-03 13:00:00', '2025-04-07', '2025-04-03 17:00:00', 0, NULL), -- 12
+       ('coffeebiz02', 'manager02', '2025-04-26 10:25:00', '2025-04-30', NULL, 0, NULL),                  -- 13
+       ('coffeebiz03', 'manager01', '2025-05-06 09:40:00', '2025-05-10', '2025-05-06 14:00:00', 0, NULL), -- 14
+       ('coffeebiz01', 'manager03', '2025-05-27 16:20:00', '2025-06-01', NULL, 0, NULL),                  -- 15
+       ('coffeebiz02', 'manager01', '2025-06-04 10:00:00', '2025-06-08', '2025-06-04 13:10:00', 0, NULL), -- 16
+       ('coffeebiz03', 'manager02', '2025-06-18 11:15:00', '2025-06-23', NULL, 0, NULL),                  -- 17
+       ('coffeebiz01', 'manager02', '2025-07-02 09:00:00', '2025-07-05', '2025-07-02 12:00:00', 0, NULL), -- 18
+       ('coffeebiz02', 'manager03', '2025-07-14 13:40:00', '2025-07-18', NULL, 0, NULL),                  -- 19
+       ('coffeebiz03', 'manager01', '2025-08-03 08:30:00', '2025-08-07', '2025-08-03 11:50:00', 0, NULL), -- 20
+       ('coffeebiz01', 'manager03', '2025-08-23 15:00:00', '2025-08-28', NULL, 0, NULL),                  -- 21
+       ('coffeebiz02', 'manager02', '2025-09-05 10:30:00', '2025-09-10', '2025-09-05 14:00:00', 0, NULL), -- 22
+       ('coffeebiz03', 'manager01', '2025-09-26 11:00:00', '2025-10-02', NULL, 0, NULL),                  -- 23
+       ('coffeebiz01', 'manager01', '2025-10-02 09:15:00', '2025-10-06', '2025-10-02 13:20:00', 0, NULL), -- 24
+       ('coffeebiz02', 'manager02', '2025-10-15 10:20:00', '2025-10-19', NULL, 0, NULL),                  -- 25
+       ('coffeebiz03', 'manager03', '2025-11-04 09:40:00', '2025-11-08', '2025-11-04 12:50:00', 0, NULL), -- 26
+       ('coffeebiz01', 'manager02', '2025-11-21 14:00:00', '2025-11-26', NULL, 0, NULL),                  -- 27
+       ('coffeebiz02', 'manager03', '2025-12-03 10:05:00', '2025-12-08', '2025-12-03 14:00:00', 0, NULL), -- 28
+       ('coffeebiz03', 'manager01', '2025-12-18 08:30:00', '2025-12-23', NULL, 0, NULL),                  -- 29
+       ('coffeebiz01', 'manager03', '2025-01-22 16:00:00', '2025-01-27', '2025-01-22 18:30:00', 0, NULL), -- 30
+       ('coffeebiz02', 'manager01', '2025-02-26 09:30:00', '2025-03-03', NULL, 0, NULL),                  -- 31
+       ('coffeebiz03', 'manager02', '2025-03-14 10:50:00', '2025-03-18', '2025-03-14 15:40:00', 0, NULL), -- 32
+       ('coffeebiz01', 'manager01', '2025-04-29 11:00:00', '2025-05-04', NULL, 0, NULL),                  -- 33
+       ('coffeebiz02', 'manager02', '2025-07-09 08:20:00', '2025-07-14', '2025-07-09 12:00:00', 0, NULL), -- 34
+       ('coffeebiz03', 'manager03', '2025-10-29 13:10:00', '2025-11-03', NULL, 0, NULL);
+-- 35
 
 -- outboundItems
 INSERT INTO outboundItems (outReqId, stkId, vehicleId, status, outQtyReq, outOrderAddr, outDttmSchd, outDttmInsp,
@@ -309,6 +438,98 @@ VALUES (1, 'STK001', '55가1001', '승인완료', 50, '서울 강남구 테헤�
         '2025-11-12 15:00:00'),
        (5, 'STK005', '55마5005', '승인완료', 40, '대구 수성구 동대구로 88', '2025-11-12 14:00:00', '2025-11-11 16:00:00',
         '2025-11-12 15:00:00');
+INSERT INTO outboundItems (outReqId, stkId, vehicleId, status, outQtyReq, outOrderAddr,
+                           outDttmSchd, outDttmInsp, outDttmShip)
+VALUES (6, 'STK001', '55가1001', '승인완료', 40, '서울 강남구 테헤란로 10',
+        '2025-01-06 09:00:00', '2025-01-05 15:00:00', '2025-01-06 10:00:00'),
+
+       (7, 'STK002', '55나2002', '승인대기', 30, '서울 마포구 서교동 123',
+        '2025-01-18 10:00:00', NULL, NULL),
+
+       (8, 'STK003', '55다3003', '승인완료', 50, '경기 성남시 분당구 88',
+        '2025-02-09 11:00:00', '2025-02-08 14:00:00', '2025-02-09 12:00:00'),
+
+       (9, 'STK004', '55라4004', '승인대기', 25, '부산 해운대구 111',
+        '2025-02-27 14:00:00', NULL, NULL),
+
+       (10, 'STK005', '55마5005', '승인완료', 20, '대구 동구 44',
+        '2025-03-05 10:00:00', '2025-03-04 13:00:00', '2025-03-05 11:00:00'),
+
+       (11, 'STK001', '55가1001', '승인대기', 45, '서울 강북구 55',
+        '2025-03-22 09:30:00', NULL, NULL),
+
+       (12, 'STK002', '55나2002', '승인완료', 60, '서울 용산구 77',
+        '2025-04-07 13:00:00', '2025-04-06 16:10:00', '2025-04-07 14:00:00'),
+
+       (13, 'STK003', '55다3003', '승인대기', 35, '서울 영등포구 88',
+        '2025-04-30 11:00:00', NULL, NULL),
+
+       (14, 'STK004', '55라4004', '승인완료', 30, '경기 성남시 판교 101',
+        '2025-05-10 09:00:00', '2025-05-09 14:00:00', '2025-05-10 09:50:00'),
+
+       (15, 'STK005', '55마5005', '승인대기', 55, '대구 중구 22',
+        '2025-06-02 15:00:00', NULL, NULL),
+
+       (16, 'STK001', '55가1001', '승인완료', 40, '서울 광진구 33',
+        '2025-06-08 09:00:00', '2025-06-07 16:00:00', '2025-06-08 10:00:00'),
+
+       (17, 'STK002', '55나2002', '승인대기', 20, '서울 성동구 101',
+        '2025-06-23 11:00:00', NULL, NULL),
+
+       (18, 'STK003', '55다3003', '승인완료', 70, '경기 고양시 88',
+        '2025-07-05 10:00:00', '2025-07-04 14:00:00', '2025-07-05 11:00:00'),
+
+       (19, 'STK004', '55라4004', '승인대기', 30, '부산 중구 44',
+        '2025-07-18 13:00:00', NULL, NULL),
+
+       (20, 'STK005', '55마5005', '승인완료', 45, '대구 달서구 77',
+        '2025-08-07 09:00:00', '2025-08-06 13:00:00', '2025-08-07 09:40:00'),
+
+       (21, 'STK001', '55가1001', '승인대기', 25, '서울 강남구 55',
+        '2025-08-28 15:00:00', NULL, NULL),
+
+       (22, 'STK002', '55나2002', '승인완료', 65, '서울 송파구 88',
+        '2025-09-10 09:00:00', '2025-09-09 16:00:00', '2025-09-10 10:00:00'),
+
+       (23, 'STK003', '55다3003', '승인대기', 35, '서울 관악구 12',
+        '2025-10-02 11:00:00', NULL, NULL),
+
+       (24, 'STK004', '55라4004', '승인완료', 80, '경기 부천시 19',
+        '2025-10-06 13:00:00', '2025-10-05 15:00:00', '2025-10-06 14:00:00'),
+
+       (25, 'STK005', '55마5005', '승인대기', 50, '대구 수성구 55',
+        '2025-10-19 12:00:00', NULL, NULL),
+
+       (26, 'STK001', '55가1001', '승인완료', 90, '서울 강남구 10',
+        '2025-11-08 09:00:00', '2025-11-07 13:40:00', '2025-11-08 10:00:00'),
+
+       (27, 'STK002', '55나2002', '승인대기', 30, '서울 마포구 33',
+        '2025-11-26 11:00:00', NULL, NULL),
+
+       (28, 'STK003', '55다3003', '승인완료', 55, '경기 성남시 22',
+        '2025-12-08 10:00:00', '2025-12-07 15:00:00', '2025-12-08 11:00:00'),
+
+       (29, 'STK004', '55라4004', '승인대기', 40, '부산 해운대구 44',
+        '2025-12-23 13:00:00', NULL, NULL),
+
+       (30, 'STK005', '55마5005', '승인완료', 20, '대구 남구 11',
+        '2025-01-27 10:00:00', '2025-01-26 14:00:00', '2025-01-27 11:00:00'),
+
+       (31, 'STK001', '55가1001', '승인대기', 35, '서울 서초구 66',
+        '2025-03-03 09:00:00', NULL, NULL),
+
+       (32, 'STK002', '55나2002', '승인완료', 45, '서울 은평구 77',
+        '2025-03-18 10:00:00', '2025-03-17 15:00:00', '2025-03-18 10:50:00'),
+
+       (33, 'STK003', '55다3003', '승인대기', 60, '경기 용인시 101',
+        '2025-05-04 13:00:00', NULL, NULL),
+
+       (34, 'STK004', '55라4004', '승인완료', 70, '부산 영도구 99',
+        '2025-07-14 09:00:00', '2025-07-13 14:00:00', '2025-07-14 10:00:00'),
+
+       (35, 'STK005', '55마5005', '승인대기', 80, '대구 동구 88',
+        '2025-11-03 13:00:00', NULL, NULL);
+
 
 -- due_diligence
 INSERT INTO due_diligence (stkId, ddDate, ddApproval, ddStatus, maid, ddLog, realStkQuantity)
@@ -555,15 +776,17 @@ BEGIN
 
         -- 지출 넣었어. 근데 왜 안나와!!!!!
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
         VALUES (CURDATE(), 'inboundCost', ROUND(laborAmt + inspectAmt, 2), 'draft', whId, userId);
     END IF;
 END$$
 DELIMITER ;
 
 -- 가정1. 입고가 완료됐을때
-SELECT * FROM inboundItems;
-SELECT * FROM inboundCost;
+SELECT *
+FROM inboundItems;
+SELECT *
+FROM inboundCost;
 
 UPDATE inboundItems
 SET status     = '승인완료',
@@ -572,8 +795,10 @@ SET status     = '승인완료',
     inDttmRecv = '2025-10-07 11:00:00'
 WHERE inreqId = 2;
 
-SELECT * FROM inboundCost;
-SELECT * FROM expense;
+SELECT *
+FROM inboundCost;
+SELECT *
+FROM expense;
 
 USE meowcoffeedb;
 
@@ -649,7 +874,7 @@ BEGIN
 
         -- 2) 지출도 아이템 단위로 즉시 생성
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
         VALUES (CURDATE(), 'outboundCost',
                 ROUND(pickingAmt + packingAmt + laborAmt, 2),
                 'draft', whId, userId);
@@ -658,9 +883,12 @@ END$$
 DELIMITER ;
 
 -- 가정2.3. 출고가 완료됐을때
-SELECT * FROM outboundItems;
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
+SELECT *
+FROM outboundItems;
+SELECT *
+FROM outboundCost;
+SELECT *
+FROM deliveryCost;
 
 UPDATE outboundItems
 SET status      = '승인완료',
@@ -668,9 +896,12 @@ SET status      = '승인완료',
     outDttmShip = '2025-10-12 11:00:00'
 WHERE outreqId = 2;
 
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
-SELECT * FROM expense;
+SELECT *
+FROM outboundCost;
+SELECT *
+FROM deliveryCost;
+SELECT *
+FROM expense;
 
 USE meowcoffeedb;
 
@@ -738,21 +969,24 @@ BEGIN
 
         -- 2) 지출 생성: userId=거래처ID
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
         VALUES (CURDATE(), 'storageCost', v_amt, 'draft', v_whId, v_comId);
     END IF;
 END$$
 DELIMITER ;
 
 -- 가정4. 실사 완료됐을때
-SELECT * FROM due_diligence;
+SELECT *
+FROM due_diligence;
 
 UPDATE due_diligence
 SET ddApproval = 'APPROVED'
 WHERE ddId = 2;
 
-SELECT * FROM storageCost;
-SELECT * FROM expense;
+SELECT *
+FROM storageCost;
+SELECT *
+FROM expense;
 
 -- 가정3. 배송 완료 시(출고아이템 상태 = SHIPPED)
 DROP TRIGGER IF EXISTS trg_outboundItems_delivery_cost;
@@ -808,7 +1042,7 @@ BEGIN
 
         -- 2) 지출 생성
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId, userId)
         VALUES (CURDATE(), 'deliveryCost', v_transportAmt, 'draft', v_whId, v_userId);
 
     END IF;
@@ -816,9 +1050,12 @@ END$$
 DELIMITER ;
 
 -- 가정2.3. 출고가 완료됐을때
-SELECT * FROM outboundItems;
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
+SELECT *
+FROM outboundItems;
+SELECT *
+FROM outboundCost;
+SELECT *
+FROM deliveryCost;
 
 UPDATE outboundItems
 SET status      = '승인완료',
@@ -826,9 +1063,12 @@ SET status      = '승인완료',
     outDttmShip = '2025-10-12 11:00:00'
 WHERE outreqId = 2;
 
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
-SELECT * FROM expense;
+SELECT *
+FROM outboundCost;
+SELECT *
+FROM deliveryCost;
+SELECT *
+FROM expense;
 
 USE meowcoffeedb;
 
@@ -841,12 +1081,12 @@ DELIMITER $$
 CREATE PROCEDURE create_invoice(IN p_run_dt DATE)
 BEGIN
     DECLARE v_start DATE;
-    DECLARE v_end   DATE;
+    DECLARE v_end DATE;
 
-    DECLARE v_in    DECIMAL(9,4);
-    DECLARE v_out   DECIMAL(9,4);
-    DECLARE v_del   DECIMAL(9,4);
-    DECLARE v_store DECIMAL(9,4);
+    DECLARE v_in DECIMAL(9, 4);
+    DECLARE v_out DECIMAL(9, 4);
+    DECLARE v_del DECIMAL(9, 4);
+    DECLARE v_store DECIMAL(9, 4);
 
     IF p_run_dt IS NULL THEN
         SET p_run_dt = CURDATE();
@@ -854,7 +1094,7 @@ BEGIN
 
     -- 전월 [1일, 당월 1일)
     SET v_start = DATE_FORMAT(DATE_SUB(p_run_dt, INTERVAL 1 MONTH), '%Y-%m-01');
-    SET v_end   = DATE_FORMAT(p_run_dt, '%Y-%m-01');
+    SET v_end = DATE_FORMAT(p_run_dt, '%Y-%m-01');
 
     -- 최신 수수료(배율)
     SELECT inFeeRatePct, outFeeRatePct, delFeeRatePct, storeFeeRatePct
@@ -865,55 +1105,57 @@ BEGIN
 
     -- 임시 테이블: 스키마 먼저 생성 후 INSERT … SELECT
     DROP TEMPORARY TABLE IF EXISTS _t_users;
-    CREATE TEMPORARY TABLE _t_users (
-                                        userId VARCHAR(30) PRIMARY KEY
+    CREATE TEMPORARY TABLE _t_users
+    (
+        userId VARCHAR(30) PRIMARY KEY
     );
 
     INSERT INTO _t_users(userId)
     SELECT DISTINCT e.userId
     FROM expense e
     WHERE e.expenseDt >= v_start
-      AND e.expenseDt <  v_end
-      AND e.expenseCategory IN ('inboundCost','outboundCost','deliveryCost','storageCost')
-      AND IFNULL(e.isDelete,0)=0;
+      AND e.expenseDt < v_end
+      AND e.expenseCategory IN ('inboundCost', 'outboundCost', 'deliveryCost', 'storageCost')
+      AND IFNULL(e.isDelete, 0) = 0;
 
     -- 같은 날 생성된 draft 정리
     DELETE i
     FROM invoice i
              JOIN _t_users u ON u.userId = i.userId
-    WHERE i.invoiceStatus='draft'
-      AND i.invoiceDt >= v_start AND i.invoiceDt < v_end;
+    WHERE i.invoiceStatus = 'draft'
+      AND i.invoiceDt >= v_start
+      AND i.invoiceDt < v_end;
 
     -- 거래처별 합계(배율 곱, /100 제거)
     INSERT INTO invoice (invoiceDt, totalAmt, invoiceStatus, userId)
     SELECT v_start,
            ROUND(SUM(
                          CASE e.expenseCategory
-                             WHEN 'inboundCost'  THEN e.totalAmt * v_in
+                             WHEN 'inboundCost' THEN e.totalAmt * v_in
                              WHEN 'outboundCost' THEN e.totalAmt * v_out
                              WHEN 'deliveryCost' THEN e.totalAmt * v_del
-                             WHEN 'storageCost'  THEN e.totalAmt * v_store
+                             WHEN 'storageCost' THEN e.totalAmt * v_store
                              ELSE 0
                              END
-                 ),2) AS totalAmt,
+                 ), 2) AS totalAmt,
            'draft',
            e.userId
     FROM expense e
              JOIN _t_users u ON u.userId = e.userId
     WHERE e.expenseDt >= v_start
-      AND e.expenseDt <  v_end
-      AND e.expenseCategory IN ('inboundCost','outboundCost','deliveryCost','storageCost')
-      AND IFNULL(e.isDelete,0)=0
+      AND e.expenseDt < v_end
+      AND e.expenseCategory IN ('inboundCost', 'outboundCost', 'deliveryCost', 'storageCost')
+      AND IFNULL(e.isDelete, 0) = 0
     GROUP BY e.userId
     HAVING ROUND(SUM(
                          CASE e.expenseCategory
-                             WHEN 'inboundCost'  THEN e.totalAmt * v_in
+                             WHEN 'inboundCost' THEN e.totalAmt * v_in
                              WHEN 'outboundCost' THEN e.totalAmt * v_out
                              WHEN 'deliveryCost' THEN e.totalAmt * v_del
-                             WHEN 'storageCost'  THEN e.totalAmt * v_store
+                             WHEN 'storageCost' THEN e.totalAmt * v_store
                              ELSE 0
                              END
-                 ),2) > 0;
+                 ), 2) > 0;
 END$$
 DELIMITER ;
 
@@ -960,7 +1202,7 @@ BEGIN
     FROM expense
     WHERE expenseDt BETWEEN month_start AND month_end
       AND expenseStatus = 'posted'
-      AND IFNULL(isDelete,0) = 0;
+      AND IFNULL(isDelete, 0) = 0;
 
     -- 이익 = 청구 − 지출
     INSERT INTO revenue (totalAmt, revenueDt)
@@ -979,15 +1221,15 @@ CREATE EVENT ev_close_monthly_revenue_all
     ON COMPLETION PRESERVE
     DO CALL create_revenue(CURDATE());
 
-INSERT INTO revenue (totalAmt, revenueDt) VALUES
-                                              (300000.00,'2025-01-15'),
-                                              (200000.00,'2025-02-15'),
-                                              (100000.00,'2025-03-15'),
-                                              (250000.00,'2025-04-15'),
-                                              (300000.00,'2025-05-15'),
-                                              (150000.00,'2025-06-15'),
-                                              (200000.00,'2025-07-15'),
-                                              (250000.00,'2025-08-15'),
-                                              (200000.00,'2025-09-15'),
-                                              (400000.00,'2025-10-15'),
-                                              (500000.00,'2025-11-15');
+INSERT INTO revenue (totalAmt, revenueDt)
+VALUES (300000.00, '2025-01-15'),
+       (200000.00, '2025-02-15'),
+       (100000.00, '2025-03-15'),
+       (250000.00, '2025-04-15'),
+       (300000.00, '2025-05-15'),
+       (150000.00, '2025-06-15'),
+       (200000.00, '2025-07-15'),
+       (250000.00, '2025-08-15'),
+       (200000.00, '2025-09-15'),
+       (400000.00, '2025-10-15'),
+       (500000.00, '2025-11-15');

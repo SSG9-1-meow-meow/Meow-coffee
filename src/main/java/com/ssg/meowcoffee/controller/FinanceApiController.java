@@ -167,4 +167,9 @@ public class FinanceApiController {
         return ResponseEntity.ok(chartService.getMonthlySeries());
     }
 
+    @GetMapping("/warehouses")
+    public ResponseEntity<List<Map<String, Object>>> readWarehouseList() {
+        return ResponseEntity.ok(financeService.getWarehouses());
+    }
+
 }

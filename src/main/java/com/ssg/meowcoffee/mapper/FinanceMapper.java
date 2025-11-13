@@ -1,4 +1,5 @@
 package com.ssg.meowcoffee.mapper;
+
 import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
@@ -46,14 +47,5 @@ public interface FinanceMapper {
     // ===== Revenue 조회 =====
     List<RevenueVO> selectRevenues(); // 전체
 
-//    BigDecimal selectMonthExpenseTotal();
-//    int selectPendingExpenseCount();
-//    int selectWarehouseCount();
-//
-//    Map<String,Object> selectInvoiceKpisForThisMonth();
-//
-//    Map<String,Object> selectRevenueKpisForThisMonth();
-//    List<Map<String,Object>> selectRevenueMonthlySeries();
-
-
+    List<Map<String, Object>> selectWarehouses();
 }
