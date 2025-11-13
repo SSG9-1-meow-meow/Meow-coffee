@@ -1,11 +1,10 @@
-package com.ssg.springsecurityex.controller;
+package com.ssg.meowcoffee.controller;
 
-import com.ssg.springsecurityex.dto.*;
+import com.ssg.meowcoffee.dto.*;
+import com.ssg.meowcoffee.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.ssg.springsecurityex.service.MemberService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
