@@ -175,9 +175,8 @@
 
 </div>
 <!-- End Custom template --><!-- Core JS Files -->
-<script src="/resources/assets/js/core/jquery-3.7.1.min.js"></script>
 <script src="/resources/assets/js/core/popper.min.js"></script>
-<script src="/resources/assets/js/core/bootstrap.min.js"></script>
+<%--<script src="/resources/assets/js/core/bootstrap.min.js"></script>--%>
 
 <!-- Axios (비동기 HTTP 요청 라이브러리) ★★★ 추가됨 ★★★ -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
