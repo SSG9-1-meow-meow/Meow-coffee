@@ -12,7 +12,7 @@ CREATE TABLE warehouse (
                            whGrade CHAR(5) NOT NULL,
                            whField INT NOT NULL,
                            whTotalCapa INT NOT NULL,
-                           whUseCapa INT NULL
+                           whUseCapa INT default 0
 );
 
 -- 2. 보관위치 (location_places)
