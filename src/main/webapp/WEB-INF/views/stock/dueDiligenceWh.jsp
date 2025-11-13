@@ -184,6 +184,7 @@ alert("실사 정보를 불러오지 못했습니다.");
 btnEdit.addEventListener("click", async () => {
 try{
 const response2 = await axios.get("/api/dueDiligences/"+ddId+"/update");
+
 const dto2 = response2.data;
 
 document.getElementById("stkId").value = dto2.stkId || "-";
@@ -233,9 +234,7 @@ const updatedData = {
 stkQuantity: document.getElementById("stkQuantity").value,
 realStkQuantity: document.getElementById("realStkQuantity").value,
 ddLog: document.getElementById("ddLog").value,
-whCode: document.getElementById("whCode").value,
-maId : "manager_kim"
-//로그인한 아이디 바꿔주면서 test
+whCode: document.getElementById("whCode").value
 };
 
 
@@ -255,10 +254,7 @@ const resp = await axios.put("/api/dueDiligences/"+ddId+"/update", updatedData);
 //삭제하기 버튼
 btnDelete.addEventListener("click", async () => {
 if (confirm("정말 삭제하시겠습니까?")) {
-const deleteData = {
-maId : "manager_kim"
-// maId : (현재 로그인한 아이디처리)
-};
+const deleteData = {};
 
 try {
 const resp = await axios.put("/api/dueDiligences/"+ddId, deleteData);
@@ -272,7 +268,7 @@ alert("삭제 중 오류가 발생했습니다.");
 }
 });
 
-// ⚫ 리스트로 버튼
+//  리스트로 버튼
 btnList.addEventListener("click", () => {
 window.location.href = "/dueDiligences";
 });

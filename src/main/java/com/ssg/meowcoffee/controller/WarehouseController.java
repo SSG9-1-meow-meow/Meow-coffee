@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -34,7 +35,15 @@ public class WarehouseController {
     }
 
     @GetMapping("/api/warehouses/search")
-    public ResponseEntity<Map<String, Object>> readWarehouseSearchList(){
+    public ResponseEntity<Map<String, Object>> readWarehouseSearchList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        //일반관리자, 총관리자만 접근 가능
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+
+        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")){
+            //권한 없음
+            return ResponseEntity.ok(null);
+        }
+
         WarehouseSearchDTO searchDTO = WarehouseSearchDTO.builder().whAddress("address").build();
         List<WarehouseDTO> addressList = warehouseService.getWarehouseSearchList(searchDTO); //주소 목록
         searchDTO.setWhAddress(null); searchDTO.setWhName("name");
@@ -131,7 +140,11 @@ public class WarehouseController {
 
     // REGISTER2: 창고 등록 (모달로 처리)
     @PostMapping("/api/warehouse")
-    public ResponseEntity<Integer> registerWarehouse(@Valid @RequestBody WarehouseDTO warehouse) {
+    public ResponseEntity<Integer> createWarehouse(@Valid @RequestBody WarehouseDTO warehouse, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //총관리자 인지 권한 확인 필수
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(!role.equals("ROLE_ADMIN")) return ResponseEntity.ok(-1);
+
         Integer result = warehouseService.registerWarehouse(warehouse);
 
         return ResponseEntity.ok(result);
@@ -139,7 +152,11 @@ public class WarehouseController {
 
     // MODIFY2: 창고 수정(모달로 처리)
     @PutMapping("/api/warehouses/{whCode}/update")
-    public ResponseEntity<Integer> updateWarehouse(@PathVariable("whCode") String whCode, @RequestBody WarehouseUpdateDTO warehouse) {
+    public ResponseEntity<Integer> updateWarehouse(@PathVariable("whCode") String whCode, @RequestBody WarehouseUpdateDTO warehouse
+    , @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(!role.equals("ROLE_ADMIN")) return ResponseEntity.ok(-1);
+
         warehouse.setWhCode(whCode);
 
         Integer result = warehouseService.modifyWarehouse(warehouse);

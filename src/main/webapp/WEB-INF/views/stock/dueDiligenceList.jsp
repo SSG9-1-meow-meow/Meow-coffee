@@ -345,8 +345,7 @@ background-color: #000;
         whCode: $("#whCode").val(),
         stkId: $("#stkId").val(),
         realStkQuantity: $("#realStock").val(),
-        ddLog: $("#ddLog").val(),
-        maId: "manager_lee"
+        ddLog: $("#ddLog").val()
         };
 
         if (!data.realStkQuantity) {
