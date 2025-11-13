@@ -92,9 +92,18 @@
     limit #{cri.skip}, #{cri.amount}
   </select>
 
+  <select id="selectLoginUser" resultMap="userResultMap">
+    select * from users
+    where userId = #{userId} and userStatus = 'APPROVAL'
+  </select>
+
   <select id="getCount" resultType="int">
     select count(userId) from users
     <include refid="search"/>
+  </select>
+
+  <select id="existsId" resultType="boolean">
+    select exists(select 1 from users where userId = #{userId})
   </select>
 
   <select id="selectUserById" resultMap="userResultMap">
@@ -116,28 +125,37 @@
   <select id="findUserId" resultType="com.ssg.meowcoffee.dto.FindIDResultDTO">
     select userId, userRole from users
     <choose>
-      <when test="#{userInfo.targetRole == 'COMPANY'}">
+      <when test="userInfo.targetRole == 'COMPANY'">
         where userCode = (
           select comCode
           from companies
           where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
         )
       </when>
-      <when test="#{userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'}">
+      <when test="userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'">
         where userCode = (
           select managerCode
           from managers
-          where managerName = #{userInfo.userName} and managerEmail = #{userInfo.userEmail}
+          where managerName = #{userInfo.userName}
+            and managerEmail = #{userInfo.userEmail}
+            and managerRole = #{userInfo.targetRole}
         )
       </when>
-      <otherwise>
+      <when test="userInfo.targetRole == 'DELIVERYMAN'">
         where userCode = (
           select delivCode
           from deliverymen
-          where delivCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
+          where delivCode = #{userInfo.userCode}
+            and delivEmail = #{userInfo.userEmail}
         )
-      </otherwise>
+      </when>
     </choose>
+  </select>
+
+  <select id="selectUserByIdAndEmail" resultType="com.ssg.meowcoffee.dto.FindIDResultDTO">
+    select userId, userRole
+    from users
+    where userId = #{userInfo.userId} and userEmail = #{userInfo.userEmail}
   </select>
 
   <insert id="insertUser" >
@@ -154,25 +172,35 @@
 
   <update id="updateUser">
     update users
-    set userPwd = #{userInfo.userPwd}
-    <if test="#{userInfo.userEmail} != null">
-      , userEmail = #{userInfo.userEmail}
-    </if>
-    <if test="#{userInfo.userPhone} != null">
-      , userPhone = #{userInfo.userPhone}
-    </if>
-    <if test="#{userInfo.userImgPath} != null">
-      , userImgPath = #{userInfo.userImgPath}
-    </if>
+    <set>
+      userPwd = #{userInfo.userPwd}
+      <if test="#{userInfo.userEmail} != null">
+        , userEmail = #{userInfo.userEmail}
+      </if>
+      <if test="#{userInfo.userPhone} != null">
+        , userPhone = #{userInfo.userPhone}
+      </if>
+      <if test="#{userInfo.userImgPath} != null">
+        , userImgPath = #{userInfo.userImgPath}
+      </if>
+    </set>
     where userId = #{userInfo.userId}
+  </update>
+
+  <update id="updateLoginTime">
+    update users
+    set userLastLoginTime = now()
+    where userId = #{userId} and userStatus = 'APPROVAL'
   </update>
 
   <update id="updateUserStatus">
     update users
-    set userStatus = #{userStat.userStatus}
-    <if test="#{userStat.userStatus == 'APPROVAL'}">
-      , userJoinDate = now()
-    </if>
+    <set>
+      userStatus = #{userStat.userStatus}
+      <if test="#{userStat.userStatus} == 'APPROVAL'">
+        , userJoinDate = now()
+      </if>
+    </set>
     where userId = #{userStat.userId}
   </update>
 
@@ -188,5 +216,9 @@
     update users
     set userStatus = 'DEACTIVATED'
     where userId = #{targetId} and userStatus in ('APPROVAL', 'WAITING_DEACTIVATE')
+  </update>
+
+  <update id="updatePwd">
+    update users set userPwd = #{resetPwd.newPwd} where userId = #{resetPwd.targetId}
   </update>
 </mapper>
