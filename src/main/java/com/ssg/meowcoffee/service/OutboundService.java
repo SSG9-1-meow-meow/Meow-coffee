@@ -31,4 +31,6 @@ public interface OutboundService {
     OutboundPageResponse<OutboundReqListDTO> getOutboundListPaged(
             String comName, String status, LocalDate from, LocalDate to,
             String sortCol, String sortDir, OutboundCriteria criteria);
+
+    List<OutboundItemDTO> getOutboundItems(Long outReqId);
 }

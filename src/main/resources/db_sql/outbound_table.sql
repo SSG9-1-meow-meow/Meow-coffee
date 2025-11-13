@@ -36,6 +36,15 @@ CREATE TABLE outboundItems (
     CONSTRAINT fk_outboundItems_outboundrequest FOREIGN KEY (outReqId) REFERENCES outboundrequest(outReqId)
 );
 
+-- 기존 데이터 정리
+UPDATE outboundrequest SET IsDelete = 0 WHERE IsDelete IS NULL;
+UPDATE outboundrequest SET IsTempo  = 0 WHERE IsTempo  IS NULL;
+
+-- 기본값/NOT NULL 설정
+ALTER TABLE outboundrequest
+    MODIFY IsDelete TINYINT NOT NULL DEFAULT 0,
+    MODIFY IsTempo  TINYINT NOT NULL DEFAULT 0;
+
 
 INSERT INTO outboundrequest (outReqId, comId, managerId, outDttmReq, outDateWish)
 VALUES

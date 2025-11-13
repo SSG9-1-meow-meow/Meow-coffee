@@ -16,27 +16,28 @@
             r.outDttmAppr   AS outDttmAppr,
             r.isTempo       AS isTempo,
             r.isDelete      AS isDelete,
-            /* 대표 상태: 코드와 한글값 모두 계산 */
+
+            /* 상태코드/라벨 (enum 또는 String과 일치) */
             CASE
                 WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN 'SHIPPED'
                 WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN 'APPROVED'
-                WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'CANCELLED'
-                WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN 'INSPECTING'
-                ELSE 'REQUESTED'
+                WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'REJECTED'
+                ELSE 'PENDING'
                 END AS status,
+
             CASE
                 WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN '출고완료'
                 WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN '승인완료'
                 WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN '반려'
-                WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN '검수중'
                 ELSE '승인대기'
                 END AS statusValue
+
         FROM outboundrequest r
                  LEFT JOIN companies     c ON c.comId    = r.comId
                  LEFT JOIN outbounditems i ON i.outReqId = r.outReqId
     </sql>
 
-    <!-- 단일 조회: OutboundReqItemDTO -->
+    <!-- 단건 조회 -->
     <select id="selectOutboundReqById"
             parameterType="long"
             resultType="com.ssg.meowcoffee.dto.OutboundReqItemDTO">
@@ -48,7 +49,7 @@
         r.isTempo, r.isDelete
     </select>
 
-    <!-- 목록 조회: OutboundReqListDTO -->
+    <!-- 목록 조회(필터, 비페이징) -->
     <select id="selectOutboundList"
             parameterType="map"
             resultType="com.ssg.meowcoffee.dto.OutboundReqListDTO">
@@ -58,41 +59,44 @@
         c.comName        AS comName,
         o.outDateWish    AS outDateWish,
         o.outDttmAppr    AS outDttmAppr,
-        /* 코드와 한글 상태 모두 반환 */
+
         CASE
         WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN 'SHIPPED'
         WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN 'APPROVED'
-        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'CANCELLED'
-        WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN 'INSPECTING'
-        ELSE 'REQUESTED'
+        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'REJECTED'
+        ELSE 'PENDING'
         END AS status,
+
         CASE
         WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN '출고완료'
         WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN '승인완료'
         WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN '반려'
-        WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN '검수중'
         ELSE '승인대기'
         END AS statusValue,
+
         o.IsTempo        AS isTempo,
         o.IsDelete       AS isDelete,
         o.outDttmReq     AS createdAt
+
         FROM outboundrequest o
         LEFT JOIN companies     c ON c.comId    = o.comId
         LEFT JOIN outbounditems i ON i.outReqId = o.outReqId
-        WHERE o.IsDelete = 0
+        WHERE COALESCE(o.IsDelete,0) = 0
 
         <if test="comName != null and comName != ''">
             AND c.comName LIKE CONCAT('%', #{comName}, '%')
         </if>
 
-        <!-- 상태코드 필터 -->
         <if test="status != null and status != ''">
             AND (
-            (#{status} = 'SHIPPED'    AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
-            (#{status} = 'APPROVED'   AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
-            (#{status} = 'CANCELLED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
-            (#{status} = 'INSPECTING' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='검수중')) OR
-            (#{status} = 'REQUESTED'  AND NOT EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status IN ('출고완료','승인완료','반려','검수중')))
+            (#{status} = 'SHIPPED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
+            (#{status} = 'APPROVED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
+            (#{status} = 'REJECTED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
+            (#{status} = 'PENDING'  AND NOT EXISTS (
+            SELECT 1 FROM outbounditems x
+            WHERE x.outReqId = o.outReqId
+            AND x.status IN ('출고완료','승인완료','반려')
+            ))
             )
         </if>
 
@@ -110,7 +114,139 @@
         ORDER BY o.outDttmReq DESC
     </select>
 
-    <!-- 프로시저/업데이트들 -->
+    <!-- 총 건수 -->
+    <select id="countOutboundList"
+            parameterType="map"
+            resultType="int">
+        SELECT COUNT(DISTINCT o.outReqId)
+        FROM outboundrequest o
+        LEFT JOIN companies c ON c.comId = o.comId
+        LEFT JOIN outbounditems i ON i.outReqId = o.outReqId
+        WHERE COALESCE(o.IsDelete,0) = 0
+
+        <if test="comName != null and comName != ''">
+            AND c.comName LIKE CONCAT('%', #{comName}, '%')
+        </if>
+
+        <if test="status != null and status != ''">
+            AND (
+            (#{status} = 'SHIPPED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
+            (#{status} = 'APPROVED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
+            (#{status} = 'REJECTED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
+            (#{status} = 'PENDING'  AND NOT EXISTS (
+            SELECT 1 FROM outbounditems x
+            WHERE x.outReqId = o.outReqId
+            AND x.status IN ('출고완료','승인완료','반려')
+            ))
+            )
+        </if>
+
+        <if test="startDate != null">
+            AND DATE(o.outDttmReq) &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(o.outDttmReq) &lt;= #{endDate}
+        </if>
+    </select>
+
+    <!-- 페이징 목록 -->
+    <select id="selectOutboundListPaged"
+            parameterType="map"
+            resultType="com.ssg.meowcoffee.dto.OutboundReqListDTO">
+        SELECT
+        o.outReqId       AS outReqId,
+        o.comId          AS comId,
+        c.comName        AS comName,
+        o.outDateWish    AS outDateWish,
+        o.outDttmAppr    AS outDttmAppr,
+
+        CASE
+        WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN 'SHIPPED'
+        WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN 'APPROVED'
+        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'REJECTED'
+        ELSE 'PENDING'
+        END AS status,
+
+        CASE
+        WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN '출고완료'
+        WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN '승인완료'
+        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN '반려'
+        ELSE '승인대기'
+        END AS statusValue,
+
+        o.IsTempo        AS isTempo,
+        o.IsDelete       AS isDelete,
+        o.outDttmReq     AS createdAt
+
+        FROM outboundrequest o
+        LEFT JOIN companies     c ON c.comId    = o.comId
+        LEFT JOIN outbounditems i ON i.outReqId = o.outReqId
+        WHERE COALESCE(o.IsDelete,0) = 0
+
+        <if test="comName != null and comName != ''">
+            AND c.comName LIKE CONCAT('%', #{comName}, '%')
+        </if>
+
+        <if test="status != null and status != ''">
+            AND (
+            (#{status} = 'SHIPPED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
+            (#{status} = 'APPROVED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
+            (#{status} = 'REJECTED' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
+            (#{status} = 'PENDING'  AND NOT EXISTS (
+            SELECT 1 FROM outbounditems x
+            WHERE x.outReqId = o.outReqId
+            AND x.status IN ('출고완료','승인완료','반려')
+            ))
+            )
+        </if>
+
+        <if test="startDate != null">
+            AND DATE(o.outDttmReq) &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(o.outDttmReq) &lt;= #{endDate}
+        </if>
+
+        GROUP BY
+        o.outReqId, o.comId, c.comName,
+        o.outDateWish, o.outDttmReq, o.outDttmAppr,
+        o.IsTempo, o.IsDelete
+
+        ORDER BY
+        <choose>
+            <when test="sortCol == 'comName'"> c.comName </when>
+            <when test="sortCol == 'outDateWish'"> o.outDateWish </when>
+            <otherwise> o.outDttmReq </otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'ASC'"> ASC </when>
+            <otherwise> DESC </otherwise>
+        </choose>
+
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 상세 아이템 -->
+    <select id="selectOutboundItemsByReqId"
+            parameterType="long"
+            resultType="com.ssg.meowcoffee.dto.OutboundItemDTO">
+        SELECT
+            oi.outReqItemsId AS outReqItemsId,
+            oi.outReqId      AS outReqId,
+            oi.stkId         AS stkId,
+            oi.outQtyReq     AS outQtyReq,
+            oi.vehicleId     AS vehicleId,
+            oi.status        AS status,
+            oi.outOrderAddr  AS outOrderAddr,
+            oi.outDttmSchd   AS outDttmSchd,
+            oi.outDttmInsp   AS outDttmInsp,
+            oi.outDttmShip   AS outDttmShip
+        FROM outbounditems oi
+        WHERE oi.outReqId = #{outReqId}
+        ORDER BY oi.outReqItemsId ASC
+    </select>
+
+    <!-- 프로시저/업데이트 -->
     <select id="callCreateOutReq" statementType="CALLABLE"
             parameterType="com.ssg.meowcoffee.dto.OutboundReqInputDTO">
         { CALL CreateOutReq(
@@ -158,7 +294,7 @@
         { CALL MarkReceived(#{outReqId, jdbcType=BIGINT}) }
     </update>
 
-    <!-- 재고 조회: 폼 참고용 -->
+    <!-- 참고(폼) -->
     <select id="selectAvailableStocksForUser"
             parameterType="map"
             resultType="com.ssg.meowcoffee.dto.StockReadDTO">
@@ -175,20 +311,16 @@
         JOIN locations loc      ON loc.lpId = lp.lpId
         JOIN warehouse w        ON w.whId = loc.whId
         <where>
-            <!-- 창고관리자면 본인에게 매핑된 창고만 -->
             <if test="role != null and role == 'MANAGER'">
                 AND w.whId IN (
-                SELECT wm.whId
-                FROM warehouse_management wm
+                SELECT wm.whId FROM warehouse_management wm
                 WHERE wm.userId = #{userId}
                 )
             </if>
-            <!-- COMPANY/ADMIN 등은 필터 없음 (필요시 조건 추가) -->
         </where>
         ORDER BY c.cfName ASC, s.stkId ASC
     </select>
 
-    <!-- 차량 조회: 폼 참고용 -->
     <select id="selectVehiclesForUser"
             parameterType="map"
             resultType="com.ssg.meowcoffee.dto.VehicleDTO">
@@ -198,7 +330,6 @@
         v.vehicleDesc   AS vehicleDesc
         FROM vehicles v
         <where>
-            <!-- 배송기사면 본인 배정 차량만 (필요 없으면 제거) -->
             <if test="role != null and role == 'DELIVERYMAN' and userId != null and userId != ''">
                 AND v.vehicleId = (SELECT u.vehicleId FROM users u WHERE u.userId = #{userId})
             </if>
@@ -206,7 +337,6 @@
         ORDER BY v.vehicleId
     </select>
 
-    <!-- 관리자 목록: 폼 참고용 -->
     <select id="selectManagers"
             resultType="com.ssg.meowcoffee.dto.ManagerDetailDTO">
         SELECT
@@ -216,109 +346,4 @@
         ORDER BY m.managerName
     </select>
 
-    <!-- 총 건수 -->
-    <select id="countOutboundList"
-            parameterType="map"
-            resultType="int">
-        SELECT COUNT(DISTINCT o.outReqId)
-        FROM outboundrequest o
-        LEFT JOIN companies c ON c.comId = o.comId
-        LEFT JOIN outbounditems i ON i.outReqId = o.outReqId
-        WHERE o.IsDelete = 0
-        <if test="comName != null and comName != ''">
-            AND c.comName LIKE CONCAT('%', #{comName}, '%')
-        </if>
-        <if test="status != null and status != ''">
-            AND (
-            (#{status} = 'SHIPPED'    AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
-            (#{status} = 'APPROVED'   AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
-            (#{status} = 'CANCELLED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
-            (#{status} = 'INSPECTING' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='검수중')) OR
-            (#{status} = 'REQUESTED'  AND NOT EXISTS (
-            SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status IN ('출고완료','승인완료','반려','검수중')
-            ))
-            )
-        </if>
-        <if test="startDate != null">
-            AND DATE(o.outDttmReq) &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-            AND DATE(o.outDttmReq) &lt;= #{endDate}
-        </if>
-    </select>
-
-    <!-- 페이징 목록 -->
-    <select id="selectOutboundListPaged"
-            parameterType="map"
-            resultType="com.ssg.meowcoffee.dto.OutboundReqListDTO">
-        SELECT
-        o.outReqId       AS outReqId,
-        o.comId          AS comId,
-        c.comName        AS comName,
-        o.outDateWish    AS outDateWish,
-        o.outDttmAppr    AS outDttmAppr,
-        CASE
-        WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN 'SHIPPED'
-        WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN 'APPROVED'
-        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN 'CANCELLED'
-        WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN 'INSPECTING'
-        ELSE 'REQUESTED'
-        END AS status,
-        CASE
-        WHEN SUM(CASE WHEN i.status = '출고완료' THEN 1 ELSE 0 END) > 0 THEN '출고완료'
-        WHEN SUM(CASE WHEN i.status = '승인완료' THEN 1 ELSE 0 END) > 0 THEN '승인완료'
-        WHEN SUM(CASE WHEN i.status = '반려'     THEN 1 ELSE 0 END) > 0 THEN '반려'
-        WHEN SUM(CASE WHEN i.status = '검수중'   THEN 1 ELSE 0 END) > 0 THEN '검수중'
-        ELSE '승인대기'
-        END AS statusValue,
-        o.IsTempo        AS isTempo,
-        o.IsDelete       AS isDelete,
-        o.outDttmReq     AS createdAt
-        FROM outboundrequest o
-        LEFT JOIN companies     c ON c.comId    = o.comId
-        LEFT JOIN outbounditems i ON i.outReqId = o.outReqId
-        WHERE o.IsDelete = 0
-
-        <if test="comName != null and comName != ''">
-            AND c.comName LIKE CONCAT('%', #{comName}, '%')
-        </if>
-
-        <if test="status != null and status != ''">
-            AND (
-            (#{status} = 'SHIPPED'    AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='출고완료')) OR
-            (#{status} = 'APPROVED'   AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='승인완료')) OR
-            (#{status} = 'CANCELLED'  AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='반려')) OR
-            (#{status} = 'INSPECTING' AND EXISTS (SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status='검수중')) OR
-            (#{status} = 'REQUESTED'  AND NOT EXISTS (
-            SELECT 1 FROM outbounditems x WHERE x.outReqId=o.outReqId AND x.status IN ('출고완료','승인완료','반려','검수중')
-            ))
-            )
-        </if>
-
-        <if test="startDate != null">
-            AND DATE(o.outDttmReq) &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-            AND DATE(o.outDttmReq) &lt;= #{endDate}
-        </if>
-
-        GROUP BY
-        o.outReqId, o.comId, c.comName,
-        o.outDateWish, o.outDttmReq, o.outDttmAppr,
-        o.IsTempo, o.IsDelete
-
-        <!-- 안전한 정렬 화이트리스트 -->
-        ORDER BY
-        <choose>
-            <when test="sortCol == 'comName'"> c.comName </when>
-            <when test="sortCol == 'outDateWish'"> o.outDateWish </when>
-            <otherwise> o.outDttmReq </otherwise> <!-- createdAt -->
-        </choose>
-        <choose>
-            <when test="sortDir == 'ASC'"> ASC </when>
-            <otherwise> DESC </otherwise>
-        </choose>
-
-        LIMIT #{size} OFFSET #{offset}
-    </select>
 </mapper>

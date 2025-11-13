@@ -11,6 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/outbounds")
@@ -49,10 +52,15 @@ public class OutboundController {
 
     /** 상세 페이지(숫자 id만 허용) */
     @GetMapping("/{outReqId:\\d+}")
-    public String detailPage(@PathVariable Long outReqId, Model model) {
+    public String detailPage(@PathVariable Long outReqId, Model model,
+                             @SessionAttribute(value="userId", required=false) String userId,
+                             @SessionAttribute(value="role",   required=false) String role) {
         model.addAttribute("outReqId", outReqId);
-        return "outbounds/detail";
+        model.addAttribute("sessionUserId", userId);
+        model.addAttribute("sessionRole", role);
+        return "outbounds/out_request-detail"; // ← 파일명과 동일
     }
+
 
     /** 빈 문자열/NULL 안전 파서 */
     private LocalDate toDate(String s) {
@@ -71,6 +79,8 @@ public class OutboundController {
     @PostMapping("/api/req")
     @ResponseBody
     public ResponseEntity<String> createOutboundRequest(@RequestBody OutboundReqInputDTO dto) {
+        // 서버 기준 생성 시각 강제 세팅
+        dto.setOutDttmReq(java.time.LocalDateTime.now());
         outboundService.createOutReq(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("출고 요청 생성 완료, ID=" + dto.getGeneratedOutReqId());
@@ -198,5 +208,11 @@ public class OutboundController {
                 outboundService.getOutboundListPaged(comName, status, from, to, sortCol, sortDir, criteria);
 
         return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/api/{outReqId:\\d+}/items")
+    @ResponseBody
+    public ResponseEntity<List<OutboundItemDTO>> getOutboundItems(@PathVariable Long outReqId) {
+        return ResponseEntity.ok(outboundService.getOutboundItems(outReqId));
     }
 }
