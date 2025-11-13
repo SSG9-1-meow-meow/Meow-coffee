@@ -4,7 +4,9 @@ import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.Map;
 @Log4j2
 public class StockController {
     private final StockService stockService;
+    //로그인한 객체 꽂기
 
     @GetMapping("/stocks")
     public String stockListPage(){
@@ -120,6 +123,9 @@ public class StockController {
     //유효성 검사 필수 (총관리자 + 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/api/stocks/warehouse")
     public ResponseEntity<Map<String, Object>> readStocksByWarehouse(@ModelAttribute Criteria criteria) {
+        //권한 확인
+//        if() return ResponseEntity.ok(Map.of("authorized", false));
+
         List<StockReadDTO> list = stockService.getWarehouses(criteria);
 
         Integer total = stockService.getListCount(null, "warehouse");
@@ -139,6 +145,10 @@ public class StockController {
     //유효성 검사 필수 (총관리자+ 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/api/stocks/company")
     public ResponseEntity<Map<String, Object>> readCompanyList(@ModelAttribute Criteria criteria) {
+        //권한 확인
+//        if() return ResponseEntity.ok(Map.of("authorized", false));
+
+
         List<CompanyReadDTO> list = stockService.getCompanyList(criteria);
 
         Integer total = stockService.getListCount(null, "company");
@@ -156,8 +166,11 @@ public class StockController {
     }
 
     //재고 실사 controller -> 기본 페이지에서만 유효성 검사해도 됨
+    //총관리자+창고관리자 권한 확인 필수
     @GetMapping("/api/dueDiligences")
     public ResponseEntity<Map<String, Object>> readDueDiligenceList(@ModelAttribute Criteria criteria) {
+//        if() return ResponseEntity.ok(Map.of("authorized", false));
+
         List<DueDiligenceReadDTO> list = stockService.getDueDiligenceList(criteria);
 
         Integer total = stockService.getListCount(null, "dueDiligence");
@@ -173,6 +186,8 @@ public class StockController {
     @GetMapping("/dueDiligences/{ddId}")
     public String dueDiligencePage(@PathVariable("ddId") Long ddId) {
         //권한 확인 필요 (총관리자 , 일반관리자)
+
+
         //일반관리자
         return "/stock/dueDiligenceWh";
         //총관리자
@@ -186,8 +201,11 @@ public class StockController {
         return ResponseEntity.ok(readDTO);
     }
 
-    @GetMapping("/api/dueDiligence") //재고 실사 등록 페이지
+    @GetMapping("/api/dueDiligence") //재고 실사 등록
     public ResponseEntity<List<String>> createDueDiligenceForm(){
+        //총관리자인 경우 권한없음 띄우기
+//        return ResponseEntity.ok(null);
+
         List<String> codeList = stockService.getWarehouseCodeList();
 
         return ResponseEntity.ok(codeList);
@@ -204,6 +222,8 @@ public class StockController {
 
     @PostMapping("/api/dueDiligence") //프론트에서 Result 받아서 -1이면 권한 없음 띄우기
     public ResponseEntity<Integer> createDueDiligence(@Valid @RequestBody DueDiligenceDTO dto) {
+        //dto에 maId 추가해야함!!!
+
         Integer result = stockService.registerDueDiligence(dto);
 
         return ResponseEntity.ok(result);
@@ -216,22 +236,26 @@ public class StockController {
         return ResponseEntity.ok(readDTO);
     }
 
-    @PutMapping("/api/dueDiligences/{ddId}/update") //받은 객체가 null인 경우 권한 없음 띄우기
+    @PutMapping("/api/dueDiligences/{ddId}/update") //받은 객체가 -1인 경우 권한 없음 띄우기
     public ResponseEntity<Integer> updateDueDiligence(@PathVariable("ddId") Long ddId,
                                                                   @Valid @RequestBody DueDiligenceDTO dto) {
         dto.setDdId(ddId);
+
+        //dto에 maId 추가해야함!!
 
         Integer result = stockService.modifyDueDiligence(dto);
 
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/api/dueDiligences/{ddId}") //String id는 현재 로그인한 id를 말함
+    @PutMapping("/api/dueDiligences/{ddId}")
     public ResponseEntity<Integer> deleteDueDiligence(@PathVariable("ddId") Long ddId,
                                                       @RequestBody DueDiligenceDTO dueDiligenceDTO) {
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //현재 정보를 불러와야 권한 확인 가능
         dueDiligenceDTO.setDdId(ddId);
         dueDiligenceDTO.setWhCode(readDTO.getWhCode());
+
+        //dto에 maId 추가해야함!!
 
         Integer result = stockService.removeDueDiligence(dueDiligenceDTO);
         return ResponseEntity.ok(result);

@@ -219,6 +219,13 @@ background-color: #000;
         type: "GET",
         dataType: "json",
         success: function(response) {
+
+        if(response.authorized === false) {
+        alert("관리자만 접근 가능한 페이지입니다.");
+        window.location.href="/stocks";
+        return;
+        }
+
         table.clear();
 
         table.rows.add(response.list);
@@ -278,6 +285,11 @@ background-color: #000;
         window.addDueDiligence = function() {
         axios.get("/api/dueDiligence").then(
         response => {
+        if(response.data === null) {
+            alert("재고 실사 등록은 일반관리자만 가능합니다.");
+            return;
+        }
+
         console.log(response.data);
         const whCodeList = response.data;
 
