@@ -234,7 +234,7 @@ stkQuantity: document.getElementById("stkQuantity").value,
 realStkQuantity: document.getElementById("realStkQuantity").value,
 ddLog: document.getElementById("ddLog").value,
 whCode: document.getElementById("whCode").value,
-maId : "manager_kim"
+maId : "manager_lee"
 //로그인한 아이디 바꿔주면서 test
 };
 
@@ -256,7 +256,7 @@ const resp = await axios.put("/api/dueDiligences/"+ddId+"/update", updatedData);
 btnDelete.addEventListener("click", async () => {
 if (confirm("정말 삭제하시겠습니까?")) {
 const deleteData = {
-maId : "manager_kim"
+maId : "manager_lee"
 // maId : (현재 로그인한 아이디처리)
 };
 
@@ -272,7 +272,7 @@ alert("삭제 중 오류가 발생했습니다.");
 }
 });
 
-// ⚫ 리스트로 버튼
+//  리스트로 버튼
 btnList.addEventListener("click", () => {
 window.location.href = "/dueDiligences";
 });
