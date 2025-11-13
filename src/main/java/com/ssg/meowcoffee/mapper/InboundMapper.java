@@ -103,11 +103,13 @@ public interface InboundMapper {
           @Param("requiredCapa") int requiredCapa
   );
 
-  /**
-   * [관리자] 개별 입고 상세 항목을 승인/반려/임시저장 처리하는 프로시저를 호출합니다.
-   * @param approvalDTO 처리 정보를 담은 DTO
-   */
-  void processInboundItem(InboundApprovalDTO approvalDTO);
+
+  // [관리자] 입고 상세 항목 처리 프로시저 콜 
+  void finalizeInboundItem(InboundProcessDTO processDTO);
+
+  int updateInspectionTime(Long inReqItemsId);
+  int completePhysicalInbound(Long inReqItemsId);
+
 
   // [관리자] 특정 입고 상세 항목의 요청 수량과 실제 수량 조회
   InboundQtyDTO selectInboundQtyById(@Param("inReqItemsId") long inReqItemsId);

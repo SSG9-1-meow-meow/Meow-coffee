@@ -343,7 +343,7 @@
   <select id="selectTopCoffeeByShippedOutboundForLastMonth" resultMap="topInOutCoffeeMap">
     SELECT C.cfName,
     SUM(OI.outQtyReq) AS total_quantity
-    FROM outboundItems II
+    FROM outboundItems OI
     INNER JOIN outboundRequest OBR ON OI.outReqId = OBR.outReqId
     INNER JOIN stock S ON OI.stkId = S.stkId
     INNER JOIN coffee C ON S.cfId = C.cfId
@@ -463,15 +463,15 @@
   </select>
 
   <!-- [관리자] 개별 입고 항목 처리 프로시저 호출 -->
-  <update id="processInboundItem" statementType="CALLABLE"
-          parameterType="com.ssg.meowcoffee.dto.InboundApprovalDTO">
-    CALL ProcessInboundItem(
-    #{inReqItemsId, mode=IN, jdbcType=BIGINT},
-    #{managerId, mode=IN, jdbcType=VARCHAR},
-    #{newStatus, mode=IN, jdbcType=VARCHAR},
-    #{locationId, mode=IN, jdbcType=CHAR},
-    #{inDttmSchd, mode=IN, jdbcType=TIMESTAMP},
-    #{isTempo, mode=IN, jdbcType=TINYINT}
+  <update id="finalizeInboundItem" statementType="CALLABLE" parameterType="com.ssg.meowcoffee.dto.InboundProcessDTO">
+    CALL FinalizeInboundItem(
+    #{inReqItemsId},
+    #{managerId},
+    #{newStatus},
+    #{confirmedDate},
+    #{lpId},
+    #{isTempo},
+    #{adminMemo}  <!-- ★ 이 파라미터 추가 -->
     )
   </update>
 
@@ -665,6 +665,12 @@
     <!-- UsersVO 추가 필드   -->
     <result property="companyName" column="userCompanyName"/>
 
+    <!-- ★★★ [추가] 아래 4개 매핑을 추가합니다 ★★★ -->
+    <result property="lpId" column="lpId"/>
+    <result property="warehouseName" column="warehouseName"/>
+    <result property="zoneName" column="zoneName"/>
+    <result property="adminMemo" column="adminMemo"/>
+
   </resultMap>
 
   <!-- inReqId로 모든 상세 정보를 조인하여 조회 -->
@@ -674,7 +680,10 @@
     II.*,
     IR.comId, IR.managerId, IR.inDttmReq, IR.inDateWish, IR.inDttmAppr, IR.IsDelete, IR.IsTempo,
     C.cfName, C.cfCategory, C.cfGrade,
-    U.userCompanyName
+    U.userCompanyName,
+    L.lpId,
+    W.whName AS warehouseName,
+    LP.zoneName
     FROM
     inboundItems II
     INNER JOIN
@@ -683,6 +692,9 @@
     coffee C ON II.cfId = C.cfId
     INNER JOIN
     users U ON IR.comId = U.userId
+    LEFT JOIN locations L ON II.locationId = L.locationId
+    LEFT JOIN warehouse W ON L.whId = W.whId
+    LEFT JOIN location_places LP ON L.lpId = LP.lpId
     WHERE
     II.inReqId = #{inReqId}
   </select>
@@ -692,7 +704,10 @@
     II.*,
     IR.comId, IR.managerId, IR.inDttmReq, IR.inDateWish, IR.inDttmAppr, IR.IsDelete, IR.IsTempo,
     C.cfName, C.cfCategory, C.cfGrade,
-    U.userCompanyName
+    U.userCompanyName,
+    L.lpId,
+    W.whName AS warehouseName,
+    LP.zoneName
     FROM
     inboundItems II
     INNER JOIN
@@ -701,6 +716,9 @@
     coffee C ON II.cfId = C.cfId
     INNER JOIN
     users U ON IR.comId = U.userId
+    LEFT JOIN locations L ON II.locationId = L.locationId
+    LEFT JOIN warehouse W ON L.whId = W.whId
+    LEFT JOIN location_places LP ON L.lpId = LP.lpId
     WHERE
     II.inReqItemsId = #{inReqItemsId}
   </select>
@@ -818,6 +836,28 @@
     W.whName, LP.zoneName, LP.lpId;
     ]]>
   </select>
+
+  <!-- [관리자] 입고 항목 검수 시작 시간 업데이트 -->
+  <update id="updateInspectionTime">
+    UPDATE inboundItems
+    SET inDttmInsp = NOW()
+    WHERE inReqItemsId = #{inReqItemsId}
+    AND inDttmInsp IS NULL -- 이미 검수 시간이 찍힌 경우 중복 업데이트 방지
+  </update>
+
+  <!-- [관리자] 실물 입고 완료 처리 -->
+  <update id="completePhysicalInbound">
+    UPDATE inboundItems
+    SET
+    status = '입고완료',         -- 상태를 '입고완료'로 변경
+    inQty = inQtyReq,            -- 실제 입고량을 요청량으로 업데이트
+    inDttmRecv = NOW()           -- 실제 입고 시각 기록
+    WHERE
+    inReqItemsId = #{inReqItemsId}
+    AND status = '승인완료'          -- '승인완료' 상태일 때만 실행 (안전장치)
+    AND inDttmInsp IS NOT NULL       -- 검수가 완료되었을 때만 실행 (안전장치)
+    AND inDttmRecv IS NULL           -- 아직 입고되지 않았을 때만 실행 (중복 방지)
+  </update>
 
 
 </mapper>

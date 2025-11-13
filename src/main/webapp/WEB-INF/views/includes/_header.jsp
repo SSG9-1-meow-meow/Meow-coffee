@@ -17,6 +17,13 @@
 
   <!-- FullCalendar CSS & JS : 관리자 입고관리를 위해 추가 (박기웅) -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+  <!-- flatpickr CSS : 관리자 입고관리를 위해 추가 (박기웅) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- (선택) flatpickr 한글 언어팩 -->
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/ko.js"></script>
+
 
   <!-- Fonts and icons -->
   <script src="/resources/assets/js/plugin/webfont/webfont.min.js"></script>
@@ -56,7 +63,32 @@
       .wrapper {
           padding-left: 0 !important;
       }
+
+      /* ★★★ [추가] FullCalendar 헤더 버튼 스타일 개선 (박기웅) ★★★ */
+      .fc .fc-button {
+          background-color: #1a2035; /* Kaiadmin 기본 버튼 배경색 */
+          color: #ffffff;            /* 흰색 글자 */
+          border: 1px solid #1a2035;
+          border-radius: 50px;       /* 둥근 버튼 */
+          padding: 0.4rem 0.8rem;
+          font-size: 1rem;
+          text-transform: none;      /* 대문자 변환 해제 */
+          box-shadow: none !important; /* 그림자 제거 */
+      }
+
+      .fc .fc-button:hover {
+          background-color: #28304e; /* 마우스 오버 시 약간 밝게 */
+          border-color: #28304e;
+      }
+
+      .fc .fc-button:active, .fc .fc-button:focus {
+          background-color: #28304e;
+          border-color: #28304e;
+          box-shadow: none !important;
+      }
   </style>
+
+
 </head>
 <body>
 <!-- Offcanvas Sidebar (toggle로 확장 표시) -->
@@ -98,7 +130,7 @@
               <a class="nav-link" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a>
+              <a class="nav-link" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1">1</span></a>
             </li>
           </ul>
         </div>
@@ -167,7 +199,7 @@
               <a class="nav-link" href="/inbounds/req">회원 입고 요청</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">출고 입고 요청</a>
+              <a class="nav-link" href="/outbounds/req">출고 입고 요청</a>
             </li>
           </ul>
         </div>
@@ -586,7 +618,7 @@
                 <ul class="dropdown-menu" aria-labelledby="navDashboard" style="left: 0;">
                   <li><a class="dropdown-item" href="#">입/출고 현황</a></li>
                   <li><a class="dropdown-item" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a></li>
-                  <li><a class="dropdown-item" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a></li>
+                  <li><a class="dropdown-item" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1">1</span></a></li>
                 </ul>
               </li>
 
@@ -621,8 +653,9 @@
                 <ul
                     class="dropdown-menu"
                     aria-labelledby="navSidebarLayouts">
-                  <li><a class="dropdown-item" href="#">매출 현황</a></li>
-                  <li><a class="dropdown-item" href="#">지출 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/expense">지출 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/invoice">청구 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/revenue">매출 현황</a></li>
                 </ul>
               </li>
             </ul>
@@ -688,7 +721,7 @@
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
-                  <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                  <li><a class="dropdown-item" href="/auth/logout">로그아웃</a></li>
                 </ul>
               </li>
 

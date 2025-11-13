@@ -12,24 +12,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class FinanceController {
 
     // ───── Expense 화면 ─────
-    // 목록 페이지: /finance/expense?whId=1
     @GetMapping("/expense")
     public String expenseList() {
-        // 창고 ID 를 받아온다는 가정하에 시작. 만약 유저 아이디를 받아온다면 아이디를 통해 해당관리자의 담당 창고 ID 를 가져와 사용
-//        @RequestParam("whId") Long whId, Model model
-//        model.addAttribute("whId", whId);
         return "finance/expense/list";
     }
 
     // ───── Invoice 화면 ─────
-    // 목록 페이지: /finance/invoice
     @GetMapping("/invoice")
     public String invoiceList() {
         return "finance/invoice/list";
     }
 
     // ───── Revenue 화면 ─────
-    // 목록 페이지: /finance/revenue?fromDt=YYYY-MM-DD&toDt=YYYY-MM-DD
     @GetMapping("/revenue")
     public String revenueList() {
         return "finance/revenue/list";

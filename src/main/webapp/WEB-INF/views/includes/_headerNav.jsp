@@ -42,7 +42,7 @@
               <a class="nav-link" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a>
+              <a class="nav-link" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1"></span></a>
             </li>
           </ul>
         </div>
@@ -83,10 +83,13 @@
         <div class="collapse" id="oc-sidebarLayouts">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a class="nav-link" href="#">매출 현황</a>
+              <a class="nav-link" href="/finance/expense">지출 현황</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">지출 현황</a>
+              <a class="nav-link" href="/finance/invoice">청구 현황</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/finance/revenue">매출 현황</a>
             </li>
           </ul>
         </div>
@@ -527,7 +530,7 @@
                 <ul class="dropdown-menu" aria-labelledby="navDashboard" style="left: 0;">
                   <li><a class="dropdown-item" href="#">입/출고 현황</a></li>
                   <li><a class="dropdown-item" href="/inbounds">입고 관리<span class="badge bg-success ms-1">4</span></a></li>
-                  <li><a class="dropdown-item" href="#">출고 관리<span class="badge bg-secondary ms-1">1</span></a></li>
+                  <li><a class="dropdown-item" href="/outbounds">출고 관리<span class="badge bg-secondary ms-1"></span></a></li>
                 </ul>
               </li>
 
@@ -599,7 +602,7 @@
                     aria-labelledby="navQuick"
                 >
                   <li><a class="dropdown-item" href="/inbounds/req">입고 요청</a></li>
-                  <li><a class="dropdown-item" href="#">출고 요청</a></li>
+                  <li><a class="dropdown-item" href="/outbounds/req">출고 요청</a></li>
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
@@ -629,7 +632,7 @@
                   <li>
                     <hr class="dropdown-divider"/>
                   </li>
-                  <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                  <li><a class="dropdown-item" href="/auth/logout">로그아웃</a></li>
                 </ul>
               </li>
 
@@ -642,4 +645,4 @@
     <!-- 여기부터 각 JSP 파일의 메인 컨텐츠가 시작됩니다. -->
     <div class="container">
       <div class="page-inner">
-        <!-- _header.jsp 종료 -->
+<%--        <!-- _header.jsp 종료 -->--%>

@@ -1,4 +1,5 @@
 package com.ssg.meowcoffee.mapper;
+
 import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
@@ -8,7 +9,10 @@ import com.ssg.meowcoffee.dto.InvoiceUpdateDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+
 @Mapper
 public interface FinanceMapper {
 
@@ -42,4 +46,6 @@ public interface FinanceMapper {
 
     // ===== Revenue 조회 =====
     List<RevenueVO> selectRevenues(); // 전체
+
+    List<Map<String, Object>> selectWarehouses();
 }

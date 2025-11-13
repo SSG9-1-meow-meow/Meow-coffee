@@ -11,6 +11,4 @@ public class RevenueVO {
     private Long revenueId;
     private BigDecimal totalAmt;
     private LocalDate revenueDt;
-    private Long whId;
-    private String userId;
 }

@@ -69,17 +69,3 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-
--- 가정1. 입고가 완료됐을때
-SELECT * FROM inboundItems;
-SELECT * FROM inboundCost;
-
-UPDATE inboundItems
-SET status     = '승인완료',
-    inQty      = 100,
-    inDttmInsp = '2025-10-05 15:00:00',
-    inDttmRecv = '2025-10-07 11:00:00'
-WHERE inreqId = 2;
-
-SELECT * FROM inboundCost;
-SELECT * FROM expense;

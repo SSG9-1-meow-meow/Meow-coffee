@@ -4,10 +4,6 @@ use meowcoffeedb;
 
 -- 출고요청 테이블
 DROP TABLE IF EXISTS outboundrequest;
-
-
-
-
 CREATE TABLE outboundrequest (
     outReqId      BIGINT       PRIMARY KEY auto_increment,
     comId         VARCHAR(30)  NOT NULL,   -- companies 뷰 참조
@@ -35,6 +31,23 @@ CREATE TABLE outboundItems (
     outDttmShip   DATETIME     NULL,
     CONSTRAINT fk_outboundItems_outboundrequest FOREIGN KEY (outReqId) REFERENCES outboundrequest(outReqId)
 );
+
+-- 기본값/NOT NULL 설정
+ALTER TABLE outboundrequest
+    MODIFY IsDelete TINYINT NOT NULL DEFAULT 0,
+    MODIFY IsTempo  TINYINT NOT NULL DEFAULT 0;
+
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE outboundItems;
+TRUNCATE TABLE outboundrequest;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 여기까지 넣어주세요
+------------------------------------------------------------
+
+-- 기존 데이터 정리
+UPDATE outboundrequest SET IsDelete = 0 WHERE IsDelete IS NULL;
+UPDATE outboundrequest SET IsTempo  = 0 WHERE IsTempo  IS NULL;
 
 
 INSERT INTO outboundrequest (outReqId, comId, managerId, outDttmReq, outDateWish)

@@ -1,9 +1,10 @@
 package com.ssg.meowcoffee.dto;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.List;
 
 // 회원관리 기능용 페이지 DTO입니다.
 @Getter

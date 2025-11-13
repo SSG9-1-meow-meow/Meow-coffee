@@ -1,42 +1,36 @@
 package com.ssg.meowcoffee.service;
 
-import com.ssg.meowcoffee.dto.OutboundReqInputDTO;
-import com.ssg.meowcoffee.dto.OutboundReqItemDTO;
-
+import com.ssg.meowcoffee.dto.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OutboundService {
 
-    // 회원 출고 요청 생성
+    // ===== 생성/변경/처리 =====
     void createOutReq(OutboundReqInputDTO dto);
-
-    // 회원 출고 요청 수정
     void modifyOutReq(OutboundReqInputDTO dto);
-
-    // 회원 출고 요청 soft delete
     void softDeleteOutReq(Long outReqId, String comId);
-
-    // 관리자 출고 승인
     void approveOutReq(Long outReqId, String managerId);
-
-    // 관리자 배차 등록/수정
     void registerDispatch(Long outReqId, String vehicleId);
-
-    // 관리자 배차 취소
     void cancelDispatch(Long outReqId);
-
-    // 관리자 출고지시서 생성
     void createOrder(Long outReqId);
-
-    // 관리자 운송장 생성
     void createWaybill(Long outReqId);
-
-    // 관리자 실물 출고완료 처리
     void markReceived(Long outReqId);
 
-    // 단일 출고 조회
+    // ===== 조회 =====
     OutboundReqItemDTO getOutboundReqById(Long outReqId);
 
-    // 출고 목록 조회
-    List<OutboundReqItemDTO> getOutboundList(String status);
+    /** 목록 조회 (거래처명/상태/기간 필터) */
+    List<OutboundReqListDTO> getOutboundList(String comName, String status, LocalDate startDate, LocalDate endDate);
+
+    // ===== 참고(폼) =====
+    List<StockReadDTO> getAvailableStocksForUser(String role, String userId);
+    List<VehicleDTO> getVehiclesForUser(String role, String userId);
+    List<ManagerDetailDTO> getManagers();
+
+    OutboundPageResponse<OutboundReqListDTO> getOutboundListPaged(
+            String comName, String status, LocalDate from, LocalDate to,
+            String sortCol, String sortDir, OutboundCriteria criteria);
+
+    List<OutboundItemDTO> getOutboundItems(Long outReqId);
 }

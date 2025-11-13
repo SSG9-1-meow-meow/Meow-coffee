@@ -5,32 +5,32 @@
 <mapper namespace="com.ssg.meowcoffee.mapper.FinanceMapper">
 
     <resultMap id="ExpenseMap" type="com.ssg.meowcoffee.domain.ExpenseVO">
-        <id     property="expenseId"       column="expenseId"/>
-        <result property="expenseDt"       column="expenseDt"/>
+        <id property="expenseId" column="expenseId"/>
+        <result property="expenseDt" column="expenseDt"/>
         <result property="expenseCategory" column="expenseCategory"/>
-        <result property="totalAmt"        column="totalAmt"/>
-        <result property="expenseStatus"   column="expenseStatus"/>
-        <result property="confirmDt"       column="confirmDt"/>
-        <result property="isDelete"        column="isDelete"/>
-        <result property="whId"            column="whId"/>
-        <result property="userId"          column="userId"/>
+        <result property="totalAmt" column="totalAmt"/>
+        <result property="expenseStatus" column="expenseStatus"/>
+        <result property="confirmDt" column="confirmDt"/>
+        <result property="isDelete" column="isDelete"/>
+        <result property="whId" column="whId"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <resultMap id="InvoiceMap" type="com.ssg.meowcoffee.domain.InvoiceVO">
-        <id     property="invoiceId"     column="invoiceId"/>
-        <result property="invoiceDt"     column="invoiceDt"/>
-        <result property="totalAmt"      column="totalAmt"/>
+        <id property="invoiceId" column="invoiceId"/>
+        <result property="invoiceDt" column="invoiceDt"/>
+        <result property="totalAmt" column="totalAmt"/>
         <result property="invoiceStatus" column="invoiceStatus"/>
-        <result property="depositDt"     column="depositDt"/>
-        <result property="userId"        column="userId"/>
+        <result property="depositDt" column="depositDt"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <resultMap id="RevenueMap" type="com.ssg.meowcoffee.domain.RevenueVO">
-        <id     property="revenueId" column="revenueId"/>
-        <result property="totalAmt"  column="totalAmt"/>
+        <id property="revenueId" column="revenueId"/>
+        <result property="totalAmt" column="totalAmt"/>
         <result property="revenueDt" column="revenueDt"/>
-        <result property="whId"      column="whId"/>
-        <result property="userId"    column="userId"/>
+        <result property="whId" column="whId"/>
+        <result property="userId" column="userId"/>
     </resultMap>
 
     <!-- ===== Expense: 조회 ===== -->
@@ -47,7 +47,7 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND whId = #{whId}
+          AND whId = #{whId}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
@@ -56,7 +56,7 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND expenseCategory = #{expenseCategory}
+          AND expenseCategory = #{expenseCategory}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
@@ -65,16 +65,16 @@
         SELECT *
         FROM expense
         WHERE isDelete = false
-        AND userId = #{userId}
+          AND userId = #{userId}
         ORDER BY expenseDt DESC, expenseId DESC
     </select>
 
     <!-- ===== Expense: 생성 (카테고리 고정: management) ===== -->
-    <insert id="insertExpense" parameterType="com.ssg.meowcoffee.dto.ExpenseInputDTO" useGeneratedKeys="true" keyProperty="expenseId" keyColumn="expenseId">
+    <insert id="insertExpense" parameterType="com.ssg.meowcoffee.dto.ExpenseInputDTO" useGeneratedKeys="true"
+            keyProperty="expenseId" keyColumn="expenseId">
         INSERT INTO expense
-        (expenseDt, expenseCategory, totalAmt, expenseStatus, whId)
-        VALUES
-        (CURDATE(), 'management', #{totalAmt}, 'draft', #{whId})
+            (expenseDt, expenseCategory, totalAmt, expenseStatus, whId)
+        VALUES (CURDATE(), 'management', #{totalAmt}, 'draft', #{whId})
     </insert>
 
     <!-- ===== Expense: 수정 ===== -->
@@ -88,7 +88,8 @@
     <!--'posted' 변경-->
     <update id="updateExpensePosted">
         UPDATE expense
-        SET confirmDt = CURDATE(), expenseStatus = 'posted'
+        SET confirmDt     = CURDATE(),
+            expenseStatus = 'posted'
         WHERE expenseId = #{expenseId}
     </update>
 
@@ -124,9 +125,13 @@
     </select>
 
     <!-- ===== Invoice: 수정 ===== -->
-    <update id="updateInvoiceStatus" parameterType="com.ssg.meowcoffee.dto.InvoiceUpdateDTO">
+    <update id="updateInvoiceStatus"
+            parameterType="com.ssg.meowcoffee.dto.InvoiceUpdateDTO">
         UPDATE invoice
         SET invoiceStatus = #{invoiceStatus}
+        <if test="invoiceStatus == 'paid'">
+            , depositDt = CURDATE()
+        </if>
         WHERE invoiceId = #{invoiceId}
     </update>
 
@@ -135,6 +140,14 @@
         SELECT *
         FROM revenue
         ORDER BY revenueDt DESC, revenueId DESC
+    </select>
+
+
+    <!-- 창고 테이블에서 목록 조회 (있으면 우선 사용) -->
+    <select id="selectWarehouses" resultType="hashmap">
+        SELECT whId, whName
+        FROM warehouse
+        ORDER BY whName
     </select>
 
 </mapper>
