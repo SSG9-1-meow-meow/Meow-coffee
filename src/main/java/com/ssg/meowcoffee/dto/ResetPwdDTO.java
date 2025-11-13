@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class FindIDDTO {
+@NoArgsConstructor
+public class ResetPwdDTO {
 
-    private String targetRole;
-    private String userCode;
-    private String userName;
-    private String userEmail;
+    private String targetId;
+    private String newPwd;
 }
