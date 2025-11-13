@@ -12,7 +12,6 @@ public class DashboardController {
 
     private final ChartService chartService;
 
-    // 메인(index.jsp)
     @GetMapping({"/", "/index"})
     public String index(Model model) {
         model.addAttribute("expenseTotal", chartService.getMonthExpenseTotal());

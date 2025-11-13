@@ -69,9 +69,9 @@
         </div>
     </div>
 
-    <!-- 2행: 좌 - 월별 매출 추이, 우 - 최근 한달 입출고 수량 (위치 교체) -->
+    <!-- 2행: 좌 - 월별 매출 추이, 우 - 최근 한달 입출고 수량 -->
     <div class="row g-3 mt-2">
-        <!-- 월별 매출 추이 (왼쪽으로 이동) -->
+        <!-- 월별 매출 추이 -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body">
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <!-- 최근 한달 입·출고 수량 (오른쪽으로 이동) -->
+        <!-- 최근 한달 입·출고 수량 -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body">
@@ -92,10 +92,9 @@
         </div>
     </div>
 
-    <!-- 3행: 리드타임 그래프 (위치 교체됨) -->
+    <!-- 3행: 리드타임 그래프 -->
     <div class="row g-3 mt-2">
-
-        <!-- ★ 왼쪽: 월별 리드타임 추이 line chart -->
+        <!-- 월별 리드타임 추이 line chart -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body">
@@ -105,7 +104,7 @@
             </div>
         </div>
 
-        <!-- ★ 오른쪽: 최근 한달 평균 리드타임 bar chart -->
+        <!-- 최근 한달 평균 리드타임 bar chart -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body">
@@ -114,9 +113,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <!-- 메인 컨텐츠 종료 -->
 
     <!-- Chart.js + axios -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -125,51 +122,37 @@
     <script>
         // 공통 포맷터
         const nf = new Intl.NumberFormat('ko-KR');
-        const fmtMan = function (n) {
-            return nf.format(Math.floor(Number(n || 0) / 10000));
-        };
-        const fmtKRWMan = function (n) {
-            return '₩' + fmtMan(n);
-        };
-        const fmtNum = function (n) {
-            return nf.format(Number(n || 0));
-        };
+        const fmtMan = n => nf.format(Math.floor(Number(n || 0) / 10000));
+        const fmtKRWMan = n => '₩' + fmtMan(n);
+        const fmtNum = n => nf.format(Number(n || 0));
 
         // 리드타임 음수/NaN 방지
-        const safe = function (n) {
+        const safe = n => {
             const v = parseFloat(n);
             if (!isFinite(v)) return 0;
             return v < 0 ? 0 : v;
         };
 
-        const yAxisTitle = function (text) {
-            return {title: {display: true, text: text}};
-        };
-        const tickSuffix = function (suffix) {
-            return {
-                ticks: {
-                    callback: function (v) {
-                        return fmtNum(v) + suffix;
-                    }
-                }
-            };
-        };
-        const tooltipSuffix = function (suffix) {
-            return {
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                let v = 0;
-                                if (ctx.raw != null) v = ctx.raw;
-                                else if (ctx.parsed && ctx.parsed.y != null) v = ctx.parsed.y;
-                                return (ctx.dataset.label || ctx.label) + ': ' + fmtNum(v) + suffix;
-                            }
+        const yAxisTitle = text => ({title: {display: true, text}});
+        const tickSuffix = suffix => ({
+            ticks: {
+                callback: v => fmtNum(v) + suffix
+            }
+        });
+        const tooltipSuffix = suffix => ({
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            let v = 0;
+                            if (ctx.raw != null) v = ctx.raw;
+                            else if (ctx.parsed && ctx.parsed.y != null) v = ctx.parsed.y;
+                            return (ctx.dataset.label || ctx.label) + ': ' + fmtNum(v) + suffix;
                         }
                     }
                 }
-            };
-        };
+            }
+        });
 
         (async function loadDashboard() {
             try {
@@ -190,30 +173,32 @@
                 const profit = await axios.get('/charts/net-profit');
                 document.getElementById('netProfit').textContent = fmtKRWMan(profit.data);
 
-                // 매출 라인 차트 (갈색, 만원)
+                // =========================
+                // 매출 라인 차트 (하늘색 + 영역)
+                // =========================
                 const revSeries = (await axios.get('/charts/revenue/monthly-series')).data;
                 new Chart(document.getElementById('revenueLineChart'), {
                     type: 'line',
                     data: {
-                        labels: revSeries.map(function (r) {
-                            return r.ym;
-                        }),
+                        labels: revSeries.map(r => r.ym),
                         datasets: [{
                             label: '매출액(만원)',
-                            data: revSeries.map(function (r) {
-                                return Math.floor((r.total || 0) / 10000);
-                            }),
+                            data: revSeries.map(r => Math.floor((r.total || 0) / 10000)),
                             tension: 0.3,
-                            fill: false,
-                            borderColor: '#4169E1', // RoyalBlue (로얄블루)
-                            backgroundColor: 'rgba(65, 105, 225, 0.2)', // 연한 배경색
-                            pointBackgroundColor: '#4169E1',
-                            pointBorderColor: '#4169E1'
+                            fill: true,
+                            borderColor: 'rgba(135, 206, 250, 1)',      // 하늘색 라인
+                            backgroundColor: 'rgba(135, 206, 250, 0.3)',// 하늘색 영역
+                            pointBackgroundColor: 'rgba(135, 206, 250, 1)',
+                            pointBorderColor: 'rgba(135, 206, 250, 1)'
                         }]
                     },
                     options: {
                         scales: {
-                            y: Object.assign({}, yAxisTitle('금액(만원)'), tickSuffix('만원'))
+                            y: Object.assign(
+                                {},
+                                yAxisTitle('금액(만원)'),
+                                tickSuffix('만원')
+                            )
                         },
                         plugins: Object.assign(
                             {legend: {display: true, onClick: null}},
@@ -222,30 +207,24 @@
                     }
                 });
 
-                // 입출고 일별 현황 (건, 입고=파랑, 출고=빨강)
+                // 입출고 일별 현황 (입고=파랑, 출고=빨강)
                 const inList = (await axios.get('/charts/in/daily-qty-30d')).data;
                 const outList = (await axios.get('/charts/out/daily-qty-30d')).data;
                 new Chart(document.getElementById('inoutDailyChart'), {
                     type: 'bar',
                     data: {
-                        labels: inList.map(function (d) {
-                            return d.chartKey;
-                        }),
+                        labels: inList.map(d => d.chartKey),
                         datasets: [
                             {
                                 label: '입고(건)',
-                                data: inList.map(function (d) {
-                                    return d.totalQuantity;
-                                }),
+                                data: inList.map(d => d.totalQuantity),
                                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                                 borderColor: 'rgba(54, 162, 235, 1)',
                                 borderWidth: 1
                             },
                             {
                                 label: '출고(건)',
-                                data: outList.map(function (d) {
-                                    return d.totalQuantity;
-                                }),
+                                data: outList.map(d => d.totalQuantity),
                                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 borderWidth: 1
@@ -254,7 +233,11 @@
                     },
                     options: {
                         scales: {
-                            y: Object.assign({}, yAxisTitle('수량(건)'), tickSuffix('건'))
+                            y: Object.assign(
+                                {},
+                                yAxisTitle('수량(건)'),
+                                tickSuffix('건')
+                            )
                         },
                         plugins: Object.assign(
                             {legend: {display: true, onClick: null}},
@@ -287,9 +270,7 @@
                             legend: {display: true, position: 'top', onClick: null},
                             tooltip: {
                                 callbacks: {
-                                    label: function (ctx) {
-                                        return ctx.label + ': ' + fmtNum(ctx.raw);
-                                    }
+                                    label: ctx => ctx.label + ': ' + fmtNum(ctx.raw)
                                 }
                             }
                         }
@@ -328,9 +309,7 @@
                             y: Object.assign({}, yAxisTitle('시간(h)'), {
                                 min: 0,
                                 ticks: {
-                                    callback: function (v) {
-                                        return v + 'h';
-                                    }
+                                    callback: v => v + 'h'
                                 }
                             })
                         },
@@ -338,9 +317,7 @@
                             legend: {display: true, onClick: null},
                             tooltip: {
                                 callbacks: {
-                                    label: function (ctx) {
-                                        return ctx.dataset.label + ': ' + ctx.raw + 'h';
-                                    }
+                                    label: ctx => ctx.dataset.label + ': ' + ctx.raw + 'h'
                                 }
                             }
                         }
@@ -354,15 +331,11 @@
                 new Chart(document.getElementById('leadtimeMonthlyChart'), {
                     type: 'line',
                     data: {
-                        labels: inSeries.map(function (r) {
-                            return r.ym;
-                        }),
+                        labels: inSeries.map(r => r.ym),
                         datasets: [
                             {
                                 label: '입고(시간)',
-                                data: inSeries.map(function (r) {
-                                    return safe(r.avg_hours);
-                                }),
+                                data: inSeries.map(r => safe(r.avg_hours)),
                                 tension: 0.3,
                                 borderColor: 'rgba(54, 162, 235, 1)',
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -370,9 +343,7 @@
                             },
                             {
                                 label: '출고(시간)',
-                                data: outSeries.map(function (r) {
-                                    return safe(r.avg_hours);
-                                }),
+                                data: outSeries.map(r => safe(r.avg_hours)),
                                 tension: 0.3,
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -385,9 +356,7 @@
                             y: Object.assign({}, yAxisTitle('시간(h)'), {
                                 min: 0,
                                 ticks: {
-                                    callback: function (v) {
-                                        return v + 'h';
-                                    }
+                                    callback: v => v + 'h'
                                 }
                             })
                         },
@@ -395,9 +364,7 @@
                             legend: {display: true, onClick: null},
                             tooltip: {
                                 callbacks: {
-                                    label: function (ctx) {
-                                        return ctx.dataset.label + ': ' + ctx.raw + 'h';
-                                    }
+                                    label: ctx => ctx.dataset.label + ': ' + ctx.raw + 'h'
                                 }
                             }
                         }
@@ -411,4 +378,5 @@
     </script>
 
     <%-- 푸터 포함 --%>
-<%@ include file="/WEB-INF/views/includes/_footer.jsp" %>
+    <%@ include file="/WEB-INF/views/includes/_footer.jsp" %>
+</div>

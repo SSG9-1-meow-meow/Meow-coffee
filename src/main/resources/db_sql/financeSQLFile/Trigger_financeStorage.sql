@@ -69,13 +69,3 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-
--- 가정4. 실사 완료됐을때
-SELECT * FROM due_diligence;
-
-UPDATE due_diligence
-SET ddApproval = 'APPROVED'
-WHERE ddId = 2;
-
-SELECT * FROM storageCost;
-SELECT * FROM expense;

@@ -137,10 +137,11 @@
     <!-- ===== Net Profit: 순이익(KPI, 이번 달) ===== -->
     <select id="selectNetProfitForThisMonth" resultType="bigdecimal">
       <![CDATA[
-        SELECT IFNULL((SELECT SUM(r.totalAmt)
-                       FROM revenue r
-                       WHERE r.revenueDt >= DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY)
-                         AND r.revenueDt < DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)), 0)
+        SELECT IFNULL((SELECT SUM(i.totalAmt)
+                       FROM invoice i
+                       WHERE i.invoiceStatus = 'paid'
+                         AND i.invoiceDt >= DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY)
+                         AND i.invoiceDt < DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY)), 0)
                    -
                IFNULL((SELECT SUM(e.totalAmt)
                        FROM expense e
