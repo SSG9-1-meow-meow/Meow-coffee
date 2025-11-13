@@ -32,9 +32,6 @@ public interface FinanceService {
     // ===== Revenue 조회 =====
     List<RevenueVO> getRevenues();                         // 전체
 
-    // ===== Chart =====
-//    FinanceChartDTO getFinanceChart();
-//    Map<String,Object> getInvoiceKpisForThisMonth();
-//    Map<String,Object> getKpis();
-//    List<Map<String,Object>> getMonthlySeries();
+    List<Map<String, Object>> getWarehouses();
+
 }

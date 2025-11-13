@@ -653,8 +653,9 @@
                 <ul
                     class="dropdown-menu"
                     aria-labelledby="navSidebarLayouts">
-                  <li><a class="dropdown-item" href="#">매출 현황</a></li>
-                  <li><a class="dropdown-item" href="#">지출 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/expense">지출 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/invoice">청구 현황</a></li>
+                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/finance/revenue">매출 현황</a></li>
                 </ul>
               </li>
             </ul>
