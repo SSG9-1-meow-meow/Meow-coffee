@@ -58,6 +58,9 @@ public class OutboundController {
         model.addAttribute("outReqId", outReqId);
         model.addAttribute("sessionUserId", userId);
         model.addAttribute("sessionRole", role);
+
+        model.addAttribute("vehicleList", outboundService.getVehiclesForUser(role, userId));
+
         return "outbounds/out_request-detail"; // ← 파일명과 동일
     }
 
