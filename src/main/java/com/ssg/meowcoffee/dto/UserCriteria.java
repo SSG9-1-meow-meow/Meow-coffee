@@ -2,22 +2,20 @@ package com.ssg.meowcoffee.dto;
 
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.util.Arrays;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-@Getter
-@Setter
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.time.LocalDate;
+import java.util.Arrays;
+
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

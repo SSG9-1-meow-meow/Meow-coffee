@@ -75,6 +75,12 @@ dependencies {
   // QR 코드 출력 의존성 추가(박기웅)
   implementation("com.google.zxing:core:3.5.3")
   implementation("com.google.zxing:javase:3.5.3")
+
+  // 스프링 시큐리티 설정 추가
+  implementation 'org.springframework.security:spring-security-config:5.8.16'
+  implementation 'org.springframework.security:spring-security-core:5.8.16'
+  implementation 'org.springframework.security:spring-security-taglibs:5.8.16'
+  implementation 'org.springframework.security:spring-security-web:5.8.16'
 }
 
 test {

@@ -4,27 +4,23 @@ import com.ssg.meowcoffee.domain.CompanyVO;
 import com.ssg.meowcoffee.domain.DeliverymanVO;
 import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserVO;
-import com.ssg.meowcoffee.dto.CompanyDetailDTO;
-import com.ssg.meowcoffee.dto.DeliverymanDTO;
-import com.ssg.meowcoffee.dto.ManagerDetailDTO;
-import com.ssg.meowcoffee.dto.UserCriteria;
-import com.ssg.meowcoffee.dto.UserDetailDTO;
-import com.ssg.meowcoffee.dto.UserInfoUpdateDTO;
-import com.ssg.meowcoffee.dto.UserPageDTO;
-import com.ssg.meowcoffee.dto.UserStatUpdateDTO;
+import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.mapper.MemberMapper;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
+    private final BCryptPasswordEncoder passwordEncoder;
     private final MemberMapper memberMapper;
     private final ModelMapper modelMapper;
 
@@ -73,7 +69,19 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public boolean registerUser(UserDetailDTO userDetailDTO) {
+        if (memberMapper.existsId(userDetailDTO.getUserId())) {
+            return false;
+        }
+        String userPwd = userDetailDTO.getUserPwd();
+        userDetailDTO.setUserPwd(passwordEncoder.encode(userPwd));
+        int affected = memberMapper.insertUser(userDetailDTO);
+        return affected == 1;
+    }
+
+    @Override
     public boolean modifyUser(UserInfoUpdateDTO userInfoUpdateDTO) {
+        // 현재 비밀번호가 변경되지 않았는지 비교 필요
         int affected = memberMapper.updateUser(userInfoUpdateDTO);
         return affected == 1;
     }
@@ -93,6 +101,26 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean deactivateUserByAdmin(String targetId) {
         int affected = memberMapper.deleteUserByAdmin(targetId);
+        return affected == 1;
+    }
+
+    @Override
+    public FindIDResultDTO getUserIdBy(FindIDDTO findIDDTO) {
+        FindIDResultDTO foundID = memberMapper.findUserId(findIDDTO);
+        return foundID;
+    }
+
+    @Override
+    public FindIDResultDTO checkUserInfo(ForgotPwdDTO forgotPwdDTO) {
+        FindIDResultDTO foundUser = memberMapper.selectUserByIdAndEmail(forgotPwdDTO);
+        return foundUser;
+    }
+
+    @Override
+    public boolean modifyPwd(ResetPwdDTO resetPwdDTO) {
+        String originalPwd = resetPwdDTO.getNewPwd();
+        resetPwdDTO.setNewPwd(passwordEncoder.encode(originalPwd));
+        int affected = memberMapper.updatePwd(resetPwdDTO);
         return affected == 1;
     }
 }

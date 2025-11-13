@@ -81,7 +81,7 @@
 
                     <hr class="my-4"/>
 
-                    <!-- 품목 테이블 (차량 컬럼 제거) -->
+                    <!-- 품목 테이블: 배송지 필수 -->
                     <div class="d-flex align-items-center mb-2">
                         <h5 class="mb-0">출고 품목</h5>
                         <button type="button" class="btn btn-sm btn-primary ms-auto" id="btnAddRow">
@@ -95,7 +95,8 @@
                             <tr>
                                 <th style="width:22%">재고ID</th>
                                 <th style="width:16%">요청수량</th>
-                                <th>배송지 주소(선택)</th>
+                                <!-- ★ 배송지에도 필수 표시(*) 추가 -->
+                                <th>배송지 주소 <span class="text-danger">*</span></th>
                                 <th style="width:8%"></th>
                             </tr>
                             </thead>
@@ -155,21 +156,30 @@
         document.querySelector('#itemsTable tbody').appendChild(row);
     }
 
-    function collectItems(){
+    // 배송지(outOrderAddr) 필수 검증
+    // ➜ requireAddr 파라미터 추가
+    function collectItems(requireAddr){
         const rows = document.querySelectorAll('#itemsTable tbody tr');
         const items = [];
         rows.forEach(r=>{
-            const stkId = r.querySelector('.stkIdInp').value.trim();
-            const outQtyReq = parseInt(r.querySelector('.outQtyReq').value || '0',10);
+            const stkId        = r.querySelector('.stkIdInp').value.trim();
+            const outQtyReq    = parseInt(r.querySelector('.outQtyReq').value || '0',10);
             const outOrderAddr = r.querySelector('.outOrderAddr').value.trim();
+
+            // 완전 공백 행이면 무시
             if(!stkId && !outQtyReq && !outOrderAddr) return;
-            if(!stkId) throw new Error('재고ID(stkId)는 필수입니다.');
+
+            if(!stkId)        throw new Error('재고ID(stkId)는 필수입니다.');
             if(!outQtyReq || outQtyReq < 1) throw new Error('요청수량은 1 이상이어야 합니다.');
+            // ★ 임시저장이 아닐 때만 배송지 필수
+            if(requireAddr && !outOrderAddr) throw new Error('배송지 주소는 필수입니다.');
+
             items.push({stkId, outQtyReq, outOrderAddr});
         });
         if(!items.length) throw new Error('최소 1개 이상의 품목을 입력하세요.');
         return items;
     }
+
 
     async function submit(isTempo){
         try{
@@ -178,25 +188,36 @@
             const managerId = managerIdSel.disabled ? managerIdSel.options[0].value : managerIdSel.value;
             const outDateWish = document.getElementById('outDateWish').value;
             const tempo = (isTempo ? 1 : (document.getElementById('isTempo').checked ? 1 : 0));
-            if(!comId) throw new Error('거래처 ID는 필수입니다.');
-            if(!managerId) throw new Error('담당 관리자 ID는 필수입니다.');
-            if(!outDateWish) throw new Error('출고 희망일은 필수입니다.');
 
-            const items = collectItems();
+            // ★ 공통: comId 는 항상 필수
+            if(!comId) throw new Error('거래처 ID는 필수입니다.');
+
+            // ★ 임시저장이 아닐 때만 강제
+            if(!isTempo && !managerId)   throw new Error('담당 관리자 ID는 필수입니다.');
+            if(!isTempo && !outDateWish) throw new Error('출고 희망일은 필수입니다.');
+
+            // ★ 임시저장일 때는 배송지 선택 안해도 통과
+            const items = collectItems(!isTempo); // isTempo=false → 배송지 필수, true → 선택
+
             const payload = {
-                comId, managerId, outDateWish, isTempo: tempo,
+                comId,
+                // managerId / outDateWish 는 없으면 null 로 보냄 (DB 컬럼이 NULL 허용)
+                managerId:   managerId || null,
+                outDateWish: outDateWish || null,
+                isTempo: tempo,
                 outItemsJson: JSON.stringify(items),
                 outDttmReq: new Date().toISOString()
             };
 
             const res = await axios.post(apiUrl, payload, {headers:{'Content-Type':'application/json'}});
-            alert(res.data || '출고 요청이 생성되었습니다.');
+            alert(res.data || (isTempo ? '임시 저장이 완료되었습니다.' : '출고 요청이 생성되었습니다.'));
             location.href = ctx + '/outbounds';
         }catch(e){
             console.error(e);
             alert(e.response?.data || e.message || '요청 처리 중 오류가 발생했습니다.');
         }
     }
+
 
     document.addEventListener('DOMContentLoaded', ()=>{
         initWishDate();

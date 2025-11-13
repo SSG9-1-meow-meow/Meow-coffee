@@ -79,18 +79,3 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-
--- 가정2.3. 출고가 완료됐을때
-SELECT * FROM outboundItems;
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
-
-UPDATE outboundItems
-SET status      = '승인완료',
-    outDttmInsp = '2025-10-10 15:00:00',
-    outDttmShip = '2025-10-12 11:00:00'
-WHERE outreqId = 2;
-
-SELECT * FROM outboundCost;
-SELECT * FROM deliveryCost;
-SELECT * FROM expense;

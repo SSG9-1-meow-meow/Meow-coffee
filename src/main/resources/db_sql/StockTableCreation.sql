@@ -8,11 +8,11 @@ CREATE TABLE warehouse (
                            whCode VARCHAR(12) NOT NULL,
                            whName VARCHAR(30) NOT NULL,
                            whAddress VARCHAR(100) NOT NULL,
-                           whTelPhone VARCHAR(13),
+                           whTelephone VARCHAR(13),
                            whGrade CHAR(5) NOT NULL,
                            whField INT NOT NULL,
                            whTotalCapa INT NOT NULL,
-                           whUseCapa INT NULL
+                           whUseCapa INT default 0
 );
 
 -- 2. 보관위치 (location_places)

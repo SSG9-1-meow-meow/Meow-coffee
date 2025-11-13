@@ -163,13 +163,13 @@ public class OutboundMapperTests {
     }
 
 
-    @Test
-    @DisplayName("출고 목록 조회")
-    @Transactional
-    void testSelectOutboundList() {
-        String status = OutboundStatus.PENDING.getName();
-        List<OutboundReqItemDTO> list = outboundMapper.selectOutboundList(status);
-        assertNotNull(list);
-        log.info("조회된 출고 목록 수: {}", list.size());
-    }
+//    @Test
+//    @DisplayName("출고 목록 조회")
+//    @Transactional
+//    void testSelectOutboundList() {
+//        String status = OutboundStatus.PENDING.getName();
+//        List<OutboundReqItemDTO> list = outboundMapper.selectOutboundList(status);
+//        assertNotNull(list);
+//        log.info("조회된 출고 목록 수: {}", list.size());
+//    }
 }

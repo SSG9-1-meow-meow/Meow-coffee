@@ -156,3 +156,7 @@ FROM outboundrequest o
 WHERE o.IsDelete = 0
 GROUP BY o.outReqId, o.comId, c.comName, o.outDateWish, o.outDttmReq, o.outDttmAppr, o.IsTempo, o.IsDelete
 ORDER BY o.outDttmReq DESC;
+
+SELECT * FROM outboundrequest ORDER BY outReqId DESC LIMIT 3;
+SELECT * FROM outbounditems  ORDER BY outReqItemsId DESC LIMIT 5;
+

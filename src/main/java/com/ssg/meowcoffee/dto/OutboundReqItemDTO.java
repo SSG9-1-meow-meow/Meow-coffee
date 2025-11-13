@@ -19,7 +19,7 @@ public class OutboundReqItemDTO {
     private String vehicleId;
     private Integer outQtyReq;
     private Integer outQty;
-    private OutboundStatus status;
+    private String  status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime outDttmReq;
@@ -33,4 +33,8 @@ public class OutboundReqItemDTO {
     private LocalDate outDateWish;
 
     private Boolean isDelete;
+    private String statusValue;  // 승인대기/승인완료/출고완료/반려
+
+
+    private String statusCode;  // 영문 코드
 }

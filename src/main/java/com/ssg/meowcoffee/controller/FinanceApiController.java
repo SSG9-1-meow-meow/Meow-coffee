@@ -1,4 +1,5 @@
 package com.ssg.meowcoffee.controller;
+
 import com.ssg.meowcoffee.domain.ExpenseVO;
 import com.ssg.meowcoffee.domain.InvoiceVO;
 import com.ssg.meowcoffee.domain.RevenueVO;
@@ -13,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.net.URI;
+
 import java.util.*;
 
 @Log4j2
@@ -23,18 +24,20 @@ import java.util.*;
 public class FinanceApiController {
 
     private final FinanceService financeService;
-
     private final ChartService chartService;
 
-    // ───── Expense API ─────
-    // 지출 목록 조회
+    /* =====================================================================
+       EXPENSE (지출)
+       ===================================================================== */
+
+    // 지출 목록 조회 (조건: whId / category / userId)
     @GetMapping("/expense")
     public ResponseEntity<List<ExpenseVO>> readExpenseList(
             @RequestParam(required = false) Long whId,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String userId
     ) {
-        log.info("readExpenseList() 호출");
+        log.info("readExpenseList()");
         List<ExpenseVO> list;
         if (whId != null) {
             list = financeService.getExpensesByWhId(whId);
@@ -48,123 +51,140 @@ public class FinanceApiController {
         return ResponseEntity.ok(list);
     }
 
-
-    // 생성: 관리비 전용, 모달로 작성
+    // 지출 생성 (관리비 전용)
     @PostMapping("/expense")
-    public ResponseEntity<Long> createExpense(@RequestBody ExpenseInputDTO expenseInputDTO) {
-        log.info("createExpense() 호출");
-        long getExpenseId = financeService.registerExpense(expenseInputDTO);
-        return new ResponseEntity<>(getExpenseId, HttpStatus.CREATED);
+    public ResponseEntity<Long> createExpense(@RequestBody ExpenseInputDTO dto) {
+        log.info("createExpense()");
+        long id = financeService.registerExpense(dto);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    // 확정: draft → posted
+    // 지출 확정(draft → posted)
     @PostMapping("/expense/{eId}")
     public ResponseEntity<Void> postExpense(@PathVariable Long eId) {
-        log.info("postExpense() 호출");
+        log.info("postExpense()");
         financeService.modifyExpenseStatus(eId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // 수정: draft만 허용, '관리비' 금액만 수정 가능 -> JSON을 쓸지, (WhID,totalAmt) 따로따로 받을지 결정
+    // 지출 수정 (draft + 관리비만 수정 가능)
     @PutMapping("/expense/{eId}")
-    public ResponseEntity<Void> updateExpense(@RequestBody ExpenseUpdateDTO expenseUpdateDTO) {
-        log.info("updateExpense() 호출");
-        financeService.modifyExpense(expenseUpdateDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> updateExpense(
+            @RequestBody ExpenseUpdateDTO dto,
+            @PathVariable String eId
+    ) {
+        log.info("updateExpense()");
+        financeService.modifyExpense(dto);
+        return ResponseEntity.ok().build();
     }
 
-    // soft delete
+    // 지출 삭제 (Soft delete)
     @DeleteMapping("/expense/{eId}")
     public ResponseEntity<Void> deleteExpense(@PathVariable Long eId) {
-        log.info("deleteExpense() 호출");
+        log.info("deleteExpense()");
         financeService.removeExpense(eId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    // ───── Invoice API ─────
+
+    /* =====================================================================
+       INVOICE (청구)
+       ===================================================================== */
+
     private static final Set<String> ALLOWED =
-            new HashSet<>(Arrays.asList("draft","issued","paid","canceled"));
+            new HashSet<>(Arrays.asList("draft", "issued", "paid", "canceled"));
 
     private static boolean hasText(String s) {
         return s != null && !s.trim().isEmpty();
     }
 
-    // ───── Invoice 목록 조회 ─────
+    // 청구 목록 조회 (상태/거래처 필터)
     @GetMapping("/invoice")
     public ResponseEntity<List<InvoiceVO>> readInvoiceList(
             @RequestParam(required = false) String userId,
-            @RequestParam(required = false, name = "status") String invoiceStatus
+            @RequestParam(required = false, name = "status") String status
     ) {
-        log.info("readInvoiceList() 호출");
+        log.info("readInvoiceList()");
         List<InvoiceVO> list;
         if (hasText(userId)) {
             list = financeService.getInvoicesByUserId(userId);
-        } else if (hasText(invoiceStatus)) {
-            list = financeService.getInvoicesByStatus(invoiceStatus);
+        } else if (hasText(status)) {
+            list = financeService.getInvoicesByStatus(status);
         } else {
             list = financeService.getInvoices();
         }
         return ResponseEntity.ok(list);
     }
 
-    // ───── Invoice 상태 변경 ─────
-    // PUT /finance/api/invoice/{invoiceId}
-    // body: { "invoiceStatus": "issued" }  // 필요 시 memo 등 추가 가능
+    // 청구 상태 변경
     @PutMapping("/invoice/{invoiceId}")
     public ResponseEntity<Void> updateInvoiceStatus(
             @PathVariable Long invoiceId,
             @RequestBody InvoiceUpdateDTO dto
     ) {
-        log.info("updateInvoiceStatus() 호출");
-        // path 변수 우선 적용
+        log.info("updateInvoiceStatus()");
         dto.setInvoiceId(invoiceId);
 
-        // 상태 값 검증
         String st = dto.getInvoiceStatus();
         if (!hasText(st) || !ALLOWED.contains(st)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.badRequest().build();
         }
 
         int updated = financeService.modifyInvoiceStatus(dto);
         if (updated == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();
     }
 
-    // ───── Revenue API ─────
+
+    /* =====================================================================
+       REVENUE (매출)
+       ===================================================================== */
+
+    // 매출 전체 조회
     @GetMapping("/revenue")
     public ResponseEntity<List<RevenueVO>> readRevenueList() {
-        log.info("readRevenueList() 호출");
-        List<RevenueVO> list = financeService.getRevenues();
-        return ResponseEntity.ok(list);
+        log.info("readRevenueList()");
+        return ResponseEntity.ok(financeService.getRevenues());
     }
 
 
-    // ───── Chart API ─────
+    /* =====================================================================
+       DASHBOARD & KPI CHARTS
+       ===================================================================== */
+
+    // 지출 KPI (이번 달 합계, pending 등)
     @GetMapping("/expenseChart")
     public ResponseEntity<FinanceChartDTO> getExpenseChart() {
-        log.info("getExpenseChart() 호출");
+        log.info("getExpenseChart()");
         return ResponseEntity.ok(chartService.getFinanceChart());
     }
 
+    // 청구 KPI
     @GetMapping("/invoiceChart")
-    public ResponseEntity<Map<String,Object>> getInvoiceChart() {
-        log.info("getInvoiceChart() 호출");
-        Map<String,Object> m = chartService.getInvoiceKpisForThisMonth();
-        return ResponseEntity.ok(m);
+    public ResponseEntity<Map<String, Object>> getInvoiceChart() {
+        log.info("getInvoiceChart()");
+        return ResponseEntity.ok(chartService.getInvoiceKpisForThisMonth());
     }
 
+    // 매출 KPI (월 총액, MoM 변화율)
     @GetMapping("/revenueChart1")
-    public ResponseEntity<Map<String,Object>> getRevenueChart1() {
-        log.info("getRevenueChart1() 호출");
+    public ResponseEntity<Map<String, Object>> getRevenueChart1() {
+        log.info("getRevenueChart1()");
         return ResponseEntity.ok(chartService.getKpis());
     }
 
+    // 월별 매출 그래프 데이터
     @GetMapping("/revenueChart2")
-    public ResponseEntity<List<Map<String,Object>>> getRevenueChart2() {
-        log.info("getRevenueChart2() 호출");
+    public ResponseEntity<List<Map<String, Object>>> getRevenueChart2() {
+        log.info("getRevenueChart2()");
         return ResponseEntity.ok(chartService.getMonthlySeries());
     }
 
+    // 창고 목록 조회 (필터용)
+    @GetMapping("/warehouses")
+    public ResponseEntity<List<Map<String, Object>>> readWarehouseList() {
+        return ResponseEntity.ok(financeService.getWarehouses());
+    }
 }
