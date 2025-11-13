@@ -74,8 +74,12 @@ background-color: #000;
                 <h4 class="card-title">창고 위치 현황</h4>
             </div>
             <div class="card-body d-flex justify-content-center">
-                <div id="map" style="width: 80%; height: 45rem"></div>
-
+                <div id="map" style="width: 70%; height: 45rem"></div>
+                <div id="explanation" style="width: 6rem; height: 6rem; border: 1px solid rgb(0,0,0); margin-left: 1rem; border-radius: 5px; padding: 1px">
+                    <p><img src="/resources/components/blueMarker.png" style="width: 2rem; height: 2rem;"/>MAIN</p>
+                    <p><img src="/resources/components/greenMarker.png" style="width: 2rem; height: 2rem;"/>SUB</p>
+                    <p></p>
+                </div>
             </div>
 
             <div class="card-footer d-flex justify-content-center align-items-center">
@@ -128,19 +132,34 @@ geocoder.addressSearch(wh.whAddress, function(result, status) {
 if (status === kakao.maps.services.Status.OK) {
 var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
-// 마커 생성
-var marker = new kakao.maps.Marker({
+let markerOptions = {
 map: map,
 position: coords,
 clickable: true
-});
+};
+
+var imageSrc;
+
+//메인 창고는 초록색 서브 창고는 파란색
+if (wh.whGrade === "main") {
+imageSrc = "/resources/components/blueMarker.png";
+} else{
+imageSrc = "/resources/components/greenMarker.png";
+}
+
+var imageSize = new kakao.maps.Size(30, 38); // 이미지 크기
+var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+markerOptions.image = markerImage;
+
+var marker = new kakao.maps.Marker(markerOptions);
 
 // 인포윈도우 내용 (whCode, whName, whGrade)
-var iwContent = '<div style="padding:8px; font-size:13px;">' +
-'<b>창고코드:</b> ' + wh.whCode + '<br/>' +
-'<b>창고명:</b> ' + wh.whName + '<br/>' +
-'<b>등급:</b> ' + wh.whGrade +
-'</div>';;
+var iwContent = '<div style="padding:12px; font-size:13px; width: 180px">' +
+'<b>'+ wh.whName+'</b> ' +  '<br/>' +
+'창고코드: ' + '<b>'+wh.whCode+'</b>' +'<br/>' +
+'창고등급: ' + '<b>'+wh.whGrade+'</b>' +'<br/>' +
+'사용용량/최대용량: ' + '<b>'+ wh.whUseCapa+ '/'+ wh.whTotalCapa+ '</b>'+
+'</div>';
 
 var infowindow = new kakao.maps.InfoWindow({
 content: iwContent,

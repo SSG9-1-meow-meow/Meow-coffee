@@ -68,7 +68,7 @@
             </when>
 
             <otherwise>
-                SELECT whCode, whName, whGrade, whAddress FROM warehouse
+                SELECT whCode, whName, whGrade, whAddress, whTotalCapa, whUseCapa FROM warehouse
             </otherwise>
         </choose>
     </select>

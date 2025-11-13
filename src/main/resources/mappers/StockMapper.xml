@@ -36,10 +36,11 @@
     </select>
 
     <select id="selectWarehouses" resultType="com.ssg.meowcoffee.dto.StockReadDTO">
-        select wh.whCode, wh.whName, wh.whGrade, wh.whAddress, sum(stk.stkQuantity) as stkQuantity
-        from warehouse wh join locations l on wh.whId = l.whId
-        join location_places lp on l.lpId = lp.lpId
-        join stock stk on stk.lpId = lp.lpId
+        select wh.whCode, wh.whName, wh.whGrade, wh.whAddress, IFNULL(sum(stk.stkQuantity), 0) as stkQuantity
+        from warehouse wh
+        left join locations l on wh.whId = l.whId
+        left join location_places lp on l.lpId = lp.lpId
+        left join stock stk on stk.lpId = lp.lpId
         group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress
         limit #{skip}, #{amount}
     </select>
@@ -133,13 +134,31 @@
     <select id="countWarehouseTotal" resultType="int">
         select count(*)
         from ( select wh.whCode, wh.whName, wh.whGrade, wh.whAddress
-        from warehouse wh join locations l on wh.whId = l.whId
-        join location_places lp on l.lpId = lp.lpId
-        join stock stk on stk.lpId = lp.lpId
+        from warehouse wh
+        left join locations l on wh.whId = l.whId
+        left join location_places lp on l.lpId = lp.lpId
+        left join stock stk on stk.lpId = lp.lpId
         group by wh.whCode, wh.whName, wh.whGrade, wh.whAddress) as mySub
     </select>
 
     <select id="countCompanyTotal" resultType="int">
         select count(*) from companies
     </select>
+
+    <!-- StockMapper.xml -->
+    <update id="updateWarehouseUseCapa">
+        UPDATE warehouse w
+        LEFT JOIN (
+        SELECT
+        wh.whId,
+        IFNULL(SUM(stk.stkQuantity), 0) AS totalQuantity
+        FROM warehouse wh
+        LEFT JOIN locations l ON wh.whId = l.whId
+        LEFT JOIN location_places lp ON l.lpId = lp.lpId
+        LEFT JOIN stock stk ON stk.lpId = lp.lpId
+        GROUP BY wh.whId
+        ) t ON w.whId = t.whId
+        SET w.whUseCapa = t.totalQuantity;
+    </update>
+
 </mapper>
