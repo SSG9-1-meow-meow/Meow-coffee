@@ -141,7 +141,7 @@ clickable: true
 var imageSrc;
 
 //메인 창고는 초록색 서브 창고는 파란색
-if (wh.whGrade === "main") {
+if (wh.whGrade === "Main") {
 imageSrc = "/resources/components/blueMarker.png";
 } else{
 imageSrc = "/resources/components/greenMarker.png";

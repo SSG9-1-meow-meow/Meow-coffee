@@ -371,7 +371,7 @@ background-color: #000;
         contentType: "application/json",
         data: JSON.stringify(data),
         success: function(response) {
-            if(response.data === -1) {alert("권한이 없습니다.")}
+            if(response.data === -1) {alert("권한이 없습니다."); return;}
             alert("등록 성공!");
         $("#dueDiligenceModal").modal("hide");
         clickPageNum(1); // 새로고침

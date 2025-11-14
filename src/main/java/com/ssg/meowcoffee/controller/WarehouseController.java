@@ -1,5 +1,6 @@
 package com.ssg.meowcoffee.controller;
 
+import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.WarehouseVO;
 import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.service.WarehouseService;
@@ -39,10 +40,14 @@ public class WarehouseController {
         //일반관리자, 총관리자만 접근 가능
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
 
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")){
+        if(!role.equals("ADMIN") && !role.equals("MANAGER")){
             //권한 없음
             return ResponseEntity.ok(null);
         }
+//        if(customUserDetails.getUserRole() != UserRole.ADMIN && customUserDetails.getUserRole() != UserRole.MANAGER){
+//            log.info(customUserDetails.getUserRole());
+//            return ResponseEntity.ok(null);
+//        }
 
         WarehouseSearchDTO searchDTO = WarehouseSearchDTO.builder().whAddress("address").build();
         List<WarehouseDTO> addressList = warehouseService.getWarehouseSearchList(searchDTO); //주소 목록
@@ -143,7 +148,8 @@ public class WarehouseController {
     public ResponseEntity<Integer> createWarehouse(@Valid @RequestBody WarehouseDTO warehouse, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //총관리자 인지 권한 확인 필수
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(!role.equals("ROLE_ADMIN")) return ResponseEntity.ok(-1);
+
+        if(!role.equals("ADMIN")) return ResponseEntity.ok(-1);
 
         Integer result = warehouseService.registerWarehouse(warehouse);
 
@@ -155,7 +161,8 @@ public class WarehouseController {
     public ResponseEntity<Integer> updateWarehouse(@PathVariable("whCode") String whCode, @RequestBody WarehouseUpdateDTO warehouse
     , @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(!role.equals("ROLE_ADMIN")) return ResponseEntity.ok(-1);
+
+        if(!role.equals("ADMIN")) return ResponseEntity.ok(-1);
 
         warehouse.setWhCode(whCode);
 

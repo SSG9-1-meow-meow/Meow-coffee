@@ -107,9 +107,9 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/stocks/coffee/{cfName}") //커피 정보 상세 조회
-    public ResponseEntity<CoffeeDTO> readCoffeeByName(@PathVariable("cfName") String cfName) {
-        CoffeeDTO coffeeDTO = stockService.getCoffee(cfName);
+    @GetMapping("/api/stocks/coffee/{cfId}") //커피 정보 상세 조회
+    public ResponseEntity<CoffeeDTO> readCoffeeByName(@PathVariable("cfId") String cfId) {
+        CoffeeDTO coffeeDTO = stockService.getCoffee(cfId);
 
         return ResponseEntity.ok(coffeeDTO);
     }
@@ -124,7 +124,8 @@ public class StockController {
     public ResponseEntity<Map<String, Object>> readStocksByWarehouse(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //권한 확인
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
+        if(!role.equals("ADMIN") && !role.equals("MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
 
         List<StockReadDTO> list = stockService.getWarehouses(criteria);
 
@@ -147,7 +148,8 @@ public class StockController {
     public ResponseEntity<Map<String, Object>> readCompanyList(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //권한 확인
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
+        if(!role.equals("ADMIN") && !role.equals("MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
 
         List<CompanyReadDTO> list = stockService.getCompanyList(criteria);
 
@@ -171,7 +173,8 @@ public class StockController {
     public ResponseEntity<Map<String, Object>> readDueDiligenceList(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
+        if(!role.equals("ADMIN") && !role.equals("MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
 
         List<DueDiligenceReadDTO> list = stockService.getDueDiligenceList(criteria);
 
@@ -188,9 +191,10 @@ public class StockController {
     @GetMapping("/dueDiligences/{ddId}")
     public String dueDiligencePage(@PathVariable("ddId") Long ddId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //권한 확인 필요 (총관리자 , 일반관리자)
-        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+//        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        String role = "ADMIN";
 
-        if(role.equals("ROLE_ADMIN")) return "/stock/dueDiligenceTop";
+        if(role.equals("ADMIN")) return "/stock/dueDiligenceTop";
         return "/stock/dueDiligenceWh"; //일반관리자 페이지
     }
 
@@ -205,7 +209,7 @@ public class StockController {
     public ResponseEntity<List<String>> createDueDiligenceForm(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //총관리자인 경우 권한없음 띄우기
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        if(role.equals("ROLE_ADMIN")) return ResponseEntity.ok(null);
+        if(role.equals("ADMIN")) return ResponseEntity.ok(null);
 
         List<String> codeList = stockService.getWarehouseCodeList();
 
@@ -224,7 +228,8 @@ public class StockController {
     @PostMapping("/api/dueDiligence") //프론트에서 Result 받아서 -1이면 권한 없음 띄우기
     public ResponseEntity<Integer> createDueDiligence(@Valid @RequestBody DueDiligenceDTO dto, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //dto에 maId 추가해야함!!!
-        dto.setMaId(customUserDetails.getUsername());
+
+        dto.setMaId(customUserDetails.getUserId());
         Integer result = stockService.registerDueDiligence(dto);
 
         return ResponseEntity.ok(result);
@@ -242,9 +247,8 @@ public class StockController {
                                                       @Valid @RequestBody DueDiligenceDTO dto,
                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         dto.setDdId(ddId);
-        dto.setMaId(customUserDetails.getUsername());
+        dto.setMaId(customUserDetails.getUserId());
         //dto에 maId 추가해야함!!
-
         Integer result = stockService.modifyDueDiligence(dto);
 
         return ResponseEntity.ok(result);
@@ -257,7 +261,7 @@ public class StockController {
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //현재 정보를 불러와야 권한 확인 가능
         dueDiligenceDTO.setDdId(ddId);
         dueDiligenceDTO.setWhCode(readDTO.getWhCode());
-        dueDiligenceDTO.setMaId(customUserDetails.getUsername());
+        dueDiligenceDTO.setMaId(customUserDetails.getUserId());
         //dto에 maId 추가해야함!!
 
         Integer result = stockService.removeDueDiligence(dueDiligenceDTO);
