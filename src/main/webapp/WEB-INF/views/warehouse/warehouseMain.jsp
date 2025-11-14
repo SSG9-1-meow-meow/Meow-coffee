@@ -204,8 +204,8 @@ background-color: #000;
                                 <label for="createWhGrade" class="form-label">창고등급</label>
                                 <select class="form-select" id="createWhGrade" name="whGrade">
                                     <option value="" selected disabled>창고 등급을 선택하세요</option>
-                                    <option value="main">MAIN</option>
-                                    <option value="sub">SUB</option>
+                                    <option value="Main">MAIN</option>
+                                    <option value="Sub">SUB</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -539,12 +539,12 @@ return;
 const whTotalCapa = Number(data.whTotalCapa);
 
 // whGrade 기준 유효성 검사
-if (data.whGrade === 'main' && whTotalCapa < 1000) {
+if (data.whGrade === 'Main' && whTotalCapa < 1000) {
 alert("메인 창고의 최대수용용량은 1000 이상이어야 합니다.");
 return;
 }
 
-if (data.whGrade === 'sub' && whTotalCapa < 300) {
+if (data.whGrade === 'Sub' && whTotalCapa < 300) {
 alert("서브 창고의 최대수용용량은 300 이상이어야 합니다.");
 return;
 }
@@ -652,7 +652,7 @@ return;
 try{
 const response = await axios.put("/api/warehouses/" + getWhCode+"/update", updateData);
 
-if(response == -1) {alert("수정 권한이 없습니다."); return;}
+if(response.data === -1) {alert("수정 권한이 없습니다."); return;}
 alert("창고 정보가 수정되었습니다.");
 $("#detailWarehouseModal").modal("hide");
 location.reload();
@@ -678,9 +678,9 @@ $fieldSelect.append('<option value="" selected disabled>평수를 선택하세�
 
 let fieldOptions = [];
 
-if (selectedGrade === "main") {
+if (selectedGrade === "Main") {
 fieldOptions = [3000, 5000, 8000];
-} else if (selectedGrade === "sub") {
+} else if (selectedGrade === "Sub") {
 fieldOptions = [1000, 2000, 3000];
 }
 
