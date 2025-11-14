@@ -190,7 +190,7 @@
                SUM(OI.outQtyReq)                       AS total_quantity
         FROM outboundItems OI
                  INNER JOIN outboundrequest ORQ ON OI.outReqId = ORQ.outReqId
-        WHERE OI.status = '승인완료'
+        WHERE OI.status = '출고완료'
           AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
           AND OI.outDttmShip >= CURDATE() - INTERVAL 30 DAY
         GROUP BY chart_key
@@ -216,7 +216,7 @@
         SELECT AVG(TIMESTAMPDIFF(HOUR, ORQ.outDttmReq, OI.outDttmShip))
         FROM outboundItems OI
                  INNER JOIN outboundrequest ORQ ON OI.outReqId = ORQ.outReqId
-        WHERE OI.status = '승인완료'
+        WHERE OI.status = '출고완료'
           AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
           AND OI.outDttmShip >= CURDATE() - INTERVAL 30 DAY
         ]]>
@@ -276,33 +276,13 @@
                                 DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY), INTERVAL n.n MONTH),
                                 '%Y-%m-01'
                         ) AS y
-                 FROM (SELECT 0 n
-                       UNION ALL
-                       SELECT 1
-                       UNION ALL
-                       SELECT 2
-                       UNION ALL
-                       SELECT 3
-                       UNION ALL
-                       SELECT 4
-                       UNION ALL
-                       SELECT 5
-                       UNION ALL
-                       SELECT 6
-                       UNION ALL
-                       SELECT 7
-                       UNION ALL
-                       SELECT 8
-                       UNION ALL
-                       SELECT 9
-                       UNION ALL
-                       SELECT 10
-                       UNION ALL
-                       SELECT 11) n) X
+                 FROM (SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL
+                       SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL
+                       SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) n) X
                  LEFT JOIN outboundItems OI
                            ON OI.outDttmShip >= X.y
                                AND OI.outDttmShip < DATE_ADD(X.y, INTERVAL 1 MONTH)
-                               AND OI.status = '승인완료'
+                               AND OI.status = '출고완료'
                  LEFT JOIN outboundrequest ORQ
                            ON ORQ.outReqId = OI.outReqId
                                AND (ORQ.IsDelete IS NULL OR ORQ.IsDelete = 0)
@@ -310,5 +290,4 @@
         ORDER BY X.y
         ]]>
     </select>
-
 </mapper>

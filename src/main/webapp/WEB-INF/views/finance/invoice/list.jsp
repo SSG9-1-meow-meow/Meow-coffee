@@ -295,7 +295,10 @@ KPI 카드 (총 청구 / 입금률 / 발행중 / 미납)
             if (r.status === 200) {
                 invConfirmModal.hide();
                 pending = {id: null, target: null};
+
+                // ✅ 여기서 목록 + KPI 둘 다 갱신
                 loadInvoiceList();
+                loadInvoiceKpis();
             }
         }).catch(err => console.error('상태 변경 오류:', err));
     });

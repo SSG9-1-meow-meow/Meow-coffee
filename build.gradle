@@ -81,6 +81,8 @@ dependencies {
   implementation 'org.springframework.security:spring-security-core:5.8.16'
   implementation 'org.springframework.security:spring-security-taglibs:5.8.16'
   implementation 'org.springframework.security:spring-security-web:5.8.16'
+
+  testImplementation 'javax.servlet:javax.servlet-api:4.0.1'
 }
 
 test {
