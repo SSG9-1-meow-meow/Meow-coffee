@@ -32,6 +32,10 @@ public interface InboundService {
   // InboundService.java
   List<AvailableLocationDTO> findAvailableLocations(LocalDate selectedDate, int requiredQty);
 
+  void finalizeInboundItem(InboundProcessDTO processDTO);
+  void startInspection(long inReqItemsId);
+  void completePhysicalInbound(long inReqItemsId);
+
 
 
 

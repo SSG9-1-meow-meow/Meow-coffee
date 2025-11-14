@@ -4,7 +4,9 @@ import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +20,15 @@ import java.util.Map;
 @Log4j2
 public class StockController {
     private final StockService stockService;
+    //로그인한 객체 꽂기
+
+    @GetMapping("/stocks")
+    public String stockListPage(){
+        return "stock/stockSearch";
+    }
 
     //재고 관리 controller
-    @GetMapping("/stocks")
+    @GetMapping("/api/stocks")
     public ResponseEntity<Map<String, Object>> readStockList(@ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = new StockSearchDTO(); //재고 전체 조회이니 searchDTO에 아무것도 설정 안해줘도 됨
         List<StockReadDTO> list = stockService.getStockList(criteria, searchDTO);
@@ -34,7 +42,7 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/category/{cfCategory}") //카테고리(대분류)별 재고 조회
+    @GetMapping("/api/stocks/category/{cfCategory}") //카테고리(대분류)별 재고 조회
     public ResponseEntity<Map<String, Object>> readStockListByCategory(@PathVariable("cfCategory") String cfCategory,
                                                                       @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfCategory(cfCategory).build();
@@ -49,7 +57,7 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/type/{cfType}") //품종(중분류)별 재고 조회
+    @GetMapping("/api/stocks/type/{cfType}") //품종(중분류)별 재고 조회
     public ResponseEntity<Map<String, Object>> readStockListByType(@PathVariable("cfType") String cfType,
                                                                   @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfType(cfType).build();
@@ -64,7 +72,7 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/grade/{cfGrade}") //등급(소분류)별 재고 조회
+    @GetMapping("/api/stocks/grade/{cfGrade}") //등급(소분류)별 재고 조회
     public ResponseEntity<Map<String, Object>> readStockListByGrade(@PathVariable("cfGrade") String cfGrade,
                                                                    @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfGrade(cfGrade).build();
@@ -79,7 +87,12 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/{cfName}") //품목별 재고 조회
+    @GetMapping("/stocks/{cfName}")
+    public String stockCfNamePage(@PathVariable("cfName") String cfName) {
+       return "/stock/stockCfName";
+    }
+
+    @GetMapping("/api/stocks/{cfName}") //품목별 재고 조회
     public ResponseEntity<Map<String, Object>> readStockListByName(@PathVariable("cfName") String cfName,
                                                                   @ModelAttribute Criteria criteria) {
         StockSearchDTO searchDTO = StockSearchDTO.builder().cfName(cfName).build();
@@ -94,16 +107,25 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/stocks/coffee/{cfName}") //커피 정보 상세 조회
+    @GetMapping("/api/stocks/coffee/{cfName}") //커피 정보 상세 조회
     public ResponseEntity<CoffeeDTO> readCoffeeByName(@PathVariable("cfName") String cfName) {
         CoffeeDTO coffeeDTO = stockService.getCoffee(cfName);
 
         return ResponseEntity.ok(coffeeDTO);
     }
 
-    //유효성 검사 필수 (총관리자 + 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/stocks/warehouse")
-    public ResponseEntity<Map<String, Object>> readStocksByWarehouse(@ModelAttribute Criteria criteria) {
+    public String stockWarehousePage() {
+        return "/stock/stockWarehouse";
+    }
+
+    //유효성 검사 필수 (총관리자 + 일반관리자만 접속 가능) -> 추가해야함
+    @GetMapping("/api/stocks/warehouse")
+    public ResponseEntity<Map<String, Object>> readStocksByWarehouse(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //권한 확인
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
         List<StockReadDTO> list = stockService.getWarehouses(criteria);
 
         Integer total = stockService.getListCount(null, "warehouse");
@@ -115,9 +137,18 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    //유효성 검사 필수 (총관리자+ 일반관리자만 접속 가능) -> 추가해야함
     @GetMapping("/stocks/company")
-    public ResponseEntity<Map<String, Object>> readCompanyList(@ModelAttribute Criteria criteria) {
+    public String stockCompanyPage() {
+        return "/stock/stockCompany";
+    }
+
+    //유효성 검사 필수 (총관리자+ 일반관리자만 접속 가능) -> 추가해야함
+    @GetMapping("/api/stocks/company")
+    public ResponseEntity<Map<String, Object>> readCompanyList(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //권한 확인
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
         List<CompanyReadDTO> list = stockService.getCompanyList(criteria);
 
         Integer total = stockService.getListCount(null, "company");
@@ -129,10 +160,19 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/dueDiligences")
+    public String dueDiligenceListPage() {
+        return "/stock/dueDiligenceList";
+    }
 
     //재고 실사 controller -> 기본 페이지에서만 유효성 검사해도 됨
-    @GetMapping("/dueDiligences")
-    public ResponseEntity<Map<String, Object>> readDueDiligenceList(@ModelAttribute Criteria criteria) {
+    //총관리자+창고관리자 권한 확인 필수
+    @GetMapping("/api/dueDiligences")
+    public ResponseEntity<Map<String, Object>> readDueDiligenceList(@ModelAttribute Criteria criteria, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")) return ResponseEntity.ok(Map.of("authorized", false));
+
         List<DueDiligenceReadDTO> list = stockService.getDueDiligenceList(criteria);
 
         Integer total = stockService.getListCount(null, "dueDiligence");
@@ -145,21 +185,34 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/dueDiligences/{ddId}") //재고 실사 상세 페이지
+    @GetMapping("/dueDiligences/{ddId}")
+    public String dueDiligencePage(@PathVariable("ddId") Long ddId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //권한 확인 필요 (총관리자 , 일반관리자)
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+
+        if(role.equals("ROLE_ADMIN")) return "/stock/dueDiligenceTop";
+        return "/stock/dueDiligenceWh"; //일반관리자 페이지
+    }
+
+    @GetMapping("/api/dueDiligences/{ddId}") //재고 실사 상세 페이지
     public ResponseEntity<DueDiligenceReadDTO> readDueDiligence(@PathVariable("ddId") Long ddId) {
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId);
 
         return ResponseEntity.ok(readDTO);
     }
 
-    @GetMapping("/dueDiligence") //재고 실사 등록 페이지
-    public ResponseEntity<List<String>> createDueDiligenceForm(){
+    @GetMapping("/api/dueDiligence") //재고 실사 등록
+    public ResponseEntity<List<String>> createDueDiligenceForm(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //총관리자인 경우 권한없음 띄우기
+        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        if(role.equals("ROLE_ADMIN")) return ResponseEntity.ok(null);
+
         List<String> codeList = stockService.getWarehouseCodeList();
 
         return ResponseEntity.ok(codeList);
     }
 
-    @GetMapping("/stocks/{stkId}/warehouse/{whCode}") //재고 실사 등록 시 정보 불러오기
+    @GetMapping("/api/stocks/{stkId}/warehouse/{whCode}") //재고 실사 등록 시 정보 불러오기
     public ResponseEntity<DueDiligenceDTO> readDueDiligenceInfo(@PathVariable String stkId, @PathVariable String whCode) {
         DueDiligenceDTO dto = stockService.getDueDiligenceInfo(stkId, whCode);
 
@@ -168,45 +221,51 @@ public class StockController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/dueDiligence") //프론트에서 Result 받아서 -1이면 권한 없음 띄우기
-    public ResponseEntity<Integer> createDueDiligence(@Valid @RequestBody DueDiligenceDTO dto) {
+    @PostMapping("/api/dueDiligence") //프론트에서 Result 받아서 -1이면 권한 없음 띄우기
+    public ResponseEntity<Integer> createDueDiligence(@Valid @RequestBody DueDiligenceDTO dto, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        //dto에 maId 추가해야함!!!
+        dto.setMaId(customUserDetails.getUsername());
         Integer result = stockService.registerDueDiligence(dto);
 
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/dueDiligences/{ddId}/update")
+    @GetMapping("/api/dueDiligences/{ddId}/update")
     public ResponseEntity<DueDiligenceReadDTO> updateDueDiligenceForm(@PathVariable("ddId") Long ddId){
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId);
 
         return ResponseEntity.ok(readDTO);
     }
 
-    @PutMapping("/dueDiligences/{ddId}/update") //받은 객체가 null인 경우 권한 없음 띄우기
-    public ResponseEntity<DueDiligenceReadDTO> updateDueDiligence(@PathVariable("ddId") Long ddId,
-                                                                  @Valid @RequestBody DueDiligenceDTO dto) {
+    @PutMapping("/api/dueDiligences/{ddId}/update") //받은 객체가 -1인 경우 권한 없음 띄우기
+    public ResponseEntity<Integer> updateDueDiligence(@PathVariable("ddId") Long ddId,
+                                                      @Valid @RequestBody DueDiligenceDTO dto,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         dto.setDdId(ddId);
+        dto.setMaId(customUserDetails.getUsername());
+        //dto에 maId 추가해야함!!
 
         Integer result = stockService.modifyDueDiligence(dto);
-        if(result == -1) return ResponseEntity.ok(null);
 
-        DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //수정한 실사로그 부분 가져와서 보여주기 위해
-        return ResponseEntity.ok(readDTO);
+        return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/dueDiligences/{ddId}") //String id는 현재 로그인한 id를 말함
+    @PutMapping("/api/dueDiligences/{ddId}")
     public ResponseEntity<Integer> deleteDueDiligence(@PathVariable("ddId") Long ddId,
-                                                      @RequestBody DueDiligenceDTO dueDiligenceDTO) {
+                                                      @RequestBody DueDiligenceDTO dueDiligenceDTO,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         DueDiligenceReadDTO readDTO = stockService.getDueDiligence(ddId); //현재 정보를 불러와야 권한 확인 가능
         dueDiligenceDTO.setDdId(ddId);
         dueDiligenceDTO.setWhCode(readDTO.getWhCode());
+        dueDiligenceDTO.setMaId(customUserDetails.getUsername());
+        //dto에 maId 추가해야함!!
 
         Integer result = stockService.removeDueDiligence(dueDiligenceDTO);
         return ResponseEntity.ok(result);
         //프론트에서 받은 값이 -1이라면 권한 없음 띄우기
     }
 
-    @GetMapping("/dueDiligences/{ddId}/{ddApproval}")//프론트에서 버튼에 따라 ddApproval이 정해져서 유효성검사 필요없음
+    @GetMapping("/api/dueDiligences/{ddId}/{ddApproval}")//프론트에서 버튼에 따라 ddApproval이 정해져서 유효성검사 필요없음
     public ResponseEntity<Integer> updateApprovalStatus(@PathVariable("ddApproval") String ddApproval,
                                                         @PathVariable("ddId") Long ddId) {
         Integer result = stockService.modifyApprovalStatus(ddApproval, ddId);

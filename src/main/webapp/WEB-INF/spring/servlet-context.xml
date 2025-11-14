@@ -10,8 +10,10 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
+    <!--  servlet-context.xml 파일에서는 컨트롤러 관련 설정만 추가  -->
+    <!--  이전에 servlet-context.xml 파일에 포함된 설정 클래스를 빈으로 등록하는 작업은 root-context에서 담당  -->
+    <!--  즉, 루트 컨테이너와 서블릿 컨테이너의 역할을 명확히 분리하고, 필터에 기반한 스프링 시큐리티 모듈이 그 사이에서 동작하는 구조가 되도록 설정해야 함   -->
     <context:component-scan base-package="com.ssg.meowcoffee.controller"/>
-    <context:component-scan base-package="com.ssg.meowcoffee.config"/>
 
     <mvc:annotation-driven conversion-service="conversionService"/>
     <mvc:resources mapping="/resources/**" location="classpath:/static/"/>

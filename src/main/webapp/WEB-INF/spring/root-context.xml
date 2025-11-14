@@ -10,22 +10,28 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-<<<<<<< Updated upstream
-=======
     <!--    로컬에서 작업하는 경우 -->
         <context:property-placeholder location="classpath:db-local.properties"/>
 
     <!--    원격에서 작업하는 경우 -->
 <!--    <context:property-placeholder location="classpath:db-railway.properties"/>-->
 
->>>>>>> Stashed changes
-    <context:component-scan base-package="com.ssg.meowcoffee"/>
+
+    <!-- 설정이란 측면에서, security-context는 root context의 일부 -->
+    <import resource="security-context.xml"/>
+
+    <!--  루트 컨텍스트에서는 웹 애플리케이션에서 공통으로 사용되는 서비스, mapper에 관한 스캔만 수행하고, -->
+    <!--  루트 컨텍스트의 자식 컨텍스트인 서블릿 컨텍스트(servlet-context)에서만 컨트롤러를 빈으로 등록하는 작업을 수행하도록 두 컨텍스트룰 분리 -->
+    <!--  (실행의 관점에서는 root-context와 servlet-context 사이에서 security-context가 실행될 수 있어야 함.)-->
+    <context:component-scan base-package="com.ssg.meowcoffee">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/meowcoffeedb?serverTimezone=Asia/Seoul"/>
-        <property name="username" value="root"/>
-        <property name="password" value="mysql1234"/>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
 
         <property name="dataSourceProperties">
             <props>

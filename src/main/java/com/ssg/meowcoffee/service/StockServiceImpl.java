@@ -7,6 +7,7 @@ import com.ssg.meowcoffee.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -207,5 +208,12 @@ public class StockServiceImpl implements StockService{
         } catch (Exception e) {
             throw new DatabaseTransactionException("리스트 total 개수 구하는 중 DB에서 오류 발생");
         }
+    }
+
+    // 하루에 한 번씩 실행 (매일 자정)
+    @Override
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateWarehouseUseCapaDaily() {
+        stockMapper.updateWarehouseUseCapa();
     }
 }

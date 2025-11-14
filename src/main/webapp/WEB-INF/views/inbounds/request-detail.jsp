@@ -116,7 +116,8 @@
             // 읽기 모드 로직
             // '처리하기' 버튼을 조건부로 생성
             let processButtonHtml = '';
-            if (currentUserRole === 'MANAGER' && item.status === 'PENDING') {
+            // if (currentUserRole === 'MANAGER' && item.status === 'PENDING') {
+            if (currentUserRole === 'MANAGER' || 'ADMIN') { // managerd
                 processButtonHtml =
                     '<a href="/inbounds/items/' + item.inReqItemsId + '" class="btn btn-sm btn-outline-primary ms-3">' +
                     '처리하기 <i class="fas fa-arrow-right"></i>' +

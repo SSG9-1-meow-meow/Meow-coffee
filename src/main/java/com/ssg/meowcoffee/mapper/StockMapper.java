@@ -26,4 +26,5 @@ public interface StockMapper {
     Integer countDueDiligenceTotal();
     Integer countWarehouseTotal();
     Integer countCompanyTotal();
+    Integer updateWarehouseUseCapa();
 }

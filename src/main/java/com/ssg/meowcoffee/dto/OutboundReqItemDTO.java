@@ -1,26 +1,40 @@
-package com.ssg.meowcoffee.dto;
-
+package com.ssg.meowcoffee.dto;// OutboundReqItemDTO
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ssg.meowcoffee.domain.OutboundStatus;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// 관리자/회원 출고 관리 UI용 DTO (ERD 기반)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class OutboundReqItemDTO {
+    private Long outReqId;
+    private String comId;
+    private String comName;
+    private String stkId;
+    private String vehicleId;
+    private Integer outQtyReq;
+    private Integer outQty;
+    private String  status;
 
-    private Long outReqId;          // 출고 요청 ID
-    private String comName;         // 거래처명
-    private String stkId;           // 재고 ID
-    private String vehicleId;       // 차량 ID
-    private Integer outQtyReq;      // 요청 수량
-    private Integer outQty;         // 출고 수량
-    private OutboundStatus status;  // 출고 상태 (ENUM)
-    private LocalDateTime outDttmReq;   // 출고 요청 일시
-    private LocalDateTime outDttmAppr;  // 출고 승인 일시
-    private Integer isTempo;        // 임시 저장 여부
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime outDttmReq;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime outDttmAppr;
+
+    private Integer isTempo;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate outDateWish;
+
+    private Boolean isDelete;
+    private String statusValue;  // 승인대기/승인완료/출고완료/반려
+
+
+    private String statusCode;  // 영문 코드
 }
