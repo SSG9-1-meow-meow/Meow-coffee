@@ -2,11 +2,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%@ include file="/WEB-INF/views/includes/_headerHead.jsp" %>
-<%@ include file="/WEB-INF/views/includes/_headerNav.jsp" %>
-
+<%-- 1) 컨트롤러에서 넘긴 userInfo / userRole / userId 먼저 세팅 --%>
 <c:set var="userInfo" value="${userInfo}" />
 <c:set var="userRole" value="${userInfo.userRole}" />
+<c:set var="userId"   value="${userInfo.userId}" />
+
+<%-- 2) 그 다음에 header include --%>
+<%@ include file="/WEB-INF/views/includes/_headerHead.jsp" %>
+<%@ include file="/WEB-INF/views/includes/_headerNav.jsp" %>
 
 <div class="container">
     <div class="page-inner">
@@ -343,6 +346,9 @@
 </div>
 
 <script>
+    // 컨텍스트 경로
+    const ctx = '${pageContext.request.contextPath}';
+
     // 컨트롤러에서 넘어온 아이디 / 권한
     const userId   = '${userInfo.userId}';
     const userRole = '${userInfo.userRole}';
@@ -403,7 +409,7 @@
         new bootstrap.Modal(document.getElementById("updateConfirmModal")).show();
     });
 
-    // "예" 버튼 클릭 -> 실제 PUT /members/profile/{id}
+    // "예" 버튼 클릭 -> 실제 PUT {ctx}/members/profile/{id}
     document.getElementById("updateConfirmBtn").addEventListener("click", function () {
         if (!validateForm()) return;
 
@@ -428,7 +434,7 @@
 
         const payload = {
             userId: userId,
-            userPwd: sendPwd,        // ★ 항상 값 존재 (null/undefined 아님)
+            userPwd: sendPwd,        // 항상 값 존재
             userPhone: phone,
             userEmail: email,
             userRoadAddr: roadAddr,
@@ -436,7 +442,8 @@
             userImgPath: null
         };
 
-        fetch(`/members/profile/${userId}`, {
+        // ★ 템플릿 문자열 쓰지 말고 문자열 이어붙이기 (EL 충돌 방지)
+        fetch(ctx + '/members/profile/' + encodeURIComponent(userId), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -445,7 +452,6 @@
         })
             .then(res => {
                 if (!res.ok) {
-                    // 디버깅용 로그
                     return res.text().then(msg => {
                         console.error('회원정보 변경 실패 - status:', res.status);
                         console.error('response body:', msg);
@@ -474,7 +480,9 @@
                 document.getElementById("newPwd").value = "";
 
                 alert('회원정보가 변경되었습니다.');
-                bootstrap.Modal.getInstance(document.getElementById("updateConfirmModal")).hide();
+                bootstrap.Modal
+                    .getInstance(document.getElementById("updateConfirmModal"))
+                    .hide();
             })
             .catch(err => {
                 console.error(err);
@@ -486,9 +494,9 @@
         new bootstrap.Modal(document.getElementById("dormantConfirmModal")).show();
     });
 
-    // 휴면전환 모달에서 "예" 클릭 -> PUT /members/profile/{id}:deactivate
+    // 휴면전환 모달에서 "예" 클릭 -> PUT {ctx}/members/profile/{id}:deactivate
     document.getElementById("dormantConfirmBtn").addEventListener("click", function () {
-        fetch(`/members/profile/${userId}:deactivate`, {
+        fetch(ctx + '/members/profile/' + encodeURIComponent(userId) + ':deactivate', {
             method: 'PUT'
         })
             .then(res => {
@@ -504,11 +512,12 @@
             })
             .then(data => {
                 alert('휴면회원 전환이 신청되었습니다.');
-                bootstrap.Modal.getInstance(document.getElementById("dormantConfirmModal")).hide();
+                bootstrap.Modal
+                    .getInstance(document.getElementById("dormantConfirmModal"))
+                    .hide();
             })
             .catch(err => {
                 console.error(err);
             });
     });
 </script>
-
