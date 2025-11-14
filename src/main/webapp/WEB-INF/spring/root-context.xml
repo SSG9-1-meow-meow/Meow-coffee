@@ -10,6 +10,15 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
+<<<<<<< Updated upstream
+=======
+    <!--    로컬에서 작업하는 경우 -->
+        <context:property-placeholder location="classpath:db-local.properties"/>
+
+    <!--    원격에서 작업하는 경우 -->
+<!--    <context:property-placeholder location="classpath:db-railway.properties"/>-->
+
+>>>>>>> Stashed changes
     <context:component-scan base-package="com.ssg.meowcoffee"/>
 
     <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">

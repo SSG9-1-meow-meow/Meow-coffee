@@ -23,7 +23,7 @@ BEGIN
     DECLARE whId BIGINT;
     DECLARE userId VARCHAR(30);
 
-    IF OLD.status <> NEW.status AND NEW.status = '승인완료' THEN
+    IF OLD.status <> NEW.status AND NEW.status = '출고완료' THEN
         -- 단가 테이블 필수
         IF (SELECT COUNT(*) FROM unitCost) = 0 THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'unitCost is empty';
@@ -79,3 +79,9 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+SELECT * FROM outboundItems;
+
+UPDATE outboundItems SET status = '출고완료', outDttmInsp = '2025-11-10 10:00:00', outDttmShip = '2025-11-11 10:00:00'  WHERE outReqId = 2 OR outReqId = 4;
+
+SELECT * FROM outboundCost;
