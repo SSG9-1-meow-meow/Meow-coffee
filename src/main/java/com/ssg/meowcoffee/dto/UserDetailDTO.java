@@ -2,14 +2,13 @@ package com.ssg.meowcoffee.dto;
 
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,7 +26,9 @@ public class UserDetailDTO {
     private String userDetailAddr;
     private String userImgPath;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate userJoinDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate userLastLogin;
 
     private UserRole userRole;

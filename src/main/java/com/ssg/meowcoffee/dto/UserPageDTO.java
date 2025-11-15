@@ -11,19 +11,19 @@ import java.util.List;
 @ToString
 public class UserPageDTO<E> {
 
-    private int page;
-    private int amount;
-    private int startPage;  //시작
-    private int endPage;    //화면상 마지막 번호
-    private boolean prev, next;
+    private final UserCriteria cri;
+    private final List<E> dtoList;
+    private final int total;
 
-    private int total;
-    private List<E> dtoList;
+    private final boolean prev;
+    private final boolean next;
+
+    private final int startPage;  //시작
+    private int endPage;    //화면상 마지막 번호
 
     @Builder
     public UserPageDTO(UserCriteria cri, List<E> dtoList, int total) {
-        this.page = cri.getPageNum();
-        this.amount = cri.getAmount();
+        this.cri = cri;
         this.total = total;
         this.dtoList = dtoList;
 
