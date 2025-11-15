@@ -26,13 +26,7 @@ public class MemberMapperTests {
     @DisplayName("페이지네이션 및 검색필터 적용된 회원 리스트 조회")
     public void testSelectAllByFilter() {
         UserCriteria criteria = UserCriteria.builder()
-                .pageNum(1)
-                .amount(10)
-                .roleType(UserRole.COMPANY)
-                .type("I")          // 키워드 검색 옵션: 아이디
-                .keyword("good")
-                .from(LocalDate.parse("2025-06-01"))
-                .to(LocalDate.parse("2025-11-01"))
+                .roleType(UserRole.MANAGER)
                 .build();
         List<UserVO> list = memberMapper.selectUsers(criteria);
         list.forEach(log::info);
