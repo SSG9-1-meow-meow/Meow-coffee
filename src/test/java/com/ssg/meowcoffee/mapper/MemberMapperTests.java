@@ -26,13 +26,7 @@ public class MemberMapperTests {
     @DisplayName("페이지네이션 및 검색필터 적용된 회원 리스트 조회")
     public void testSelectAllByFilter() {
         UserCriteria criteria = UserCriteria.builder()
-                .pageNum(1)
-                .amount(10)
-                .roleType(UserRole.COMPANY)
-                .type("I")          // 키워드 검색 옵션: 아이디
-                .keyword("good")
-                .from(LocalDate.parse("2025-06-01"))
-                .to(LocalDate.parse("2025-11-01"))
+                .roleType(UserRole.MANAGER)
                 .build();
         List<UserVO> list = memberMapper.selectUsers(criteria);
         list.forEach(log::info);
@@ -49,7 +43,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("현재 로그인한 사용자의 마지막 로그인 시간을 갱신")
     public void testLastLoginTime() {
-        String loginId = "coffeebiz01";
+        String loginId = "bu_manager_01";
         int affected = memberMapper.updateLoginTime(loginId);
         Assertions.assertEquals(1, affected);
     }
@@ -57,7 +51,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("회원 리스트에서의 승인대기 중인 특정 회원정보 조회")
     public void testSelectUserById() {
-        String userId = "delivery02";
+        String userId = "company123";
         UserVO userVO = memberMapper.selectUserById(userId);
         Assertions.assertEquals(UserStatus.WAITING_APPROVAL, userVO.getUserStatus());
     }
@@ -65,7 +59,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("로그인할 회원 아이디에 해당하는 회원정보 불러오기")
     public void testSelectLoginUser() {
-        String userId = "company_good";
+        String userId = "sb_contact_01";
         UserVO userVO = memberMapper.selectLoginUser(userId);
         Assertions.assertNotNull(userVO);
     }
@@ -73,7 +67,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("현재 회원권한이 창고관리자인 회원정보를 조회")
     public void testSelectManagerById() {
-        String userId = "manager_kim";
+        String userId = "bu_manager_01";
         ManagerVO managerVO = memberMapper.selectManagerById(userId);
         log.info(managerVO);
         Assertions.assertEquals(userId, managerVO.getManagerId());
@@ -83,7 +77,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("거래처의 담당자가 현재 회원정보를 조회")
     public void testSelectCompanyById() {
-        String userId = "company_basic";
+        String userId = "sb_contact_01";
         CompanyVO companyVO = memberMapper.selectCompanyById(userId);
         log.info(companyVO);
         Assertions.assertEquals(userId, companyVO.getComId());
@@ -92,7 +86,7 @@ public class MemberMapperTests {
     @Test
     @DisplayName("현재 회원권한이 배송기사인 회원정보를 조회")
     public void testSelectDeliverymanById() {
-        String userId = "delivery01";
+        String userId = "sb_driver_01";
         DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
         log.info(deliverymanVO);
         Assertions.assertEquals(userId, deliverymanVO.getDelivId());
@@ -101,8 +95,8 @@ public class MemberMapperTests {
     @Test
     @DisplayName("입력한 이메일, 사업자등록번호에 해당하는 거래처 아이디 찾기")
     public void testFindCompanyId() {
-        String userCode = "123-45-67890";
-        String userEmail = "ceo1@meowcoffee.com";
+        String userCode = "120-81-03232";
+        String userEmail = "sb_contact_02@starbucks.com";
         FindIDDTO findIDDTO = FindIDDTO.builder()
                 .targetRole(UserRole.COMPANY.getRoleName())
                 .userCode(userCode)
@@ -110,39 +104,39 @@ public class MemberMapperTests {
                 .build();
 
         FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
-        Assertions.assertEquals("coffeebiz01", found.getUserId());
+        Assertions.assertEquals("sb_contact_02", found.getUserId());
         Assertions.assertEquals(UserRole.COMPANY, found.getUserRole());
     }
 
     @Test
     @DisplayName("입력한 이름, 이메일에 해당하는 창고관리자 아이디 찾기")
     public void testFindManagerId() {
-        String userName = "최출고";
-        String userEmail = "manager.choi@wms.com";
+        String userName = "최경남";
+        String userEmail = "bu_manager_02@meowCoffee.com";
         FindIDDTO findIDDTO = FindIDDTO.builder()
                 .targetRole(UserRole.MANAGER.getRoleName())
                 .userName(userName)
                 .userEmail(userEmail)
                 .build();
         FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
-        Assertions.assertEquals("manager_choi", found.getUserId());
+        Assertions.assertEquals("bu_manager_02", found.getUserId());
         Assertions.assertEquals(UserRole.MANAGER, found.getUserRole());
     }
 
     @Test
     @DisplayName("입력한 사업자등록번호와 이메일에 해당하는 배송기사 아이디 찾기")
     public void testFindDeliverymanId() {
-        String userCode = "120-10-12345";
-        String userEmail = "delivery.park@wms.com";
+        String userCode = "120-81-03232";
+        String userEmail = "sb_driver_04@starbucks.com";
         FindIDDTO findIDDTO = FindIDDTO.builder()
-                .targetRole(UserRole.DELIVERY.getRoleName())
+                .targetRole(UserRole.DELIVERYMAN.getRoleName())
                 .userCode(userCode)
                 .userEmail(userEmail)
                 .build();
         FindIDResultDTO found = memberMapper.findUserId(findIDDTO);
         log.info(found.getUserId() + ":" + found.getUserRole());
-        Assertions.assertEquals("delivery_park", found.getUserId());
-        Assertions.assertEquals(UserRole.DELIVERY, found.getUserRole());
+        Assertions.assertEquals("sb_driver_04", found.getUserId());
+        Assertions.assertEquals(UserRole.DELIVERYMAN, found.getUserRole());
     }
 
     @Test
@@ -189,12 +183,12 @@ public class MemberMapperTests {
     @Test
     @DisplayName("현재 로그인한 회원이 회원 정보를 변경")
     public void testUpdateUser() {
-        String userId = "manager01";
+        String userId = "company123";
         UserInfoUpdateDTO newUserInfo = UserInfoUpdateDTO.builder()
                 .userId(userId)
                 .userPwd("2222")
                 .userPhone("010-1234-5678")
-                .userEmail("manager01@testers.com")
+                .userEmail("company1234@test.com")
                 .build();
         int affected = memberMapper.updateUser(newUserInfo);
         Assertions.assertEquals(1, affected);

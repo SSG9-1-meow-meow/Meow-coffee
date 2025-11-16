@@ -52,10 +52,10 @@
       <!--  이름/아이디 키워드 검색  -->
       <if test="cri.type != null and cri.keyword != null">
         <choose>
-          <when test="cri.type == 'N'.toString()">
+          <when test="cri.type == 'name'.toString()">
             and userName like concat('%', #{cri.keyword}, '%')
           </when>
-          <when test="cri.type == 'I'.toString()">
+          <when test="cri.type == 'id'.toString()">
             and userId like concat('%', #{cri.keyword}, '%')
           </when>
         </choose>
@@ -64,7 +64,7 @@
       <!--  기간별 필터링  -->
       <if test="cri.from != null">
         <choose>
-          <when test="cri.periodFilter == 'reg'">
+          <when test="cri.periodFilter == 'regDate'">
             and userJoinDate >= #{cri.from}
           </when>
           <otherwise>
@@ -74,7 +74,7 @@
       </if>
       <if test="cri.to != null">
         <choose>
-          <when test="cri.periodFilter == 'reg'">
+          <when test="cri.periodFilter == 'regDate'">
             and userJoinDate <![CDATA[ <= ]]> #{cri.to}
           </when>
           <otherwise>
@@ -126,15 +126,15 @@
     select userId, userRole from users
     <choose>
       <when test="userInfo.targetRole == 'COMPANY'">
-        where userCode = (
-          select comCode
+        where userEmail = (
+          select comEmail
           from companies
           where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
         )
       </when>
       <when test="userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'">
-        where userCode = (
-          select managerCode
+        where userEmail = (
+          select managerEmail
           from managers
           where managerName = #{userInfo.userName}
             and managerEmail = #{userInfo.userEmail}
@@ -142,8 +142,8 @@
         )
       </when>
       <when test="userInfo.targetRole == 'DELIVERYMAN'">
-        where userCode = (
-          select delivCode
+        where userEmail = (
+          select delivEmail
           from deliverymen
           where delivCode = #{userInfo.userCode}
             and delivEmail = #{userInfo.userEmail}

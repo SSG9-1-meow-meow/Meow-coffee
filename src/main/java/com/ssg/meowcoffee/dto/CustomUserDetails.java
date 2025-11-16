@@ -3,9 +3,7 @@ package com.ssg.meowcoffee.dto;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,10 +16,8 @@ import java.util.List;
 
 @Log4j2
 @Getter
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails, Serializable {
-
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class CustomUserDetails implements UserDetails {
 
     private String userId;
     private String userPwd;
@@ -55,19 +51,19 @@ public class CustomUserDetails implements UserDetails, Serializable {
         return this.userId;
     }
 
-    // 계정 만료, 잠금, 자격 증명 만료 관련 조건을 설정하는 부분
+    // 계정 만료, 잠금, 비밀번호 만료 관련 조건을 설정하는 부분
     @Override
-    public boolean isAccountNonExpired() {  // 만료되지 않은 계정
+    public boolean isAccountNonExpired() {  // 계정 만료조건
         return true;
     }
 
     @Override
-    public boolean isAccountNonLocked() {
+    public boolean isAccountNonLocked() {   // 계정 잠금 조건
         return true;
     }
 
     @Override
-    public boolean isCredentialsNonExpired() { // 자격 증명 유효조건
+    public boolean isCredentialsNonExpired() { // 비밀번호 만료조건
         return true;
     }
 

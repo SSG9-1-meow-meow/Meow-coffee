@@ -1,15 +1,15 @@
 package com.ssg.meowcoffee.controller;
 
 import com.ssg.meowcoffee.dto.*;
+import com.ssg.meowcoffee.service.AuthService;
 import com.ssg.meowcoffee.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -20,30 +20,38 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService authService;  // 권한 확인 오류 해결
 
     // 관리자(창고관리자, 총관리자) 전용 기능: 회원리스트 조회, 회원상태 변경, 휴면회원 전환
     @GetMapping("/list")
-    public String memberList(@Valid UserCriteria criteria, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            criteria = UserCriteria.builder().build();
+    public String memberList() {
+        log.info("GET /members/list");
+
+        String currentUserRole = authService.getCurrentUserRole();
+        if (!currentUserRole.equals("ADMIN") && !currentUserRole.equals("MANAGER")) {
+            log.error("관리자 권한이 없는 사용자입니다.");
+            return "redirect:/";
         }
-        model.addAttribute("userList", memberService.getUserList(criteria));
         return "member/list";
     }
 
-    @GetMapping("/list:api")
-    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@Valid UserCriteria criteria, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            criteria = UserCriteria.builder().build();
-        }
+    @GetMapping("/list/api")
+    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@ModelAttribute UserCriteria criteria) {
+        log.info("GET /members/list/api...");
         UserPageDTO<UserDetailDTO> userPageDTO = memberService.getUserList(criteria);
-        model.addAttribute("userPageDTO", userPageDTO);
         return ResponseEntity.ok(userPageDTO);
     }
 
     // 승인대기, 휴면대기, 휴면상태 회원까지 조회하기 위한 관리자 기능
     @GetMapping("/list/{id}")
     public ResponseEntity<UserDetailDTO> readUser(@PathVariable("id") String userId) {
+        String currentUserRole = authService.getCurrentUserRole();
+
+        if (!currentUserRole.equals("ADMIN") && !currentUserRole.equals("MANAGER")) {
+            log.error("회원리스트 조회는 관리자만 가능합니다.");
+            return ResponseEntity.badRequest().build();
+        }
+
         UserDetailDTO userById = memberService.getUserById(userId);
         if (userById == null) {
             return ResponseEntity.notFound().build();
@@ -55,11 +63,17 @@ public class MemberController {
     public ResponseEntity<UserDetailDTO> updateUserInfo(
             @PathVariable("id") String userId,
             @Valid @RequestBody UserStatUpdateDTO updateDTO) {
-        updateDTO.setUserId(userId);
+        String currentUserRole = authService.getCurrentUserRole();
 
+        if (!currentUserRole.equals("ADMIN")) {
+            log.error("회원상태 변경은 오직 총관리자만 가능합니다.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        updateDTO.setUserId(userId);
         boolean result = memberService.modifyUserStatus(updateDTO);
         if (!result) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
 
         UserDetailDTO updated = memberService.getUserById(userId);
@@ -67,10 +81,18 @@ public class MemberController {
     }
 
     @PutMapping("/list/{id}:deactivate")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<UserDetailDTO> deactivateUser(@PathVariable("id") String userId) {
+        String currentUserRole = authService.getCurrentUserRole();
+
+        if (!currentUserRole.equals("ADMIN")) {
+            log.error("휴면회원 전환은 오직 총관리자만 가능합니다.");
+            return ResponseEntity.badRequest().build();
+        }
+
         boolean result = memberService.deactivateUserByAdmin(userId);
         if (!result) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
         UserDetailDTO deactivated = memberService.getUserById(userId);
         return ResponseEntity.ok(deactivated);
@@ -93,9 +115,7 @@ public class MemberController {
     }
 
     @PutMapping("/profile/{id}:deactivate")
-    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(
-            @PathVariable("id") String userId,
-            RedirectAttributes redirectAttributes) {
+    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(@PathVariable("id") String userId) {
         boolean result = memberService.deactivateUser(userId);
         if (!result) {
             return ResponseEntity.notFound().build();
@@ -104,7 +124,6 @@ public class MemberController {
         return ResponseEntity.ok(deactivated);
     }
 
-    // 임시 구현 코드 - 이 부분은 스프링시큐리티를 적용해서 변경할 예정입니다.
     @GetMapping("/profile/{id}")
     public String readUserProfile(@PathVariable("id") String userId, Model model) {
         // 1) 현재 회원 정보 조회
@@ -120,30 +139,5 @@ public class MemberController {
 
         // 4) 프로필 JSP로 포워딩
         return "member/profile";   // /WEB-INF/views/member/profile.jsp
-    }
-
-    // 승인완료 상태인 현재 회원정보 조회
-    @GetMapping("/profile/{id}:manager")
-    public ResponseEntity<ManagerDetailDTO> readManager(@PathVariable("id") String userId) {
-        ManagerDetailDTO managerDetail = memberService.getManagerById(userId);
-        return (managerDetail != null)
-                ? ResponseEntity.ok(managerDetail)
-                : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/profile/{id}:company")
-    public ResponseEntity<CompanyDetailDTO> readCompany(@PathVariable("id") String userId) {
-        CompanyDetailDTO companyDetail = memberService.getCompanyById(userId);
-        return (companyDetail != null)
-                ? ResponseEntity.ok(companyDetail)
-                : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/profile/{id}:deliveryman")
-    public ResponseEntity<DeliverymanDTO> readDeliveryman(@PathVariable("id") String userId) {
-        DeliverymanDTO deliveryman = memberService.getDeliverymenById(userId);
-        return (deliveryman != null)
-                ? ResponseEntity.ok(deliveryman)
-                : ResponseEntity.notFound().build();
     }
 }
