@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -59,7 +58,7 @@ public class MemberController {
 
         boolean result = memberService.modifyUserStatus(updateDTO);
         if (!result) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
 
         UserDetailDTO updated = memberService.getUserById(userId);
@@ -70,7 +69,7 @@ public class MemberController {
     public ResponseEntity<UserDetailDTO> deactivateUser(@PathVariable("id") String userId) {
         boolean result = memberService.deactivateUserByAdmin(userId);
         if (!result) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
         UserDetailDTO deactivated = memberService.getUserById(userId);
         return ResponseEntity.ok(deactivated);
@@ -93,9 +92,7 @@ public class MemberController {
     }
 
     @PutMapping("/profile/{id}:deactivate")
-    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(
-            @PathVariable("id") String userId,
-            RedirectAttributes redirectAttributes) {
+    public ResponseEntity<UserDetailDTO> deactivateCurrentUser(@PathVariable("id") String userId) {
         boolean result = memberService.deactivateUser(userId);
         if (!result) {
             return ResponseEntity.notFound().build();

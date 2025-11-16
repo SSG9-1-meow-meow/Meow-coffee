@@ -390,6 +390,18 @@ file="/WEB-INF/views/includes/_header.jsp" %>
   document.addEventListener("DOMContentLoaded", function () {
     loadUserList();
     loadInfoModal();
+
+    // [신규 추가] 모달의 "수정" 버튼(id="editButton")에 클릭 이벤트 리스너 추가
+    const editButton = document.getElementById('editButton');
+    editButton.addEventListener('click', () => {
+      const userId = editButton.dataset.userId;
+
+      if (!userId) {
+        alert("수정할 사용자 ID를 찾을 수 없습니다.");
+        return;
+      }
+      updateUserStatus(userId);
+    });
   })
 
   function loadUserList() {
@@ -454,8 +466,8 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     userList.forEach(user => {
       const userRole = getRoleName(user.userRole);
       const userStatusInfo = getStatus(user.userStatus);
-      const joinDate = user.userJoinDate === null ? '-' : new Date(user.userJoinDate).toLocaleString("ko-KR");
-      const lastLogin = user.userLastLogin === null ? '-' : new Date(user.userLastLogin).toLocaleString("ko-KR");
+      const joinDate = user.userJoinDate === null ? '-' : new Date(user.userJoinDate).toLocaleDateString("ko-KR");
+      const lastLogin = user.userLastLogin === null ? '-' : new Date(user.userLastLogin).toLocaleDateString("ko-KR");
 
       html += '<tr>'
               + '<td>' + user.userId + '</td>'
@@ -597,6 +609,10 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     // 홑따옴표(')와 문자열 연결(+)을 사용하는 방식
     switch (user.userRole) {
       case 'COMPANY':
+        const joinDate = new Date(user.userJoinDate);
+        const expireDate = new Date(user.userJoinDate);
+        expireDate.setFullYear(expireDate.getFullYear()+1);
+
         title = '거래처 회원정보 조회';
         html =
                 '<div class="col-md-12">' +
@@ -632,13 +648,13 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                 '<div class="col-md-6">' +
                 '<div class="form-group form-group-default">' +
                 '<label>계약체결일</label>' +
-                '<input type="text" class="form-control" value="' + user.userJoinDate + '" readonly />' +
+                '<input type="text" class="form-control" value="' + joinDate.toLocaleDateString("ko-KR") + '" readonly />' +
                 '</div>' +
                 '</div>' +
                 '<div class="col-md-6">' +
                 '<div class="form-group form-group-default">' +
                 '<label>계약만료일</label>' +
-                '<input type="text" class="form-control" value="' + user.userJoinDate + '" readonly />' +
+                '<input type="text" class="form-control" value="' + expireDate.toLocaleDateString("ko-KR") + '" readonly />' +
                 '</div>' +
                 '</div>';
         break;
@@ -657,12 +673,6 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                 '<div class="form-group form-group-default">' +
                 '<label>사번</label>' +
                 '<input type="text" class="form-control" value="' + user.userCode + '" readonly />' +
-                '</div>' +
-                '</div>' +
-                '<div class="col-md-6">' +
-                '<div class="form-group form-group-default">' +
-                '<label>직급</label>' +
-                '<input type="text" class="form-control" value="' + user.userRole + '" readonly />' +
                 '</div>' +
                 '</div>';
         break;
@@ -697,13 +707,41 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     container.insertAdjacentHTML('beforeend', html);
   }
 
+  function updateUserStatus(userId) {
+    if (!confirm("현재 회원의 상태를 변경하시겠습니까?")) {
+      return;
+    }
+
+    const newStatus = document.getElementById("userStatus").value;
+    const payload = {
+      userStatus: newStatus
+    }
+
+    axios.put('/members/list/' + userId, payload)
+            .then(response => {
+              alert("현재 회원의 상태를 변경합니다.");
+              loadUserList();
+
+              // 상태 변경 성공 시 모달창 닫기
+              const infoModalElement = document.getElementById('infoModal');
+              const infoModal = bootstrap.Modal.getInstance(infoModalElement);
+              if (infoModal) {
+                infoModal.hide();
+              }
+            })
+            .catch(error => {
+              alert("회원상태 변경 실패: " + error.message);
+              console.error(error.message);
+            });
+  }
+
   function deactivateUser(userId) {
     if (!confirm("현재 회원을 휴면회원으로 전환시키겠습니까?")) {
       return;
     }
     axios.put('/members/list/' + userId + ":deactivate")
             .then(response => {
-              alert("현재 회원을 휴면회원으로 전환했습니다.");
+              alert("현재 회원을 휴면회원으로 전환합니다.");
               loadUserList();
             })
             .catch(error => {
