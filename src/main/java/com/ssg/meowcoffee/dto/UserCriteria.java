@@ -1,13 +1,9 @@
 package com.ssg.meowcoffee.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDate;
@@ -43,8 +39,6 @@ public class UserCriteria {
 
     // 설정한 기간
     private LocalDate from;
-
-    @Future
     private LocalDate to;
 
     // 페이지네이션 관련
@@ -54,11 +48,17 @@ public class UserCriteria {
 
     // 회원권한, 회원상태별 필터링
     public void setRoleType(String roleType) {
-        this.roleType = UserRole.valueOf(roleType);
+        this.roleType = Arrays.stream(UserRole.values())
+                .filter(userRole -> userRole.getRoleName().equals(roleType))
+                .findAny()
+                .orElse(UserRole.ALL);
     }
 
-    public void setStatusType(String searchOption) {
-        this.statusType = UserStatus.valueOf(searchOption);
+    public void setStatusType(String statusType) {
+        this.statusType = Arrays.stream(UserStatus.values())
+                .filter(userStatus -> userStatus.getStatusName().equals(statusType))
+                .findAny()
+                .orElse(UserStatus.ALL);
     }
 
     public int getSkip() {

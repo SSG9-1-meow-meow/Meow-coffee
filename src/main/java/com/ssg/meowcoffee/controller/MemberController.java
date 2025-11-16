@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,11 +36,8 @@ public class MemberController {
     }
 
     @GetMapping("/list/api")
-    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@Valid UserCriteria criteria, BindingResult bindingResult) {
+    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@ModelAttribute UserCriteria criteria) {
         log.info("GET /members/list/api...");
-        if (bindingResult.hasErrors()) {
-            criteria = UserCriteria.builder().build();
-        }
         UserPageDTO<UserDetailDTO> userPageDTO = memberService.getUserList(criteria);
         return ResponseEntity.ok(userPageDTO);
     }

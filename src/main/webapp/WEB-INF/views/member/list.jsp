@@ -262,7 +262,6 @@ file="/WEB-INF/views/includes/_header.jsp" %>
 
         <div class="dataTables_paginate paging_simple_numbers" id="basic-datatables_paginate">
           <ul class="pagination pg-primary mb-0 justify-content-end" id="userPagination" tabindex="-1">
-
           </ul>
         </div>
       </div>
@@ -376,7 +375,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
 
 <script>
   let criteria = {
-    page: 1,
+    pageNum: 1,
     amount: 10,
     roleType: '',
     statusType: '',
@@ -405,6 +404,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
   })
 
   function loadUserList() {
+
     axios.get('/members/list/api', {params: criteria})
             .then(function (response) {
               renderUserTable(response.data.dtoList);
@@ -491,24 +491,64 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     tbody.innerHTML = html; // 조립된 HTML을 tbody에 한 번에 삽입
   }
 
-  function changePage(page) {
-    criteria.page = page;
+  function changePage(pageNum) {
+    criteria.pageNum = pageNum;
     loadUserList();
   }
 
   function renderPage(userPage) {
     const pagination = document.getElementById('userPagination');
-    pagination.innerHTML = '';
+    pagination.innerHTML = ''; // 기존 페이지 버튼 비우기
 
+    /**
+     * 페이지 링크(li, a)를 생성하고 클릭 이벤트를 바인딩하는 헬퍼 함수
+     */
+    const createPageLink = (page, text, isActive = false) => {
+      // 1. <li> 태그 생성
+      const li = document.createElement('li');
+      li.className = 'page-item';
+      if (isActive) {
+        li.classList.add('active'); // 활성화된 페이지는 active 클래스 추가
+      }
+
+      // 2. <a> 태그 생성
+      const a = document.createElement('a');
+      a.className = 'page-link';
+      a.href = 'javascript:void(0);'; // href 속성 추가
+      a.textContent = text; // 페이지 번호 또는 '이전'/'다음' 텍스트
+
+      // 3. (!!!핵심!!!) <a> 태그에 'click' 이벤트 리스너 직접 추가
+      a.addEventListener('click', () => {
+        changePage(page); // changePage 함수 호출
+      });
+
+      // 4. <li>에 <a>를 자식으로 추가
+      li.appendChild(a);
+
+      // 5. 완성된 <li> 반환
+      return li;
+    };
+
+    // "이전" 버튼 생성
     if (userPage.prev) {
-      pagination.innerHTML += '<li class="page-item"><a class="page-link" onclick="changePage(' + (userPage.startPage - 1) + ')">이전</a></li>';
+      pagination.appendChild(
+              createPageLink(userPage.startPage - 1, '이전')
+      );
     }
+
+    // 페이지 번호 버튼 생성
     for (let i = userPage.startPage; i <= userPage.endPage; i++) {
-      const isActive = (i === userPage.cri.page) ? 'active' : '';
-      pagination.innerHTML += '<li class="page-item ' + isActive + '"><a class="page-link" onclick="changePage(' + i + ')">' + i + '</a></li>';
+      const isActive = (i === criteria.pageNum); // criteria.page와 비교
+      pagination.appendChild(
+              createPageLink(i, i, isActive) // (i, i) -> (페이지번호, 텍스트)
+      );
     }
+
+    // "다음" 버튼 생성
     if (userPage.next) {
-      pagination.innerHTML += '<li class="page-item"><a class="page-link" onclick="changePage(' + (userPage.endPage + 1) + ')">다음</a></li>';
+      pagination.appendChild(
+              createPageLink(userPage.endPage + 1, '다음')
+      );
     }
   }
 
@@ -520,7 +560,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     const periodEl = document.querySelector("input[name='periodFilter']:checked");
 
     // 2. (수정) 검색 시 항상 1페이지로 리셋
-    criteria.page = 1;
+    criteria.pageNum = 1;
 
     // 3. (수정) 요소가 있으면 .value를, 없으면 빈 문자열(또는 null)을 할당
     criteria.roleType = roleEl ? roleEl.value : '';
