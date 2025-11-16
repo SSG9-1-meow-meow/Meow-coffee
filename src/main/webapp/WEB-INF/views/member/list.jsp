@@ -43,6 +43,16 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                     <input
                             type="radio"
                             name="roleType"
+                            value="ALL"
+                            class="selectgroup-input"
+                            checked
+                    />
+                    <span class="selectgroup-button">전체</span>
+                  </label>
+                  <label class="selectgroup-item">
+                    <input
+                            type="radio"
+                            name="roleType"
                             value="COMPANY"
                             class="selectgroup-input"
                     />
@@ -80,6 +90,16 @@ file="/WEB-INF/views/includes/_header.jsp" %>
               <div class="form-group form-group-default">
                 <label class="form-label">회원상태</label>
                 <div class="selectgroup w-100">
+                  <label class="selectgroup-item">
+                    <input
+                            type="radio"
+                            name="statusType"
+                            value="ALL"
+                            class="selectgroup-input"
+                            checked
+                    />
+                    <span class="selectgroup-button">전체</span>
+                  </label>
                   <label class="selectgroup-item">
                     <input
                             type="radio"
@@ -209,7 +229,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
         </div>
         <div class="card-action">
           <div class="d-flex align-items-center">
-            <button type="submit" onclick="searchUsers()" class="btn btn-primary btn-round ms-auto">
+            <button type="button" onclick="searchUsers()" class="btn btn-primary btn-round ms-auto">
               검색
             </button>
           </div>
@@ -259,12 +279,12 @@ file="/WEB-INF/views/includes/_header.jsp" %>
           <div class="modal-content">
               <div class="modal-header border-0">
                 <h5 class="modal-title">
-                  <span class="fw-mediumbold">회원정보</span>
+                  <span class="fw-mediumbold" id="modalTitle">회원정보</span>
                 </h5>
                 <button
                         type="button"
                         class="close"
-                        data-dismiss="modal"
+                        data-bs-dismiss="modal"
                         aria-label="Close"
                 >
                   <span aria-hidden="true">&times;</span>
@@ -273,7 +293,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
               <div class="modal-body">
                 <p>회원정보</p>
                 <form>
-                  <div class="row" id="basicInfo">
+                  <div class="row" id="basicInfoContainer">
                     <label>기본 인적사항</label>
                     <div class="col-sm-12">
                       <div class="form-group form-group-default">
@@ -282,7 +302,6 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                                 id="userId"
                                 type="text"
                                 class="form-control"
-                                placeholder="fill name"
                                 readonly
                         />
                       </div>
@@ -291,10 +310,9 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                       <div class="form-group form-group-default">
                         <label>회원유형</label>
                         <input
-                                id="addPosition"
+                                id="userRoleType"
                                 type="text"
                                 class="form-control"
-                                placeholder="fill position"
                                 readonly
                         />
                       </div>
@@ -320,7 +338,6 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                                 id="userEmail"
                                 type="email"
                                 class="form-control"
-                                placeholder="fill name"
                                 readonly
                         />
                       </div>
@@ -332,7 +349,6 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                                 id="userPhone"
                                 type="text"
                                 class="form-control"
-                                placeholder="fill name"
                                 readonly
                         />
                       </div>
@@ -340,130 +356,14 @@ file="/WEB-INF/views/includes/_header.jsp" %>
                   </div>
 
                   <%-- 모달의 이 부분들은 회원권한에 따라 선택적으로 출력할 부분 --%>
-                  <div class="row" class="companyInfo">
-                    <label>
-                      <c:choose>
-                        <c:when test="${userRole == 'COMPANY'}">거래처 회원정보 조회</c:when>
-                        <c:when test="${userRole == 'MANAGER' || userRole == 'ADMIN'}">관리자 회원정보 조회</c:when>
-                        <c:when test="${userRole == 'DELIVERY'}">배송기사 회원정보 조회</c:when>
-                        <c:otherwise>회원정보 조회</c:otherwise>
-                      </c:choose>
-                    </label>
-                    <c:if test='${userRole == "COMPANY"}'>
-                      <div class="col-md-12">
-                        <div class="form-group form-group-default">
-                          <label>업체명</label>
-                          <input
-                                  id="userCompanyName"
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="fill name"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                    </c:if>
-                    <div class="col-md-6 pe-0">
-                      <div class="form-group form-group-default">
-                        <label><c:out value='${userRole == "COMPANY" ? "대표자명" : "회원명"}'/></label>
-                        <input
-                                id="userName"
-                                type="text"
-                                class="form-control"
-                                placeholder="fill position"
-                                readonly
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group form-group-default">
-                        <label><c:out value='${userRole == "COMPANY" || userRole == "DELIVERYMAN" ? "사업자등록번호" : "사번"}'/></label>
-                        <input
-                                id="userCode"
-                                type="text"
-                                class="form-control"
-                                placeholder="fill name"
-                                readonly
-                        />
-                      </div>
-                    </div>
-                    <c:if test='${userRole == "COMPANY"}'>
-                      <div class="col-md-6 pe-0">
-                        <div class="form-group form-group-default">
-                          <label>도로명주소</label>
-                          <input
-                                  id="userRoadAddr"
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="fill name"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="form-group form-group-default">
-                          <label>상세주소</label>
-                          <input
-                                  id="userDetailAddr"
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="fill name"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                    </c:if>
-                    <c:if test='${userRole == "DELIVERYMAN"}'>
-                      <div class="col-md-6 pe-0">
-                        <div class="form-group form-group-default">
-                          <label>차량번호</label>
-                          <input
-                                  id="delivVhcCode"
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="fill position"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="form-group form-group-default">
-                          <label>차종모델</label>
-                          <input
-                                  id="delivVhcModel"
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="fill name"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                    </c:if>
-                    <c:if test='${userRole == "MANAGER" || userRole == "ADMIN"}'>
-                      <div class="col-md-6">
-                        <div class="form-group form-group-default">
-                          <label>직급</label>
-                          <input
-                                  id="managerRole"
-                                  type="${userRole == 'COMPANY' || userRole == 'DELIVERYMAN' ? 'hidden' : 'text'}"
-                                  class="form-control"
-                                  placeholder="fill name"
-                                  readonly
-                          />
-                        </div>
-                      </div>
-                    </c:if>
+                  <div class="row" id="roleSpecificContainer">
                   </div>
               </div>
               <div class="modal-footer border-0">
-                <button type="button" id="addRowButton" class="btn btn-primary">
+                <button type="button" id="editButton" class="btn btn-primary">
                   수정
                 </button>
-                <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal"
-                >
+                <button type="button" id="closeBtn" class="btn btn-danger" data-bs-dismiss="modal">
                   닫기
                 </button>
               </div>
@@ -489,10 +389,11 @@ file="/WEB-INF/views/includes/_header.jsp" %>
 
   document.addEventListener("DOMContentLoaded", function () {
     loadUserList();
+    loadInfoModal();
   })
 
   function loadUserList() {
-    axios.get('/members/list/api?${params.toString()}', {params: criteria})
+    axios.get('/members/list/api', {params: criteria})
             .then(function (response) {
               renderUserTable(response.data.dtoList);
               renderPage(response.data);
@@ -565,15 +466,15 @@ file="/WEB-INF/views/includes/_header.jsp" %>
               + '<td>' + lastLogin + '</td>'
               + '<td>' +
                   '<div class="form-button-action">' +
-                    '<button id="editUserStatusBtn" class="btn btn-link btn-primary" data-bs-toggle="modal" data-bs-target="#infoModal">' +
+                    '<button type="button" class="btn btn-link btn-primary view-user-btn" data-user-id="' + user.userId + '">' +
                       '<i class="fa fa-edit"></i>' +
                     '</button>' +
-                    '<button id="deactivateBtn" class="btn btn-link btn-danger">' +
+                    '<button type="button" class="btn btn-link btn-danger deactivate-btn" data-user-id="' + user.userId + '">' +
                       '<i class="fas fa-lock"></i>' +
                     '</button>' +
-                   '</div>' +
-                  '</td>' +
-                '</tr>'
+                  '</div>' +
+                '</td>' +
+              '</tr>'
     });
     tbody.innerHTML = html; // 조립된 HTML을 tbody에 한 번에 삽입
   }
@@ -592,7 +493,7 @@ file="/WEB-INF/views/includes/_header.jsp" %>
     }
     for (let i = userPage.startPage; i <= userPage.endPage; i++) {
       const isActive = (i === userPage.cri.page) ? 'active' : '';
-      pagination.innerHTML += '<li class="page-item ' + isActive + '"><a class="page-link" onclick="changePage("' + i + '")">' + i + '</a></li>';
+      pagination.innerHTML += '<li class="page-item ' + isActive + '"><a class="page-link" onclick="changePage(' + i + ')">' + i + '</a></li>';
     }
     if (userPage.next) {
       pagination.innerHTML += '<li class="page-item"><a class="page-link" onclick="changePage(' + (userPage.endPage + 1) + ')">다음</a></li>';
@@ -622,32 +523,178 @@ file="/WEB-INF/views/includes/_header.jsp" %>
 
     loadUserList(); // 수정된 criteria로 목록 로드
   }
-</script>
 
-<script>
-  const modalElement = document.getElementById('infoModal');
-  const modal = new bootstrap.Modal(modalElement);
-  
-  function resetInfoModal() {
-    // 1. 모달 요소를 찾습니다.
-    const modal = document.getElementById("infoModal");
+  function loadInfoModal() {
+    // 1. Bootstrap 모달 인스턴스 생성
+    const infoModalElement = document.getElementById('infoModal');
+    const infoModal = new bootstrap.Modal(infoModalElement);
 
-    // 2. 모달 내부의 모든 <input> 필드를 찾습니다.
-    //    (readonly 속성이 있어도 JavaScript로 value 변경은 가능합니다)
-    const inputs = modal.querySelectorAll("input[type='text'], input[type='email']");
+    // 2. 이벤트 위임 (Event Delegation)
+    const userListBody = document.getElementById('userSearchResult');
 
-    // 3. 모든 <input>의 value를 빈 문자열('')로 설정합니다.
-    inputs.forEach(input => {
-      input.value = "";
+    // 컨테이너에 클릭 이벤트를 추가합니다.
+    userListBody.addEventListener('click', (event) => {
+      // 가장 가까운 상위 요소 중 .view-user-btn을 찾습니다.
+      const viewButton = event.target.closest('.view-user-btn');
+      const deactivateButton = event.target.closest('.deactivate-btn');
+
+      if (viewButton) {
+        // 3. 데이터 가져오기 (Axios)
+        // 버튼의 data-user-id 속성에서 ID를 가져옵니다.
+        const userId = viewButton.dataset.userId;
+        if (!userId) {
+          console.error("해당하는 사용자가 없습니다.")
+          return;
+        }
+
+        // Axios로 서버에 데이터를 요청합니다.
+        axios.get('/members/list/' + userId)
+                .then(response => {
+                  const user = response.data; // 회원 정보 JSON
+
+                  // 4. 모달 내용 채우기 (헬퍼 함수 호출)
+                  populateBasicInfo(user);
+                  populateRoleSpecificInfo(user);
+
+                  // 5. (참고) 수정 버튼에 PK 할당
+                  document.getElementById('editButton').dataset.userId = user.userId;
+
+                  // 6. Bootstrap 모달 띄우기 (인스턴스 사용)
+                  infoModal.show();
+                })
+                .catch(error => {
+                  console.error('회원 정보 조회 실패:', error);
+                  alert('정보를 불러오는 데 실패했습니다.');
+                });
+      }
+      if (deactivateButton) {
+        const userId = deactivateButton.dataset.userId;
+        deactivateUser(userId);
+      }
     });
+  }
 
-    // 4. 모달 내부의 모든 <select> 필드를 찾습니다.
-    const selects = modal.querySelectorAll("select");
+  /** * [헬퍼 함수 1] 공통 정보를 모달에 채웁니다. (Vanilla JS)
+   */
+  function populateBasicInfo(user) {
+    document.getElementById('userId').value = user.userId;
+    document.getElementById('userRoleType').value = getRoleName(user.userRole);
+    document.getElementById('userStatus').value = user.userStatus;
+    document.getElementById('userEmail').value = user.userEmail;
+    document.getElementById('userPhone').value = user.userPhone;
+  }
 
-    // 5. 모든 <select>의 선택을 첫 번째 옵션(index 0)으로 되돌립니다.
-    selects.forEach(select => {
-      select.selectedIndex = 0;
-    });
+  /** * [헬퍼 함수 2] 권한별 정보를 모달에 동적으로 생성합니다. (Vanilla JS)
+   */
+  function populateRoleSpecificInfo(user) {
+    const container = document.getElementById('roleSpecificContainer');
+    // (중요) 이전에 열었던 내용을 모두 비웁니다.
+    container.innerHTML = '';
+
+    let html = ''; // HTML 문자열을 조립
+    let title = '회원정보 조회';
+
+    // 홑따옴표(')와 문자열 연결(+)을 사용하는 방식
+    switch (user.userRole) {
+      case 'COMPANY':
+        title = '거래처 회원정보 조회';
+        html =
+                '<div class="col-md-12">' +
+                '<div class="form-group form-group-default">' +
+                '<label>업체명</label>' +
+                '<input type="text" class="form-control" value="' + user.userCompanyName + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>대표자명</label>' +
+                '<input type="text" class="form-control" value="' + user.userName + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>사업자등록번호</label>' +
+                '<input type="text" class="form-control" value="' + user.userCode + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>도로명주소</label>' +
+                '<input type="text" class="form-control" value="' + user.userRoadAddr + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>상세주소</label>' +
+                '<input type="text" class="form-control" value="' + user.userDetailAddr + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>계약체결일</label>' +
+                '<input type="text" class="form-control" value="' + user.userJoinDate + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>계약만료일</label>' +
+                '<input type="text" class="form-control" value="' + user.userJoinDate + '" readonly />' +
+                '</div>' +
+                '</div>';
+        break;
+
+      case 'MANAGER':
+      case 'ADMIN':
+        title = '관리자 회원정보 조회';
+        html =
+                '<div class="col-md-6 pe-0">' +
+                '<div class="form-group form-group-default">' +
+                '<label>회원명</label>' +
+                '<input type="text" class="form-control" value="' + user.userName + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>사번</label>' +
+                '<input type="text" class="form-control" value="' + user.userCode + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>직급</label>' +
+                '<input type="text" class="form-control" value="' + user.userRole + '" readonly />' +
+                '</div>' +
+                '</div>';
+        break;
+
+      case 'DELIVERYMAN':
+        title = '배송기사 회원정보 조회';
+        html =
+                '<div class="col-md-6 pe-0">' +
+                '<div class="form-group form-group-default">' +
+                '<label>회원명</label>' +
+                '<input type="text" class="form-control" value="' + user.userName + '" readonly />' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group form-group-default">' +
+                '<label>사업자등록번호</label>' +
+                '<input type="text" class="form-control" value="' + user.userCode + '" readonly />' +
+                '</div>' +
+                '</div>';
+        break;
+    }
+
+    // 모달 제목 변경
+    document.getElementById('modalTitle').textContent = title;
+
+    // 권한별 정보 타이틀(Label)을 먼저 삽입
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = title;
+    container.appendChild(titleLabel);
+
+    // 생성된 HTML 문자열을 DOM에 삽입
+    container.insertAdjacentHTML('beforeend', html);
   }
 
   function deactivateUser(userId) {

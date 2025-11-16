@@ -1,6 +1,7 @@
 package com.ssg.meowcoffee.controller;
 
 import com.ssg.meowcoffee.dto.*;
+import com.ssg.meowcoffee.service.AuthService;
 import com.ssg.meowcoffee.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,24 +21,23 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService authService;
 
     // 관리자(창고관리자, 총관리자) 전용 기능: 회원리스트 조회, 회원상태 변경, 휴면회원 전환
     @GetMapping("/list")
-    public String memberList(@Valid UserCriteria criteria, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            criteria = UserCriteria.builder().build();
-        }
-        model.addAttribute("userList", memberService.getUserList(criteria));
+    public String memberList() {
+        log.info("GET /members/list");
         return "member/list";
     }
 
-    @GetMapping("/list:api")
-    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@Valid UserCriteria criteria, BindingResult bindingResult, Model model) {
+    @GetMapping("/list/api")
+    public ResponseEntity<UserPageDTO<UserDetailDTO>> memberListData(@Valid UserCriteria criteria, BindingResult bindingResult) {
+        log.info("GET /members/list/api...");
         if (bindingResult.hasErrors()) {
             criteria = UserCriteria.builder().build();
         }
+
         UserPageDTO<UserDetailDTO> userPageDTO = memberService.getUserList(criteria);
-        model.addAttribute("userPageDTO", userPageDTO);
         return ResponseEntity.ok(userPageDTO);
     }
 
@@ -120,30 +120,5 @@ public class MemberController {
 
         // 4) 프로필 JSP로 포워딩
         return "member/profile";   // /WEB-INF/views/member/profile.jsp
-    }
-
-    // 승인완료 상태인 현재 회원정보 조회
-    @GetMapping("/profile/{id}:manager")
-    public ResponseEntity<ManagerDetailDTO> readManager(@PathVariable("id") String userId) {
-        ManagerDetailDTO managerDetail = memberService.getManagerById(userId);
-        return (managerDetail != null)
-                ? ResponseEntity.ok(managerDetail)
-                : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/profile/{id}:company")
-    public ResponseEntity<CompanyDetailDTO> readCompany(@PathVariable("id") String userId) {
-        CompanyDetailDTO companyDetail = memberService.getCompanyById(userId);
-        return (companyDetail != null)
-                ? ResponseEntity.ok(companyDetail)
-                : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/profile/{id}:deliveryman")
-    public ResponseEntity<DeliverymanDTO> readDeliveryman(@PathVariable("id") String userId) {
-        DeliverymanDTO deliveryman = memberService.getDeliverymenById(userId);
-        return (deliveryman != null)
-                ? ResponseEntity.ok(deliveryman)
-                : ResponseEntity.notFound().build();
     }
 }
