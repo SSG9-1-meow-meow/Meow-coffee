@@ -126,15 +126,15 @@
     select userId, userRole from users
     <choose>
       <when test="userInfo.targetRole == 'COMPANY'">
-        where userCode = (
-          select comCode
+        where userEmail = (
+          select comEmail
           from companies
           where comCode = #{userInfo.userCode} and comEmail = #{userInfo.userEmail}
         )
       </when>
       <when test="userInfo.targetRole == 'MANAGER' or userInfo.targetRole == 'ADMIN'">
-        where userCode = (
-          select managerCode
+        where userEmail = (
+          select managerEmail
           from managers
           where managerName = #{userInfo.userName}
             and managerEmail = #{userInfo.userEmail}
@@ -142,8 +142,8 @@
         )
       </when>
       <when test="userInfo.targetRole == 'DELIVERYMAN'">
-        where userCode = (
-          select delivCode
+        where userEmail = (
+          select delivEmail
           from deliverymen
           where delivCode = #{userInfo.userCode}
             and delivEmail = #{userInfo.userEmail}
