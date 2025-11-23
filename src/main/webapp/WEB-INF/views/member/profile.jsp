@@ -514,6 +514,7 @@
                 bootstrap.Modal
                     .getInstance(document.getElementById("dormantConfirmModal"))
                     .hide();
+                self.location = '/auth/logout';
             })
             .catch(err => {
                 console.error(err);
