@@ -8,8 +8,7 @@
 <c:set var="userId"   value="${userInfo.userId}" />
 
 <%-- 2) 그 다음에 header include --%>
-<%@ include file="/WEB-INF/views/includes/_headerHead.jsp" %>
-<%@ include file="/WEB-INF/views/includes/_headerNav.jsp" %>
+<%@ include file="/WEB-INF/views/includes/_header.jsp" %>
 
 <div class="container">
     <div class="page-inner">
