@@ -8,8 +8,7 @@
 <c:set var="userId"   value="${userInfo.userId}" />
 
 <%-- 2) 그 다음에 header include --%>
-<%@ include file="/WEB-INF/views/includes/_headerHead.jsp" %>
-<%@ include file="/WEB-INF/views/includes/_headerNav.jsp" %>
+<%@ include file="/WEB-INF/views/includes/_header.jsp" %>
 
 <div class="container">
     <div class="page-inner">
@@ -24,7 +23,7 @@
                                 <c:choose>
                                     <c:when test="${userRole == 'COMPANY'}">거래처 회원정보 조회</c:when>
                                     <c:when test="${userRole == 'MANAGER' || userRole == 'ADMIN'}">관리자 회원정보 조회</c:when>
-                                    <c:when test="${userRole == 'DELIVERY'}">배송기사 회원정보 조회</c:when>
+                                    <c:when test="${userRole == 'DELIVERYMAN'}">배송기사 회원정보 조회</c:when>
                                     <c:otherwise>회원정보 조회</c:otherwise>
                                 </c:choose>
                             </div>
@@ -219,7 +218,7 @@
                                     </c:if>
 
                                     <!-- 배송기사 전용 영역 -->
-                                    <c:if test="${userRole == 'DELIVERY'}">
+                                    <c:if test="${userRole == 'DELIVERYMAN'}">
                                         <div id="deliverySection">
                                             <label class="mb-3"><b>배송기사 확인 정보</b></label>
 
@@ -515,6 +514,7 @@
                 bootstrap.Modal
                     .getInstance(document.getElementById("dormantConfirmModal"))
                     .hide();
+                self.location = '/auth/logout';
             })
             .catch(err => {
                 console.error(err);
