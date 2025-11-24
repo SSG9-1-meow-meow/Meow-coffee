@@ -40,7 +40,7 @@ public class WarehouseController {
         //일반관리자, 총관리자만 접근 가능
         String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
 
-        if(!role.equals("ADMIN") && !role.equals("MANAGER")){
+        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")){
             //권한 없음
             return ResponseEntity.ok(null);
         }
