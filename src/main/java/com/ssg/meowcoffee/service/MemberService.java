@@ -7,10 +7,6 @@ public interface MemberService {
     UserPageDTO<UserDetailDTO> getUserList(UserCriteria userCriteria);
     UserDetailDTO getUserById(String userId);
 
-    ManagerDetailDTO getManagerById(String userId);
-    CompanyDetailDTO getCompanyById(String userId);
-    DeliverymanDTO getDeliverymenById(String userId);
-
     boolean registerUser(UserDetailDTO userDetailDTO);
 
     boolean modifyUser(UserInfoUpdateDTO userInfoUpdateDTO);           // 회원정보 변경

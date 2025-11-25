@@ -65,34 +65,6 @@ public class MemberMapperTests {
     }
 
     @Test
-    @DisplayName("현재 회원권한이 창고관리자인 회원정보를 조회")
-    public void testSelectManagerById() {
-        String userId = "bu_manager_01";
-        ManagerVO managerVO = memberMapper.selectManagerById(userId);
-        log.info(managerVO);
-        Assertions.assertEquals(userId, managerVO.getManagerId());
-        Assertions.assertEquals("창고관리자", managerVO.getManagerRole().getValue());
-    }
-
-    @Test
-    @DisplayName("거래처의 담당자가 현재 회원정보를 조회")
-    public void testSelectCompanyById() {
-        String userId = "sb_contact_01";
-        CompanyVO companyVO = memberMapper.selectCompanyById(userId);
-        log.info(companyVO);
-        Assertions.assertEquals(userId, companyVO.getComId());
-    }
-
-    @Test
-    @DisplayName("현재 회원권한이 배송기사인 회원정보를 조회")
-    public void testSelectDeliverymanById() {
-        String userId = "sb_driver_01";
-        DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
-        log.info(deliverymanVO);
-        Assertions.assertEquals(userId, deliverymanVO.getDelivId());
-    }
-
-    @Test
     @DisplayName("입력한 이메일, 사업자등록번호에 해당하는 거래처 아이디 찾기")
     public void testFindCompanyId() {
         String userCode = "120-81-03232";
