@@ -198,6 +198,11 @@ com.ssg.meowcoffee
 | `POST` | `/inbounds/items/{inReqItemsId}`    | 관리자가 개별 입고 항목을 최종 처리(승인/반려)합니다.       |
 | `GET`  | `/inbounds/api/available-locations` | 특정 날짜와 수량에 대해 할당 가능한 창고 위치를 조회합니다. |
 
+### 2.4 화면 설계 및 와이어 프레임
+
+![회원입고이미지](/docs/화면설계-회원%20입고관리.drawio.png)
+![관리자입고이미지](/docs/화면설계-관리자%20입출고%20관리.drawio.png)
+
 ---
 
 ## 3. 트러블 슈팅 (Troubleshooting)
