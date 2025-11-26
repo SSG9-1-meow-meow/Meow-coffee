@@ -30,6 +30,10 @@ resources
       └─ StockMapper.xml       # MyBatis SQL 매퍼
 ````
 ---
+## 💻 화면 설계
+<img src="/docs/재고관리 화면설계.png">
+
+---
 ## ⚙️ 주요 기능
 ### 1. 재고 조회
 - **전체 재고 조회**: `/api/stocks`
@@ -84,7 +88,7 @@ resources
 
 --- 
 
-## 🗂️ 데이터베이스 구조
+## 📦 데이터베이스 구조
 - **stock**: 재고
 - **coffee**: 커피 품목 정보
 - **warehouse**: 창고 정보
@@ -102,8 +106,8 @@ resources
 4. 검색 필터는 `StockSearchDTO`로 처리하며, cfCategory, cfType, cfGrade, cfName 중 하나를 기반으로 조회합니다.
 
 --- 
-## 💻 프론트 상세 구현 사항
-<img src="/resources/static/components/stockNav.png" alt="stockNav">
+## 🎨 프론트 상세 구현 사항
+<img src="/src/main/resources/static/components/stockNav.png" alt="stockNav">
 
 재고 페이지에서의 nav바를 기준으로 각각 jsp 파일을 생성하였고, 상세 조회 페이지도 별도의 jsp파일로 분리하였습니다.
 ````
@@ -117,3 +121,14 @@ WEB-INF/views
     ├─ dueDiligenceTop.jsp  # 총관리자용 재고 실사 상세 페이지(승인하기, 거부하기 버튼)
     └─ dueDiligenceWh.jsp   # 일반관리자용 재고 실사 상세 페이지(수정하기, 삭제하기 버튼)
 ````
+
+---
+## 🔥 트러블 슈팅(Trouble Shooting)
+### 1. jsp파일의 EL태그 미인식으로 인한 오류
+
+**문제 상황:** 화면 설계를 기반으로 한 프론트 설계를 먼저 해둔 뒤, 해당 내용을 jsp파일에 붙여넣기했으나
+EL태그를 jsp파일에서 인식하지 못하여 페이지 로드 자체가 안되는 문제가 발생했다.
+
+**해결 방법:** EL태그로 작업한 부분을 모두 string concatenation으로 수정하였다.
+
+### 2. 
