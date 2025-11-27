@@ -31,7 +31,7 @@ resources
 ````
 ---
 ## 💻 화면 설계
-<img src="/docs/재고관리 화면설계.png">
+<img src="/docs/화면설계%20-%20재고.png">
 
 ---
 ## ⚙️ 주요 기능
