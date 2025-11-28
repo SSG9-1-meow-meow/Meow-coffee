@@ -51,6 +51,7 @@
 | **Utility**     | Lombok, ModelMapper, Jackson, Log4j2   | 개발 편의성 개선 (코드 자동화, 매핑, JSON 처리, 로깅)    |
 | **Build Tool**  | Gradle                                 | 프로젝트의 의존성 관리 및 빌드 프로세스 자동화             |
 
+
 ---
 
 ## 2. 프로젝트 구조
@@ -102,6 +103,80 @@ src
                 └── servlet-context.xml         # DispatcherServlet 설정
 
 ```
+
+### 로그인/회원관리 API
+
+* 요청된 url 처리 시 컨트롤러의 메서드에서 리다이렉트를 수행하거나, jsp 파일명을 반환하는 케이스는 모두 와이어프레임 하단에 정리
+
+#### 로그인 관련 API
+
+| API                   | HTTP 메서드 | 기능       |
+|-----------------------|----------|----------|
+| **`/auth/reset-pwd`** | `PUT`    | 비밀번호 재설정 |
+
+#### 회원관리 관련 API
+
+| API                                | HTTP 메서드 | 기능             | 비고                     |
+|------------------------------------|----------|----------------|------------------------|
+| `/members/list/api`                | `GET`    | 회원 목록 조회       | 관리자 전용 (페이징 및 검색필터 적용) |
+| `/members/list/{id}`               | `GET`    | 특정 회원 상세 정보 조회 | 관리자 전용                 |
+| `/members/list/{id}`               | `PUT`    | 회원 상태 및 정보 수정  | 총관리자 전용                |
+| `/members/list/{id}:deactivate`    | `PUT`    | 휴면 회원 강제 전환    | 총관리자 전용                |
+| `/members/profile/{id}`            | `PUT`    | 현재 회원 정보 수정    | 일반 사용자                 |
+| `/members/profile/{id}:deactivate` | `PUT`    | 현재 회원 휴면 신청    | 일반 사용자                 |
+
+
+### 로그인/회원관리 와이어프레임
+
+<details>
+  <summary>로그인 기능</summary>
+
+  <img src="화면설계-로그인_아이디 찾기_비밀번호 변경.drawio.png" width="70%">
+  
+  <details>
+    <summary>로그인 뷰 출력/리다이렉트 url</summary>
+
+    | URL | HTTP 메서드 | 기능 | 비고 |
+    | --- | --- | --- | --- |
+    | `/login`, `/auth` | `GET` | 로그인 페이지 진입 | `/auth/login`로 리다이렉트 |
+    | `/auth/login` | `GET` | 로그인 폼 뷰 반환 |  |
+    | `/logout` | `GET` | 로그아웃 처리 | `/auth/logout`로 리다이렉트 |
+    | `/auth/register-select` | `GET` | 회원 유형 선택 뷰 반환 |  |
+    | `/auth/register-select` | `POST` | 회원가입 유형 선택 처리 | `/auth/register/{role}` |
+    | `/auth/register` | `GET` | 회원 유형 선택 페이지로 진입 | `/auth/register-select` |
+    | `/auth/register/{role}` | `GET` | 회원가입 폼 뷰 반환 |  |
+    | `/auth/register` | `POST` | 회원가입 처리 | 성공 시 `/auth/login`, 실패 시 `/auth/register-select` |
+    | `/auth/forgot-id` | `GET` | 아이디 찾기 시작 뷰 반환 |  |
+    | `/auth/forgot-id` | `POST` | 아이디 찾기 역할 선택 처리 | `/auth/forgot-id/{role}` 로 리다이렉트 |
+    | `/auth/forgot-id/{role}` | `GET` | 아이디 찾기 입력 폼 뷰 반환 |  |
+    | `/auth/forgot-id/result` | `POST` | 아이디 조회 처리 | 성공 시 `/auth/forgot-id/result`, 실패 시 `/auth/forgot-id` |
+    | `/auth/forgot-id/result` | `GET` | 아이디 찾기 결과 뷰 반환 |  |
+    | `/auth/forgot-pwd` | `GET` | 비밀번호 찾기 시작 뷰 반환 |  |
+    | `/auth/forgot-pwd` | `POST` | 회원 정보 확인 처리 | 성공 시 `/auth/reset-pwd`, 실패 시 `/auth/forgot-pwd` |
+    | `/auth/reset-pwd` | `GET` | 비밀번호 재설정 폼 뷰 반환 |  |
+
+  </details>
+</details> 
+
+<details>
+  <summary>회원관리 기능</summary>
+
+  <img src="화면설계-회원관리(총관리자, 창고관리자).drawio.png" width="60%">
+
+  <img src="화면설계-회원관리(거래처).drawio.png" width="60%">
+
+  <img src="화면설계-회원관리(배송기사).drawio.png" width="60%">
+  
+  <details>
+    <summary>회원관리 뷰 출력/리다이렉트 url</summary>
+
+  | URL                     | HTTP 메서드 | 기능                  | 비고                                         |
+  |-------------------------|----------|---------------------|--------------------------------------------|
+  | `/members/list`         | `GET`    | 관리자용 회원 목록 페이지 뷰 반환 | 접근 권한이 없으면 `/`로 리다이렉트                      |
+  | `/members/profile/{id}` | `GET`    | 특정 사용자 프로필 뷰 반환     | 현재 로그인한 ID에 해당하는 회원정보가 없으면 `/index`로 리다이렉트 |
+
+  </details>
+</details> 
 
 
 ---
