@@ -136,24 +136,24 @@ src
   <details>
     <summary>로그인 뷰 출력/리다이렉트 url</summary>
 
-    | URL | HTTP 메서드 | 기능 | 비고 |
-    | --- | --- | --- | --- |
-    | `/login`, `/auth` | `GET` | 로그인 페이지 진입 | `/auth/login`로 리다이렉트 |
-    | `/auth/login` | `GET` | 로그인 폼 뷰 반환 |  |
-    | `/logout` | `GET` | 로그아웃 처리 | `/auth/logout`로 리다이렉트 |
-    | `/auth/register-select` | `GET` | 회원 유형 선택 뷰 반환 |  |
-    | `/auth/register-select` | `POST` | 회원가입 유형 선택 처리 | `/auth/register/{role}` |
-    | `/auth/register` | `GET` | 회원 유형 선택 페이지로 진입 | `/auth/register-select` |
-    | `/auth/register/{role}` | `GET` | 회원가입 폼 뷰 반환 |  |
-    | `/auth/register` | `POST` | 회원가입 처리 | 성공 시 `/auth/login`, 실패 시 `/auth/register-select` |
-    | `/auth/forgot-id` | `GET` | 아이디 찾기 시작 뷰 반환 |  |
-    | `/auth/forgot-id` | `POST` | 아이디 찾기 역할 선택 처리 | `/auth/forgot-id/{role}` 로 리다이렉트 |
-    | `/auth/forgot-id/{role}` | `GET` | 아이디 찾기 입력 폼 뷰 반환 |  |
-    | `/auth/forgot-id/result` | `POST` | 아이디 조회 처리 | 성공 시 `/auth/forgot-id/result`, 실패 시 `/auth/forgot-id` |
-    | `/auth/forgot-id/result` | `GET` | 아이디 찾기 결과 뷰 반환 |  |
-    | `/auth/forgot-pwd` | `GET` | 비밀번호 찾기 시작 뷰 반환 |  |
-    | `/auth/forgot-pwd` | `POST` | 회원 정보 확인 처리 | 성공 시 `/auth/reset-pwd`, 실패 시 `/auth/forgot-pwd` |
-    | `/auth/reset-pwd` | `GET` | 비밀번호 재설정 폼 뷰 반환 |  |
+  | URL                      | HTTP 메서드 | 기능               | 비고                                                    |
+  |--------------------------|----------|------------------|-------------------------------------------------------|
+  | `/login`, `/auth`        | `GET`    | 로그인 페이지 진입       | `/auth/login`로 리다이렉트                                  |
+  | `/auth/login`            | `GET`    | 로그인 폼 뷰 반환       |                                                       |
+  | `/logout`                | `GET`    | 로그아웃 처리          | `/auth/logout`로 리다이렉트                                 |
+  | `/auth/register-select`  | `GET`    | 회원 유형 선택 뷰 반환    |                                                       |
+  | `/auth/register-select`  | `POST`   | 회원가입 유형 선택 처리    | `/auth/register/{role}`                               |
+  | `/auth/register`         | `GET`    | 회원 유형 선택 페이지로 진입 | `/auth/register-select`                               |
+  | `/auth/register/{role}`  | `GET`    | 회원가입 폼 뷰 반환      |                                                       |
+  | `/auth/register`         | `POST`   | 회원가입 처리          | 성공 시 `/auth/login`, 실패 시 `/auth/register-select`      |
+  | `/auth/forgot-id`        | `GET`    | 아이디 찾기 시작 뷰 반환   |                                                       |
+  | `/auth/forgot-id`        | `POST`   | 아이디 찾기 역할 선택 처리  | `/auth/forgot-id/{role}` 로 리다이렉트                      |
+  | `/auth/forgot-id/{role}` | `GET`    | 아이디 찾기 입력 폼 뷰 반환 |                                                       |
+  | `/auth/forgot-id/result` | `POST`   | 아이디 조회 처리        | 성공 시 `/auth/forgot-id/result`, 실패 시 `/auth/forgot-id` |
+  | `/auth/forgot-id/result` | `GET`    | 아이디 찾기 결과 뷰 반환   |                                                       |
+  | `/auth/forgot-pwd`       | `GET`    | 비밀번호 찾기 시작 뷰 반환  |                                                       |
+  | `/auth/forgot-pwd`       | `POST`   | 회원 정보 확인 처리      | 성공 시 `/auth/reset-pwd`, 실패 시 `/auth/forgot-pwd`       |
+  | `/auth/reset-pwd`        | `GET`    | 비밀번호 재설정 폼 뷰 반환  |                                                       |
 
   </details>
 </details> 
