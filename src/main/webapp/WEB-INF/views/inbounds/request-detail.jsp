@@ -114,10 +114,8 @@
                 '</div>';
         } else {
             // 읽기 모드 로직
-            // '처리하기' 버튼을 조건부로 생성
             let processButtonHtml = '';
-            // if (currentUserRole === 'MANAGER' && item.status === 'PENDING') {
-            if (currentUserRole === 'MANAGER' || 'ADMIN') { // managerd
+            if (currentUserRole === 'MANAGER' || currentUserRole === 'ADMIN') { // 관리자 권한인 경우만 처리하기 버튼 보임
                 processButtonHtml =
                     '<a href="/inbounds/items/' + item.inReqItemsId + '" class="btn btn-sm btn-outline-primary ms-3">' +
                     '처리하기 <i class="fas fa-arrow-right"></i>' +
@@ -259,7 +257,7 @@
 
         // 서버로 보낼 데이터 객체
         const requestData = {
-            _comId: 'coffeebiz01', // TODO: 실제 로그인한 사용자 ID로 변경해야 함
+            _comId: '', // 스프링 시큐리티 적용된 아이디로 컨트롤러에서 처리
             _inDateWish: inDateWish,
             _inItemsJson: JSON.stringify(items), // items or JSON.stringify(items) <= 문자열 안에 또 json이 있는 형태임.
             _isTempo: isTempo
