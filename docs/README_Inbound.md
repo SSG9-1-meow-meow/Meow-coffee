@@ -364,4 +364,5 @@ com.ssg.meowcoffee
 
 ### 4-3. **Spring Security 적용**
 
-현재 임시로 사용 중인 사용자 인증/인가 로직을 Spring Security로 전환하여, 역할 기반(Role-Based) 접근 제어를 보다 체계적이고 안전하게 구현할 계획입니다.
+~~현재 임시로 사용 중인 사용자 인증/인가 로직을 Spring Security로 전환하여, 역할 기반(Role-Based) 접근 제어를 보다 체계적이고 안전하게 구현할 계획입니다.~~
+Spring Security 적용하여 회원/관리자 권한 분리 및 입고 처리 CRUD 수정 완료.
