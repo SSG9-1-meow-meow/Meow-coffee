@@ -87,7 +87,8 @@
                             </c:forEach>
                         </select>
                         <button type="button" class="btn btn-outline-primary btn-sm" id="btnDispatch">배차 등록</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="btnApprove">출고 승인</button>
+                        <!-- 기본은 숨김: 배차 완료되면 JS에서 보여줌 -->
+                        <button type="button" class="btn btn-primary btn-sm d-none" id="btnApprove">출고 승인</button>
                     </div>
 
                     <!-- 우측: 출고완료/새로고침 -->
@@ -132,6 +133,11 @@
     const sessionUserId = '<c:out value="${sessionUserId}" default=""/>';
     const apiBase       = ctx + '/outbounds/api/' + encodeURIComponent(outReqId);
 
+    // 현재 요청 상태(PENDING/APPROVED/SHIPPED/REJECTED)
+    let currentStatusCode = null;
+    // 이 페이지에서 배차 등록이 한번이라도 성공했는지 여부
+    let hasDispatched = false;
+
     // 날짜 도우미
     function toKDate(value, withTime){
         if (value == null || value === '') return '-';
@@ -166,6 +172,8 @@
     // 헤더 렌더
     function renderHeader(h){
         const code = (h.status || 'PENDING').toUpperCase();
+        currentStatusCode = code;   // 상태 저장
+
         const badge = document.getElementById('status-badge');
         badge.className = 'badge ' + statusBadgeClass(code);
         badge.textContent = h.statusValue || (code==='PENDING'?'승인대기':code);
@@ -201,11 +209,24 @@
         const box  = document.getElementById('items-container');
         box.innerHTML = '';
 
+        // 액션바 관련 요소
+        const mgrBar        = document.getElementById('mgr-actions');
+        const vehicleSelect = document.getElementById('vehicleSelect');
+        const btnDispatch   = document.getElementById('btnDispatch');
+        const btnApprove    = document.getElementById('btnApprove');
+
         if(list.length === 0){
             box.innerHTML = '<div class="text-muted small">등록된 품목이 없습니다.</div>';
         }else{
             const tpl = document.getElementById('item-row-tpl');
+            // 아이템 중 vehicleId 있는 게 하나라도 있으면 배차된 걸로 본다
+            let hasVehicleInItems = false;
+
             list.forEach(it=>{
+                if (it.vehicleId) {
+                    hasVehicleInItems = true;
+                }
+
                 const node = tpl.content.cloneNode(true);
                 node.querySelector('[data-field="cfName"]').textContent      = it.cfName ?? '-';
                 node.querySelector('[data-field="cfId"]').textContent        = it.cfId ?? '-';
@@ -223,8 +244,35 @@
                 node.querySelector('[data-field="vehicleId"]').textContent   = it.vehicleId ?? '-';
                 box.appendChild(node);
             });
+
+            // DB에 이미 배차 정보가 있으면 플래그 켜줌(페이지 새로 열 때도 반영)
+            if (hasVehicleInItems) {
+                hasDispatched = true;
+            }
         }
         show(wrap); show(sep);
+
+        // === 출고 승인 / 배차 버튼 노출 제어 ===
+        // PENDING 상태에서
+        if (currentStatusCode === 'PENDING') {
+            show(mgrBar); // 액션 바 자체는 보여준다
+
+            if (hasDispatched) {
+                // 배차 완료된 이후: 출고 승인만 보이게
+                hide(vehicleSelect);
+                hide(btnDispatch);
+                show(btnApprove);
+            } else {
+                // 배차 전: 배차 등록만 보이고 출고 승인은 숨김
+                show(vehicleSelect);
+                show(btnDispatch);
+                hide(btnApprove);
+            }
+        } else {
+            // PENDING 아니면 이 JSP에서 출고 승인, 배차 둘 다 숨김
+            hide(btnDispatch);
+            hide(btnApprove);
+        }
     }
 
     // 공통 API 래퍼
@@ -237,7 +285,7 @@
         return (r.data && (r.data.message || r.data)) || '처리되었습니다.';
     }
 
-    // 에러 표시 (HTML 에러 페이지는 깔끔하게 처리)
+    // 에러 표시
     function showError(e){
         const box = document.getElementById('error');
         let msg = '요청 중 오류가 발생했습니다.';
@@ -269,6 +317,10 @@
             }
             const msg = await post(apiBase + '/dispatch?vehicleId=' + encodeURIComponent(v));
             alert(msg);
+
+            // 배차 등록 성공 플래그
+            hasDispatched = true;
+
             await loadDetail();
         }catch(e){ showError(e); }
     }
@@ -326,5 +378,7 @@
         loadDetail();
     });
 </script>
+
+
 
 <%@ include file="/WEB-INF/views/includes/_footer.jsp" %>
