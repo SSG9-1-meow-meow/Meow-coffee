@@ -154,227 +154,259 @@
             }
         });
 
-        (async function loadDashboard() {
-            try {
-                // 지출 (만원)
-                const expTotal = await axios.get('/charts/expense/month-total');
-                document.getElementById('expenseTotal').textContent = fmtKRWMan(expTotal.data);
-                const expPending = await axios.get('/charts/expense/pending-count');
-                document.getElementById('expensePending').textContent = expPending.data;
+        // 컨텍스트 루트 (예: /meow-coffee)
+        const ctxPath = '${pageContext.request.contextPath}';
 
-                // 청구 (만원)
-                const inv = (await axios.get('/charts/invoice/kpis')).data;
-                document.getElementById('invoiceTotal').textContent = fmtKRWMan(inv.monthInvoiceTotal);
-                document.getElementById('paidRate').textContent = inv.paidRatePct + '%';
-                document.getElementById('issuingCount').textContent = inv.issuingCount;
-                document.getElementById('unpaidCount').textContent = inv.unpaidCount;
+        document.addEventListener('DOMContentLoaded', function () {
+            (async function loadDashboard() {
+                try {
+                    // 지출 (만원)
+                    const expTotal = await axios.get(ctxPath + '/charts/expense/month-total');
+                    document.getElementById('expenseTotal').textContent = fmtKRWMan(expTotal.data);
+                    const expPending = await axios.get(ctxPath + '/charts/expense/pending-count');
+                    document.getElementById('expensePending').textContent = expPending.data;
 
-                // 순이익 (만원)
-                const profit = await axios.get('/charts/net-profit');
-                document.getElementById('netProfit').textContent = fmtKRWMan(profit.data);
+                    // 청구 (만원)
+                    const inv = (await axios.get(ctxPath + '/charts/invoice/kpis')).data;
+                    document.getElementById('invoiceTotal').textContent = fmtKRWMan(inv.monthInvoiceTotal);
+                    document.getElementById('paidRate').textContent = inv.paidRatePct + '%';
+                    document.getElementById('issuingCount').textContent = inv.issuingCount;
+                    document.getElementById('unpaidCount').textContent = inv.unpaidCount;
 
-                // =========================
-                // 매출 라인 차트 (하늘색 + 영역)
-                // =========================
-                const revSeries = (await axios.get('/charts/revenue/monthly-series')).data;
-                new Chart(document.getElementById('revenueLineChart'), {
-                    type: 'line',
-                    data: {
-                        labels: revSeries.map(r => r.ym),
-                        datasets: [{
-                            label: '매출액(만원)',
-                            data: revSeries.map(r => Math.floor((r.total || 0) / 10000)),
-                            tension: 0.3,
-                            fill: true,
-                            borderColor: 'rgba(135, 206, 250, 1)',      // 하늘색 라인
-                            backgroundColor: 'rgba(135, 206, 250, 0.3)',// 하늘색 영역
-                            pointBackgroundColor: 'rgba(135, 206, 250, 1)',
-                            pointBorderColor: 'rgba(135, 206, 250, 1)'
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: Object.assign(
-                                {},
-                                yAxisTitle('금액(만원)'),
-                                tickSuffix('만원')
-                            )
-                        },
-                        plugins: Object.assign(
-                            {legend: {display: true, onClick: null}},
-                            tooltipSuffix('만원').plugins
-                        )
-                    }
-                });
+                    // 순이익 (만원)
+                    const profit = await axios.get(ctxPath + '/charts/net-profit');
+                    document.getElementById('netProfit').textContent = fmtKRWMan(profit.data);
 
-                // 입출고 일별 현황 (입고=파랑, 출고=빨강)
-                const inList = (await axios.get('/charts/in/daily-qty-30d')).data;
-                const outList = (await axios.get('/charts/out/daily-qty-30d')).data;
-                new Chart(document.getElementById('inoutDailyChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: inList.map(d => d.chartKey),
-                        datasets: [
-                            {
-                                label: '입고(건)',
-                                data: inList.map(d => d.totalQuantity),
-                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
+                    // =========================
+                    // 매출 라인 차트 (하늘색 + 영역)
+                    // =========================
+                    const revSeries = (await axios.get(ctxPath + '/charts/revenue/monthly-series')).data;
+                    const revenueCanvas = document.getElementById('revenueLineChart');
+                    if (revenueCanvas) {
+                        new Chart(revenueCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: revSeries.map(r => r.ym),
+                                datasets: [{
+                                    label: '매출액(만원)',
+                                    data: revSeries.map(r => Math.floor((r.total || 0) / 10000)),
+                                    tension: 0.3,
+                                    fill: true,
+                                    borderColor: 'rgba(135, 206, 250, 1)',      // 하늘색 라인
+                                    backgroundColor: 'rgba(135, 206, 250, 0.3)',// 하늘색 영역
+                                    pointBackgroundColor: 'rgba(135, 206, 250, 1)',
+                                    pointBorderColor: 'rgba(135, 206, 250, 1)'
+                                }]
                             },
-                            {
-                                label: '출고(건)',
-                                data: outList.map(d => d.totalQuantity),
-                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
+                            options: {
+                                scales: {
+                                    y: Object.assign(
+                                        {},
+                                        yAxisTitle('금액(만원)'),
+                                        tickSuffix('만원')
+                                    )
+                                },
+                                plugins: Object.assign(
+                                    {legend: {display: true, onClick: null}},
+                                    tooltipSuffix('만원').plugins
+                                )
                             }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: Object.assign(
-                                {},
-                                yAxisTitle('수량(건)'),
-                                tickSuffix('건')
-                            )
-                        },
-                        plugins: Object.assign(
-                            {legend: {display: true, onClick: null}},
-                            tooltipSuffix('건').plugins
-                        )
+                        });
                     }
-                });
 
-                // 창고 사용량 도넛 (사용=초록, 미사용=노랑)
-                const wh = (await axios.get('/charts/warehouse-utilization')).data;
-                document.getElementById('whUsagePct').textContent = wh.usageRatePct + '%';
-                new Chart(document.getElementById('whDonut'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['사용', '미사용'],
-                        datasets: [{
-                            label: '용량',
-                            data: [wh.usedCapa, wh.unusedCapa],
-                            backgroundColor: ['#1cc88a', '#f6c23e'],
-                            borderColor: ['#1cc88a', '#f6c23e'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        radius: '90%',
-                        cutout: '70%',
-                        plugins: {
-                            legend: {display: true, position: 'top', onClick: null},
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ctx.label + ': ' + fmtNum(ctx.raw)
-                                }
-                            }
-                        }
-                    }
-                });
-
-                // 평균 리드타임 bar
-                const avgInRaw = (await axios.get('/charts/in/avg-leadtime-30d')).data;
-                const avgOutRaw = (await axios.get('/charts/out/avg-leadtime-30d')).data;
-                const avgIn = safe(avgInRaw);
-                const avgOut = safe(avgOutRaw);
-
-                new Chart(document.getElementById('avgLeadChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['입고', '출고'],
-                        datasets: [
-                            {
-                                label: '입고(시간)',
-                                data: [avgIn, 0],
-                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
+                    // 입출고 일별 현황 (입고=파랑, 출고=빨강)
+                    const inList = (await axios.get(ctxPath + '/charts/in/daily-qty-30d')).data;
+                    const outList = (await axios.get(ctxPath + '/charts/out/daily-qty-30d')).data;
+                    const inoutCanvas = document.getElementById('inoutDailyChart');
+                    if (inoutCanvas) {
+                        new Chart(inoutCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: inList.map(d => d.chartKey),
+                                datasets: [
+                                    {
+                                        label: '입고(건)',
+                                        data: inList.map(d => d.totalQuantity),
+                                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: '출고(건)',
+                                        data: outList.map(d => d.totalQuantity),
+                                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    }
+                                ]
                             },
-                            {
-                                label: '출고(시간)',
-                                data: [0, avgOut],
-                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
+                            options: {
+                                scales: {
+                                    y: Object.assign(
+                                        {},
+                                        yAxisTitle('수량(건)'),
+                                        tickSuffix('건')
+                                    )
+                                },
+                                plugins: Object.assign(
+                                    {legend: {display: true, onClick: null}},
+                                    tooltipSuffix('건').plugins
+                                )
                             }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: Object.assign({}, yAxisTitle('시간(h)'), {
-                                min: 0,
-                                ticks: {
-                                    callback: v => v + 'h'
-                                }
-                            })
-                        },
-                        plugins: {
-                            legend: {display: true, onClick: null},
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ctx.dataset.label + ': ' + ctx.raw + 'h'
-                                }
-                            }
-                        }
+                        });
                     }
-                });
 
-                // 월별 리드타임 추이
-                const inSeries = (await axios.get('/charts/in/leadtime-monthly')).data;
-                const outSeries = (await axios.get('/charts/out/leadtime-monthly')).data;
-
-                new Chart(document.getElementById('leadtimeMonthlyChart'), {
-                    type: 'line',
-                    data: {
-                        labels: inSeries.map(r => r.ym),
-                        datasets: [
-                            {
-                                label: '입고(시간)',
-                                data: inSeries.map(r => safe(r.avg_hours)),
-                                tension: 0.3,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                fill: false
+                    // 창고 사용량 도넛 (사용=초록, 미사용=노랑)
+                    const wh = (await axios.get(ctxPath + '/charts/warehouse-utilization')).data;
+                    document.getElementById('whUsagePct').textContent = wh.usageRatePct + '%';
+                    const whCanvas = document.getElementById('whDonut');
+                    if (whCanvas) {
+                        new Chart(whCanvas, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['사용', '미사용'],
+                                datasets: [{
+                                    label: '용량',
+                                    data: [wh.usedCapa, wh.unusedCapa],
+                                    backgroundColor: ['#1cc88a', '#f6c23e'],
+                                    borderColor: ['#1cc88a', '#f6c23e'],
+                                    borderWidth: 1
+                                }]
                             },
-                            {
-                                label: '출고(시간)',
-                                data: outSeries.map(r => safe(r.avg_hours)),
-                                tension: 0.3,
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: Object.assign({}, yAxisTitle('시간(h)'), {
-                                min: 0,
-                                ticks: {
-                                    callback: v => v + 'h'
-                                }
-                            })
-                        },
-                        plugins: {
-                            legend: {display: true, onClick: null},
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ctx.dataset.label + ': ' + ctx.raw + 'h'
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                radius: '90%',
+                                cutout: '70%',
+                                plugins: {
+                                    legend: {display: true, position: 'top', onClick: null},
+                                    tooltip: {
+                                        callbacks: {
+                                            label: ctx => ctx.label + ': ' + fmtNum(ctx.raw)
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        });
                     }
-                });
 
-            } catch (err) {
-                console.error('대시보드 로드 실패:', err);
-            }
-        })();
+                    // 평균 리드타임 bar
+                    const avgInRaw = (await axios.get(ctxPath + '/charts/in/avg-leadtime-30d')).data;
+                    const avgOutRaw = (await axios.get(ctxPath + '/charts/out/avg-leadtime-30d')).data;
+                    const avgIn = safe(avgInRaw);
+                    const avgOut = safe(avgOutRaw);
+
+                    const avgLeadCanvas = document.getElementById('avgLeadChart');
+                    if (avgLeadCanvas) {
+                        new Chart(avgLeadCanvas, {
+                            type: 'bar',
+                            data: {
+                                // x축은 하나의 그룹만 사용
+                                labels: ['입출고'],
+                                datasets: [
+                                    {
+                                        label: '입고(시간)',
+                                        data: [avgIn],
+                                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1,
+                                        categoryPercentage: 0.5,
+                                        barPercentage: 0.4
+                                    },
+                                    {
+                                        label: '출고(시간)',
+                                        data: [avgOut],
+                                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1,
+                                        categoryPercentage: 0.5,
+                                        barPercentage: 0.4
+                                    }
+                                ]
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        type: 'category',
+                                        title: { display: false }
+                                    },
+                                    y: Object.assign({}, yAxisTitle('시간(h)'), {
+                                        min: 0,
+                                        ticks: {
+                                            callback: v => v + 'h'
+                                        }
+                                    })
+                                },
+                                plugins: {
+                                    legend: { display: true, onClick: null }, // 위 가운데에 입고/출고 두 개 범례
+                                    tooltip: {
+                                        callbacks: {
+                                            // "입고(시간): 162.4h" 이런 식으로
+                                            label: ctx => `${ctx.dataset.label}: ${ctx.raw}h`
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 월별 리드타임 추이
+                    const inSeries = (await axios.get(ctxPath + '/charts/in/leadtime-monthly')).data;
+                    const outSeries = (await axios.get(ctxPath + '/charts/out/leadtime-monthly')).data;
+
+                    const leadtimeCanvas = document.getElementById('leadtimeMonthlyChart');
+                    if (leadtimeCanvas) {
+                        new Chart(leadtimeCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: inSeries.map(r => r.ym),
+                                datasets: [
+                                    {
+                                        label: '입고(시간)',
+                                        // ✅ avg_hours → avgHours
+                                        data: inSeries.map(r => safe(r.avgHours)),
+                                        tension: 0.3,
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                        fill: false
+                                    },
+                                    {
+                                        label: '출고(시간)',
+                                        // ✅ avg_hours → avgHours
+                                        data: outSeries.map(r => safe(r.avgHours)),
+                                        tension: 0.3,
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        fill: false
+                                    }
+                                ]
+                            },
+                            options: {
+                                scales: {
+                                    y: Object.assign({}, yAxisTitle('시간(h)'), {
+                                        min: 0,
+                                        ticks: {
+                                            callback: v => v + 'h'
+                                        }
+                                    })
+                                },
+                                plugins: {
+                                    legend: {display: true, onClick: null},
+                                    tooltip: {
+                                        callbacks: {
+                                            label: ctx => ctx.dataset.label + ': ' + ctx.raw + 'h'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                } catch (err) {
+                    console.error('대시보드 로드 실패:', err);
+                }
+            })();
+        });
     </script>
 
     <%-- 푸터 포함 --%>

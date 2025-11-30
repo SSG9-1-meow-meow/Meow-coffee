@@ -1,13 +1,13 @@
 package com.ssg.meowcoffee.dto;
 
+import com.ssg.meowcoffee.domain.UserRole;
 import com.ssg.meowcoffee.domain.UserStatus;
 import com.ssg.meowcoffee.domain.UserVO;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,51 +15,38 @@ import java.util.Collection;
 import java.util.List;
 
 @Log4j2
-@Data
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails, Serializable {
+@Getter
+public class CustomUserDetails extends User implements Serializable {
 
-    private final UserVO userVO;
+    private UserRole userRole;
+    private UserStatus userStatus;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    private CustomUserDetails(UserVO userVO) {
+        super(userVO.getUserId(),
+                userVO.getUserPwd(),
+                userVO.getUserStatus() == UserStatus.APPROVAL,  // 로그인 가능 조건
+                true,                                                   // 계정 유효조건
+                true,                                                   // 비밀번호 유효기간
+                userVO.getUserStatus() == UserStatus.APPROVAL,          // 계정 활성화 조건
+                createAuthorities(userVO.getUserRole())
+        );
+        this.userRole = userVO.getUserRole();
+        this.userStatus = userVO.getUserStatus();
+    }
+
+    private static Collection<? extends GrantedAuthority> createAuthorities(UserRole userRole) {
         // 현재 로그인한 사용자가 보유한 권한을 반환
         List<GrantedAuthority> collection = new ArrayList<>();
-        collection.add(new SimpleGrantedAuthority("ROLE_" + userVO.getUserRole()));
+        collection.add(new SimpleGrantedAuthority("ROLE_" + userRole.getRoleName()));
         return collection;
     }
 
-    @Override
-    public String getPassword() {
-        // 현재 로그인한 사용자의 비밀번호를 반환
-        return userVO.getUserPwd();
+    public static CustomUserDetails from(UserVO userVO) {
+        return new CustomUserDetails(userVO);
     }
 
-    @Override
-    public String getUsername() {
-        // 현재 로그인한 사용자의 아이디를 반환
-        return userVO.getUserId();
-    }
-
-    // 계정 만료, 잠금, 자격 증명 만료 관련 조건을 설정하는 부분
-    @Override
-    public boolean isAccountNonExpired() {  // 만료되지 않은 계정
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() { // 자격 증명 유효조건
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        // 로그인 가능한 조건을 지정(승인 완료된 계정이어야만 로그인 가능)
-        return userVO.getUserStatus() == UserStatus.APPROVAL;
+    // 기존 코드 호환성 유지용 getter
+    public String getUserId() {
+        return super.getUsername();
     }
 }

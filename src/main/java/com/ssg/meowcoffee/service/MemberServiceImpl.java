@@ -1,8 +1,5 @@
 package com.ssg.meowcoffee.service;
 
-import com.ssg.meowcoffee.domain.CompanyVO;
-import com.ssg.meowcoffee.domain.DeliverymanVO;
-import com.ssg.meowcoffee.domain.ManagerVO;
 import com.ssg.meowcoffee.domain.UserVO;
 import com.ssg.meowcoffee.dto.*;
 import com.ssg.meowcoffee.mapper.MemberMapper;
@@ -45,27 +42,6 @@ public class MemberServiceImpl implements MemberService {
         UserVO userVO = memberMapper.selectUserById(userId);
         UserDetailDTO userDetail = modelMapper.map(userVO, UserDetailDTO.class);
         return userDetail;
-    }
-
-    @Override
-    public ManagerDetailDTO getManagerById(String userId) {
-        ManagerVO managerVO = memberMapper.selectManagerById(userId);
-        ManagerDetailDTO managerDetail = modelMapper.map(managerVO, ManagerDetailDTO.class);
-        return managerDetail;
-    }
-
-    @Override
-    public CompanyDetailDTO getCompanyById(String userId) {
-        CompanyVO companyVO = memberMapper.selectCompanyById(userId);
-        CompanyDetailDTO companyDetail = modelMapper.map(companyVO, CompanyDetailDTO.class);
-        return companyDetail;
-    }
-
-    @Override
-    public DeliverymanDTO getDeliverymenById(String userId) {
-        DeliverymanVO deliverymanVO = memberMapper.selectDeliverymenById(userId);
-        DeliverymanDTO deliverymanDTO = modelMapper.map(deliverymanVO, DeliverymanDTO.class);
-        return deliverymanDTO;
     }
 
     @Override

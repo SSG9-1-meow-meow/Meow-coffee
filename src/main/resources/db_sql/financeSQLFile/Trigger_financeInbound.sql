@@ -19,7 +19,7 @@ BEGIN
     DECLARE whId BIGINT;
     DECLARE userId VARCHAR(30);
 
-    IF NEW.status = '승인완료' AND (OLD.status IS NULL OR OLD.status <> '승인완료') THEN
+    IF NEW.status = '입고완료' AND (OLD.status IS NULL OR OLD.status <> '입고완료') THEN
         -- 소요시간(시간단위). 초→시간
         SET hours =
                 CASE
@@ -69,3 +69,11 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+SELECT * FROM inboundItems;
+
+UPDATE inboundItems SET status='입고완료', inQty=50, inDttmInsp='2025-11-08 10:00:00', inDttmRecv='2025-11-09 10:00:00' WHERE inReqId = 1 OR inReqId = 2 OR inReqId = 3;
+
+SELECT * FROM inboundCost;
+
+ SELECT * FROM expense;

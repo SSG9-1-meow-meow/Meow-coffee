@@ -1,6 +1,7 @@
 package com.ssg.meowcoffee.mapper;
 
 import com.ssg.meowcoffee.dto.InOutChartDTO;
+import com.ssg.meowcoffee.service.ChartService;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,5 +80,16 @@ public class ChartTests {
         List<Map<String, Object>> outSeries = chartMapper.selectOutboundLeadTimeMonthlySeries();
         log.info("입고 월별 리드타임: " + inSeries);
         log.info("출고 월별 리드타임: " + outSeries);
+    }
+
+    @Autowired
+    ChartService chartService;
+
+    @Test
+    void testSelectMonthlyLeadTimeSeries2() {
+        List<Map<String, Object>> inSeries = chartMapper.selectInboundLeadTimeMonthlySeries();
+        List<Map<String, Object>> outSeries = chartMapper.selectOutboundLeadTimeMonthlySeries();
+        log.info(inSeries);
+        log.info(outSeries);
     }
 }

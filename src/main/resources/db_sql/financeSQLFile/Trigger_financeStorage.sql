@@ -69,3 +69,10 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+SELECT * FROM due_diligence;
+
+UPDATE due_diligence SET ddApproval = 'APPROVED' WHERE ddid = 2;
+
+SELECT * FROM expense ORDER BY expenseId DESC;
+

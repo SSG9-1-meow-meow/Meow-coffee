@@ -11,20 +11,22 @@
        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!--    로컬에서 작업하는 경우 -->
-    <!--    <context:property-placeholder location="classpath:db-local.properties"/>-->
+        <context:property-placeholder location="classpath:db-local.properties"/>
 
     <!--    원격에서 작업하는 경우 -->
-    <context:property-placeholder location="classpath:db-railway.properties"/>
+<!--    <context:property-placeholder location="classpath:db-railway.properties"/>-->
 
 
     <!-- 설정이란 측면에서, security-context는 root context의 일부 -->
     <import resource="security-context.xml"/>
 
     <!--  루트 컨텍스트에서는 웹 애플리케이션에서 공통으로 사용되는 서비스, mapper에 관한 스캔만 수행하고, -->
-    <!--  루트 컨텍스트의 자식 컨텍스트인 서블릿 컨텍스트(servlet-context)에서만 컨트롤러를 빈으로 등록하는 작업을 수행하도록 두 컨텍스트룰 분리 -->
-    <!--  (실행의 관점에서는 root-context와 servlet-context 사이에서 security-context가 실행될 수 있어야 함.)-->
+    <!--  컨트롤러는 루트 컨텍스트의 자식 컨텍스트인 서블릿 컨텍스트(servlet-context)에서만 빈으로 등록하도록 역할 분리 -->
     <context:component-scan base-package="com.ssg.meowcoffee">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <!--  단, 로그인한 사용자를 인증할 때 사용할 CustomUserDetailsService 객체는 security-context.xml 파일에서 빈으로 등록 -->
+        <!--  (이로 인해 root-context.xml 파일 내부에서 중복해서 빈으로 등록되는 것을 방지한다. - 스프링 빈은 싱글톤)      -->
+        <context:exclude-filter type="assignable" expression="com.ssg.meowcoffee.service.CustomUserDetailsService"/>
     </context:component-scan>
 
     <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">

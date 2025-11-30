@@ -174,7 +174,7 @@
 
             // 서버로 보낼 데이터 객체
             const requestData = {
-                _comId: 'coffeebiz01', // TODO: 실제 로그인한 사용자 ID로 변경해야 함
+                _comId: '', // 컨트롤러단에서 스프링 시큐리티 적용된 아이디로 처리
                 _inDateWish: inDateWish,
                 _inItemsJson: JSON.stringify(items), // items or JSON.stringify(items) <= 문자열 안에 또 json이 있는 형태임.
                 _isTempo: isTempo
