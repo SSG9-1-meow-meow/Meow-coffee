@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/WEB-INF/views/includes/_header.jsp" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 
 <!-- 메인 컨텐츠 시작 -->
 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
@@ -7,9 +10,11 @@
     <h3 class="fw-bold mb-3">출고 관리 목록</h3>
   </div>
   <div class="ms-md-auto mt-2 mt-md-0">
-    <a href="${pageContext.request.contextPath}/outbounds/req" class="btn btn-primary">
-      <i class="fa fa-plus"></i> 신규 출고 요청
-    </a>
+    <c:if test="${sessionRole eq 'COMPANY'}">
+      <a href="${pageContext.request.contextPath}/outbounds/req" class="btn btn-primary">
+        <i class="fa fa-plus"></i> 신규 출고 요청
+      </a>
+    </c:if>
   </div>
 </div>
 
@@ -104,6 +109,9 @@
 <!-- 메인 컨텐츠 종료 -->
 
 <script>
+  var sessionRole   = '${sessionRole}';
+  var sessionUserId = '${sessionUserId}';
+
   var ctx = '${pageContext.request.contextPath}';
   var apiUrl = ctx + '/outbounds/api';
 
@@ -153,6 +161,15 @@
 
     for (var i=0; i<list.length; i++){
       var item = list[i];
+
+      // 🔸 거래처는 자기 출고건만 보이게 필터링
+      if (sessionRole === 'COMPANY') {
+        // 백엔드에서 내려주는 필드명에 맞춰서 comId 사용
+        if (item.comId !== sessionUserId) {
+          continue;   // 내 게 아니면 건너뛰기
+        }
+      }
+
       var id    = item.outReqId;
       var com   = (item.comName ? item.comName : (item.comId ? item.comId : '-'));
       var wish  = toKDate(item.outDateWish, false);

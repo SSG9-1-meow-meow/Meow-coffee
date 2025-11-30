@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ include file="/WEB-INF/views/includes/_header.jsp" %>
 
+
 <c:set var="outReqId" value="${outReqId}" />
 <c:set var="sessionUserId" value="${sessionUserId}" />
 <c:set var="sessionRole" value="${sessionRole}" />
@@ -169,10 +170,9 @@
     function hide(el){ el.classList.add('d-none'); }
     function text(el, v){ el.textContent = (v ?? '-') + ''; }
 
-    // 헤더 렌더
     function renderHeader(h){
         const code = (h.status || 'PENDING').toUpperCase();
-        currentStatusCode = code;   // 상태 저장
+        currentStatusCode = code;   // ★ 현재 상태 저장 (추가)
 
         const badge = document.getElementById('status-badge');
         badge.className = 'badge ' + statusBadgeClass(code);
@@ -189,17 +189,28 @@
         const mgrBar  = document.getElementById('mgr-actions');
         const btnRecv = document.getElementById('btnReceived');
 
-        if (code === 'PENDING'){
-            show(mgrBar);
-            hide(btnRecv);
-        } else if (code === 'APPROVED'){
-            hide(mgrBar);
-            show(btnRecv);
+        // ★ 역할별로 버튼 보이게/숨기게
+        const role = (sessionRole || '').toUpperCase();
+
+        if (role === 'MANAGER' || role === 'ADMIN') {
+            if (code === 'PENDING'){
+                show(mgrBar);
+                hide(btnRecv);
+            } else if (code === 'APPROVED'){
+                hide(mgrBar);
+                show(btnRecv);
+            } else {
+                hide(mgrBar);
+                hide(btnRecv);
+            }
+
         } else {
+            // COMPANY 등은 조회만
             hide(mgrBar);
             hide(btnRecv);
         }
     }
+
 
     // 아이템 렌더
     function renderItems(items){
@@ -219,7 +230,6 @@
             box.innerHTML = '<div class="text-muted small">등록된 품목이 없습니다.</div>';
         }else{
             const tpl = document.getElementById('item-row-tpl');
-            // 아이템 중 vehicleId 있는 게 하나라도 있으면 배차된 걸로 본다
             let hasVehicleInItems = false;
 
             list.forEach(it=>{
@@ -245,35 +255,47 @@
                 box.appendChild(node);
             });
 
-            // DB에 이미 배차 정보가 있으면 플래그 켜줌(페이지 새로 열 때도 반영)
             if (hasVehicleInItems) {
                 hasDispatched = true;
             }
         }
         show(wrap); show(sep);
 
-        // === 출고 승인 / 배차 버튼 노출 제어 ===
-        // PENDING 상태에서
+        // ★ 여기부터 버튼 제어 로직 ★
+
+        const role = (sessionRole || '').toUpperCase();
+
+        // 1) 거래처/다른 역할은 전부 조회만 가능 → 버튼 전부 숨김
+        if (role !== 'MANAGER' && role !== 'ADMIN') {
+            hide(mgrBar);
+            hide(btnDispatch);
+            hide(btnApprove);
+            // btnReceived는 renderHeader에서 이미 숨겼으므로 건드릴 필요 없음
+            return;
+        }
+
+        // 2) 관리자 / 창고관리자만 아래 로직 실행
         if (currentStatusCode === 'PENDING') {
-            show(mgrBar); // 액션 바 자체는 보여준다
+            show(mgrBar); // 액션바 자체는 보여준다
 
             if (hasDispatched) {
-                // 배차 완료된 이후: 출고 승인만 보이게
+                // 배차 완료 이후 → 출고 승인 버튼만
                 hide(vehicleSelect);
                 hide(btnDispatch);
                 show(btnApprove);
             } else {
-                // 배차 전: 배차 등록만 보이고 출고 승인은 숨김
+                // 배차 전 → 차량 선택 + 배차 등록 버튼만
                 show(vehicleSelect);
                 show(btnDispatch);
                 hide(btnApprove);
             }
         } else {
-            // PENDING 아니면 이 JSP에서 출고 승인, 배차 둘 다 숨김
+            // PENDING이 아니면 배차/승인 둘 다 숨김
             hide(btnDispatch);
             hide(btnApprove);
         }
     }
+
 
     // 공통 API 래퍼
     async function get(url){
@@ -328,19 +350,17 @@
     // 출고 승인
     async function actionApprove(){
         try{
-            let mid = (sessionUserId || '').trim();
-            if(!mid){
-                mid = prompt('승인 관리자 ID를 입력하세요:') || '';
-            }
-            if(!mid) return;
-
-            const msg = await post(apiBase + ':approve?managerId=' + encodeURIComponent(mid));
+            // ★ 더 이상 관리자 ID를 입력받지 않음.
+            //   서버에서 로그인한 사용자 ID를 사용해서 승인 처리.
+            const msg = await post(apiBase + ':approve');
             alert(msg);
             window.location.href = ctx + '/outbounds';
         }catch(e){
             showError(e);
         }
     }
+
+
 
     // 출고 완료 처리
     async function actionReceived(){
