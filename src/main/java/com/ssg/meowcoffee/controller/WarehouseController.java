@@ -38,9 +38,9 @@ public class WarehouseController {
     @GetMapping("/api/warehouses/search")
     public ResponseEntity<Map<String, Object>> readWarehouseSearchList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         //일반관리자, 총관리자만 접근 가능
-        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        UserRole role = customUserDetails.getUserRole();
 
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_MANAGER")){
+        if(role != UserRole.ADMIN && role != UserRole.MANAGER){
             //권한 없음
             return ResponseEntity.ok(null);
         }
@@ -147,9 +147,9 @@ public class WarehouseController {
     @PostMapping("/api/warehouse")
     public ResponseEntity<Integer> createWarehouse(@Valid @RequestBody WarehouseDTO warehouse, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         //총관리자 인지 권한 확인 필수
-        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        UserRole role = customUserDetails.getUserRole();
 
-        if(!role.equals("ADMIN")) return ResponseEntity.ok(-1);
+        if(role != UserRole.ADMIN) return ResponseEntity.ok(-1);
 
         Integer result = warehouseService.registerWarehouse(warehouse);
 
@@ -160,9 +160,9 @@ public class WarehouseController {
     @PutMapping("/api/warehouses/{whCode}/update")
     public ResponseEntity<Integer> updateWarehouse(@PathVariable("whCode") String whCode, @RequestBody WarehouseUpdateDTO warehouse
     , @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        UserRole role = customUserDetails.getUserRole();
 
-        if(!role.equals("ADMIN")) return ResponseEntity.ok(-1);
+        if(role != UserRole.ADMIN) return ResponseEntity.ok(-1);
 
         warehouse.setWhCode(whCode);
 
