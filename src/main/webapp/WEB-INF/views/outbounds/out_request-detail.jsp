@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ include file="/WEB-INF/views/includes/_header.jsp" %>
 
+
 <c:set var="outReqId" value="${outReqId}" />
 <c:set var="sessionUserId" value="${sessionUserId}" />
 <c:set var="sessionRole" value="${sessionRole}" />
@@ -87,7 +88,8 @@
                             </c:forEach>
                         </select>
                         <button type="button" class="btn btn-outline-primary btn-sm" id="btnDispatch">배차 등록</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="btnApprove">출고 승인</button>
+                        <!-- 기본은 숨김: 배차 완료되면 JS에서 보여줌 -->
+                        <button type="button" class="btn btn-primary btn-sm d-none" id="btnApprove">출고 승인</button>
                     </div>
 
                     <!-- 우측: 출고완료/새로고침 -->
@@ -132,6 +134,11 @@
     const sessionUserId = '<c:out value="${sessionUserId}" default=""/>';
     const apiBase       = ctx + '/outbounds/api/' + encodeURIComponent(outReqId);
 
+    // 현재 요청 상태(PENDING/APPROVED/SHIPPED/REJECTED)
+    let currentStatusCode = null;
+    // 이 페이지에서 배차 등록이 한번이라도 성공했는지 여부
+    let hasDispatched = false;
+
     // 날짜 도우미
     function toKDate(value, withTime){
         if (value == null || value === '') return '-';
@@ -163,9 +170,10 @@
     function hide(el){ el.classList.add('d-none'); }
     function text(el, v){ el.textContent = (v ?? '-') + ''; }
 
-    // 헤더 렌더
     function renderHeader(h){
         const code = (h.status || 'PENDING').toUpperCase();
+        currentStatusCode = code;   // ★ 현재 상태 저장 (추가)
+
         const badge = document.getElementById('status-badge');
         badge.className = 'badge ' + statusBadgeClass(code);
         badge.textContent = h.statusValue || (code==='PENDING'?'승인대기':code);
@@ -181,17 +189,28 @@
         const mgrBar  = document.getElementById('mgr-actions');
         const btnRecv = document.getElementById('btnReceived');
 
-        if (code === 'PENDING'){
-            show(mgrBar);
-            hide(btnRecv);
-        } else if (code === 'APPROVED'){
-            hide(mgrBar);
-            show(btnRecv);
+        // ★ 역할별로 버튼 보이게/숨기게
+        const role = (sessionRole || '').toUpperCase();
+
+        if (role === 'MANAGER' || role === 'ADMIN') {
+            if (code === 'PENDING'){
+                show(mgrBar);
+                hide(btnRecv);
+            } else if (code === 'APPROVED'){
+                hide(mgrBar);
+                show(btnRecv);
+            } else {
+                hide(mgrBar);
+                hide(btnRecv);
+            }
+
         } else {
+            // COMPANY 등은 조회만
             hide(mgrBar);
             hide(btnRecv);
         }
     }
+
 
     // 아이템 렌더
     function renderItems(items){
@@ -201,11 +220,23 @@
         const box  = document.getElementById('items-container');
         box.innerHTML = '';
 
+        // 액션바 관련 요소
+        const mgrBar        = document.getElementById('mgr-actions');
+        const vehicleSelect = document.getElementById('vehicleSelect');
+        const btnDispatch   = document.getElementById('btnDispatch');
+        const btnApprove    = document.getElementById('btnApprove');
+
         if(list.length === 0){
             box.innerHTML = '<div class="text-muted small">등록된 품목이 없습니다.</div>';
         }else{
             const tpl = document.getElementById('item-row-tpl');
+            let hasVehicleInItems = false;
+
             list.forEach(it=>{
+                if (it.vehicleId) {
+                    hasVehicleInItems = true;
+                }
+
                 const node = tpl.content.cloneNode(true);
                 node.querySelector('[data-field="cfName"]').textContent      = it.cfName ?? '-';
                 node.querySelector('[data-field="cfId"]').textContent        = it.cfId ?? '-';
@@ -223,9 +254,48 @@
                 node.querySelector('[data-field="vehicleId"]').textContent   = it.vehicleId ?? '-';
                 box.appendChild(node);
             });
+
+            if (hasVehicleInItems) {
+                hasDispatched = true;
+            }
         }
         show(wrap); show(sep);
+
+        // ★ 여기부터 버튼 제어 로직 ★
+
+        const role = (sessionRole || '').toUpperCase();
+
+        // 1) 거래처/다른 역할은 전부 조회만 가능 → 버튼 전부 숨김
+        if (role !== 'MANAGER' && role !== 'ADMIN') {
+            hide(mgrBar);
+            hide(btnDispatch);
+            hide(btnApprove);
+            // btnReceived는 renderHeader에서 이미 숨겼으므로 건드릴 필요 없음
+            return;
+        }
+
+        // 2) 관리자 / 창고관리자만 아래 로직 실행
+        if (currentStatusCode === 'PENDING') {
+            show(mgrBar); // 액션바 자체는 보여준다
+
+            if (hasDispatched) {
+                // 배차 완료 이후 → 출고 승인 버튼만
+                hide(vehicleSelect);
+                hide(btnDispatch);
+                show(btnApprove);
+            } else {
+                // 배차 전 → 차량 선택 + 배차 등록 버튼만
+                show(vehicleSelect);
+                show(btnDispatch);
+                hide(btnApprove);
+            }
+        } else {
+            // PENDING이 아니면 배차/승인 둘 다 숨김
+            hide(btnDispatch);
+            hide(btnApprove);
+        }
     }
+
 
     // 공통 API 래퍼
     async function get(url){
@@ -237,7 +307,7 @@
         return (r.data && (r.data.message || r.data)) || '처리되었습니다.';
     }
 
-    // 에러 표시 (HTML 에러 페이지는 깔끔하게 처리)
+    // 에러 표시
     function showError(e){
         const box = document.getElementById('error');
         let msg = '요청 중 오류가 발생했습니다.';
@@ -269,6 +339,10 @@
             }
             const msg = await post(apiBase + '/dispatch?vehicleId=' + encodeURIComponent(v));
             alert(msg);
+
+            // 배차 등록 성공 플래그
+            hasDispatched = true;
+
             await loadDetail();
         }catch(e){ showError(e); }
     }
@@ -276,19 +350,17 @@
     // 출고 승인
     async function actionApprove(){
         try{
-            let mid = (sessionUserId || '').trim();
-            if(!mid){
-                mid = prompt('승인 관리자 ID를 입력하세요:') || '';
-            }
-            if(!mid) return;
-
-            const msg = await post(apiBase + ':approve?managerId=' + encodeURIComponent(mid));
+            // ★ 더 이상 관리자 ID를 입력받지 않음.
+            //   서버에서 로그인한 사용자 ID를 사용해서 승인 처리.
+            const msg = await post(apiBase + ':approve');
             alert(msg);
             window.location.href = ctx + '/outbounds';
         }catch(e){
             showError(e);
         }
     }
+
+
 
     // 출고 완료 처리
     async function actionReceived(){
@@ -326,5 +398,7 @@
         loadDetail();
     });
 </script>
+
+
 
 <%@ include file="/WEB-INF/views/includes/_footer.jsp" %>
